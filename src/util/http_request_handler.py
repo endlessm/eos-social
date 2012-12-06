@@ -3,25 +3,21 @@ import sys
 import urlparse
 import urllib
 import urllib2
+#from facebook import get_access_token_from_code, GraphAPIError
 
 class FBHTTPRequestHandler(BaseHTTPRequestHandler):
     
     def __init__(self, presenter, *args):
-        print '*args:', args
-        for arg in args:
-            print arg
         self._presenter = presenter
         BaseHTTPRequestHandler.__init__(self, *args)
 
     def do_GET(self):
-        print 'Handling GET request...'
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.end_headers()
 
         code = urlparse.parse_qs(urlparse.urlparse(self.path).query).get('code')
         code = code[0] if code else None
-        print 'CODE:', code
         if code is None:
             self.wfile.write("Sorry, authentication failed.")
             self._presenter.close_fb_auth_view()
@@ -31,7 +27,6 @@ class FBHTTPRequestHandler(BaseHTTPRequestHandler):
                                                'client_secret':self._presenter._app_secret,
                                                'code':code})
         self._presenter._fb_access_token = urlparse.parse_qs(response)['access_token'][0]
-        print 'TOKEN:', self._presenter._fb_access_token
         open(self._presenter._model.LOCAL_FACEBOOK_FILE,'w').write(self._presenter._fb_access_token)
         self.wfile.write("You have successfully logged in to facebook. "
                          "You can close this window now.")
@@ -45,7 +40,6 @@ class FBHTTPRequestHandler(BaseHTTPRequestHandler):
             endpoint = "https://"+self._presenter._fb_graph_url
         else:
             endpoint = "http://"+self._presenter._fb_graph_url
-        print "BAD URI!!!", endpoint+path+'?'+urllib.urlencode(args)
         return endpoint+path+'?'+urllib.urlencode(args)
 
     def get(self, path, args=None):

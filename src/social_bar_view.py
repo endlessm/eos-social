@@ -1,6 +1,6 @@
 import gtk
 import gobject
-from fb_auth_view import FBAuthView
+from facebook.fb_auth_view import FBAuthView
 
 #gtk.gdk.threads_init()
 

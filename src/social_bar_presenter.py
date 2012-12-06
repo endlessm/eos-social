@@ -14,6 +14,8 @@ from facebook.facebook_posts import FacebookPosts
 class SocialBarPresenter:
     
     def __init__(self, view=None, model=None):
+        self._view = view
+        self._model = model
         # -- DEV --
         self._app_id = '393860344022808'
         self._app_secret = 'eb0dcb05f7512be39f7a3826ce99dfcd'
@@ -22,7 +24,6 @@ class SocialBarPresenter:
 #        self._app_secret = ''
         self._fb_graph_url = 'graph.facebook.com'
         self._webserver_url = 'http://localhost:8080/'
-        self._model = SocialBarModel()
         self._fb_access_token = self._model.get_stored_fb_access_token()
         if self._fb_access_token:
             self._graph_api = GraphAPI(access_token=self._fb_access_token)
@@ -38,6 +39,12 @@ class SocialBarPresenter:
 #        self.fb_auth_box.open('http://google.com')
 #        self.fb_auth_box.web_view.show()
 #        self.fb_auth_box.show_all()
+
+    def get_view(self):
+        return self._view
+
+    def get_model(self):
+        return self._model
         
     def get_fb_news_feed(self, callback):
         if self._fb_access_token:

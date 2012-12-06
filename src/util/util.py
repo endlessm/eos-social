@@ -1,3 +1,4 @@
+import urllib
 import urllib2
 import json
 
@@ -8,3 +9,12 @@ def get_data(url):
         return json.loads(data)
     except:
         return None
+
+def fb_auth_url(app_id, redirect_url, permissions=None):
+    parameters = {'client_id':app_id, 'redirect_uri':redirect_url}
+    if permissions:
+        parameters['scope'] = ','.join(permissions)
+    encoded_parameters = urllib.urlencode(parameters)
+    auth_url = 'http://graph.facebook.com/oauth/authorize?'
+    auth_url += encoded_parameters
+    return auth_url

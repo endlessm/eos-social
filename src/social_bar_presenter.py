@@ -1,13 +1,10 @@
-#from facebook.fb_auth_view import FBAuthView
 from social_bar_model import SocialBarModel
-#from social_bar_view import SocialBarView
 from util.http_request_handler import FBHTTPRequestHandler
-from util.util import get_data
-from facebook.facebook import GraphAPIError, GraphAPI, auth_url
+from util.social_bar_http_server import SocialBarHttpServer
+from util.util import get_data, fb_auth_url
+from facebook.facebook import GraphAPIError, GraphAPI
 import webbrowser
-import BaseHTTPServer
 import pprint
-#from facebook.facebook_post import FacebookPost
 from facebook.facebook_posts import FacebookPosts
 
 
@@ -28,16 +25,6 @@ class SocialBarPresenter:
             self._graph_api = GraphAPI(access_token=self._fb_access_token)
         else:
             self._graph_api = None
-#        self.fb_auth_box = FBAuthView()
-#        self._view = SocialBarView()
-#        self._view.main()
-#        self.fb_auth_box.open('http://google.com')
-#        self.fb_auth_box.show_all()
-    
-#    def show_it(self):
-#        self.fb_auth_box.open('http://google.com')
-#        self.fb_auth_box.web_view.show()
-#        self.fb_auth_box.show_all()
         
     def get_fb_news_feed(self, callback):
         if self._fb_access_token:
@@ -48,7 +35,8 @@ class SocialBarPresenter:
                 result = self._graph_api.request('/me/home')
             except GraphAPIError as error:
                 print error.result
-#                self._view.show_popup_notification('Message text.')
+                # Do I need to show login/auth automatically or just to inform a user?
+                # This decision obviously depends on error received!
                 return None
             
             if result:
@@ -64,55 +52,22 @@ class SocialBarPresenter:
 #        else:
 #            self._view.show_fb_auth_popup()
     
-#    def get_new_fb_posts(self, callback, url):
-#        if self._fb_access_token:
-#            if not self._graph_api:
-#                self._graph_api = GraphAPI(access_token=self._fb_access_token)
-#
-#            result = get_data(url)
-#            print result
-#            # @TODO: check for error
-#            if callback:
-#                callback(result)
             
                 
     
     def fb_login(self, callback=None):
-        url = auth_url(self._app_id, self._webserver_url, ['read_steam','publish_stream'])
-        print 'OAuth URL:', url
-        url = 'http://graph.facebook.com/oauth/authorize?scope=publish_actions,read_stream&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F&client_id=393860344022808'
-        #print 'ORIGINAL URL:', url
-        # initialize web server on port 8080
+        url = fb_auth_url(self._app_id, self._webserver_url, ['read_stream','publish_stream'])
+        # self._view.show_fb_auth_popup(url)
         webbrowser.open(url)
-        #print 'Launch localhost:8080'
-        webserver = BaseHTTPServer.HTTPServer(('localhost', 8080), self.http_handler)
-        
-        # attach a handler for http requests
-        # print 'Listen for access token on 8080'
-        while not self._fb_access_token:
-            webserver.handle_request()
-            
-        # construct url for facebook login/auth
-#        http://graph.facebook.com/oauth/authorize?scope=read_stream&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F&client_id=335071089906279
-        
-        ## webbrowser for now.
-#        webbrowser.open(url)
-        
-        # show popup with facebook login/auth page opened
-#        self._view._fb_auth_view.web_view.open(url)
-#        self._view._fb_auth_view.show_all()
-        
-#        self._view.close_fb_auth_popup()
+        webserver = SocialBarHttpServer(('localhost', 8080), self.http_handler)
+        webserver.serve_forever()
+
         if callback:
             callback()
-        
-        return
     
     def post_to_fb(self, text):
         print 'Post to Facebook.'
-        if self._fb_access_token:
-            if not self._graph_api:
-                self._graph_api = GraphAPI(access_token=self._fb_access_token)
+        self._graph_api = GraphAPI(access_token=self._fb_access_token)
         
         try:
             self._graph_api.put_wall_post(text)
@@ -123,9 +78,7 @@ class SocialBarPresenter:
     
     def post_fb_like(self, id):
         print 'Posting like to post with id', id
-        if self._fb_access_token:
-            if not self._graph_api:
-                self._graph_api = GraphAPI(access_token=self._fb_access_token)
+        self._graph_api = GraphAPI(access_token=self._fb_access_token)
         
         try:
             self._graph_api.put_like(id)
@@ -136,9 +89,7 @@ class SocialBarPresenter:
     
     def post_fb_comment(self, id, comment):
         print 'Posting comment (',comment,') to post with id', id
-        if self._fb_access_token:
-            if not self._graph_api:
-                self._graph_api = GraphAPI(access_token=self._fb_access_token)
+        self._graph_api = GraphAPI(access_token=self._fb_access_token)
         
         try:
             self._graph_api.put_comment(id, comment)
@@ -159,6 +110,8 @@ class SocialBarPresenter:
             # @TODO: check for error
             if callback:
                 callback(result)
+            else:
+                return result
     
     def show_fb_login(self):
         self._view.show_fb_auth_popup()
@@ -169,9 +122,14 @@ class SocialBarPresenter:
     
     def close_fb_auth_view(self):
         print 'Should close FB login dialogue.'
+#        self._view.close_fb_auth_popup()
     
     def http_handler(self, *args):
         FBHTTPRequestHandler(self, *args)
+    
+    def set_fb_access_token(self, token):
+        self._fb_access_token = token
+        self._model.save_fb_access_token(token)
     
     def print_posts(self, result):
         print 'FOUND', str(len(result.posts)), 'POSTS...'

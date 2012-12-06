@@ -6,7 +6,7 @@ from util.util import get_data
 from facebook.facebook import GraphAPIError, GraphAPI, auth_url
 import webbrowser
 import BaseHTTPServer
-#import pprint
+import pprint
 #from facebook.facebook_post import FacebookPost
 from facebook.facebook_posts import FacebookPosts
 
@@ -52,6 +52,7 @@ class SocialBarPresenter:
                 return None
             
             if result:
+                pprint.pprint(result)
                 result = FacebookPosts(result)
             
             if callback:
@@ -133,6 +134,19 @@ class SocialBarPresenter:
             print error.result
             return False
     
+    def post_fb_comment(self, id, comment):
+        print 'Posting comment (',comment,') to post with id', id
+        if self._fb_access_token:
+            if not self._graph_api:
+                self._graph_api = GraphAPI(access_token=self._fb_access_token)
+        
+        try:
+            self._graph_api.put_comment(id, comment)
+            return True
+        except GraphAPIError as error:
+            print error.result
+            return False
+        
     def get_new_fb_posts(self, callback, url):
         print 'Getting new facebook posts...'
         if self._fb_access_token:

@@ -5,6 +5,11 @@ class FacebookPost:
         self.id = data['id']
         self.poster = data['from']['name']
         self.poster_image = 'http://www.facebook.com/' + data['from']['id'] + '/picture'
+        self.image = ''
+        self.subject = ''
+        self.actions = {}
+        self.likes = {}
+        self.comments = {}
         
         if data.has_key('message'):
             text = data['message']
@@ -17,16 +22,21 @@ class FacebookPost:
         
         if data.has_key('name'):
             self.subject = data['name']
-        else:
-            self.subject = ''
         
         if data.has_key('picture'):
             self.image = data['picture']
-        else:
-            self.image = ''
         
         self.date_created = str(datetime.datetime.strptime(data['created_time'],'%Y-%m-%dT%H:%M:%S+0000'))
-        self.date_updated = str(datetime.datetime.strptime(data['updated_time'],'%Y-%m-%dT%H:%M:%S+0000'))        
+        self.date_updated = str(datetime.datetime.strptime(data['updated_time'],'%Y-%m-%dT%H:%M:%S+0000'))
+        
+        if data.has_key('actions'):
+            self.actions = data['actions']
+        
+        if data.has_key('likes'):
+            self.likes = data['likes']
+        
+        if data.has_key('comments'):
+            self.comments = data['comments']
     
     def __str__(self):
         rv =  'id      : ' + self.id + '\n'
@@ -37,6 +47,9 @@ class FacebookPost:
         rv += 'image   : ' + self.image + '\n'
         rv += 'created : ' + self.date_created + '\n'
         rv += 'updated : ' + self.date_updated + '\n'
+        rv += 'likes   : ' + unicode(self.likes) + '\n'
+        rv += 'comments: ' + unicode(self.comments) + '\n'
+        rv += 'actions : ' + unicode(self.actions) + '\n'
         rv += '-'*80
         return rv
 #    poster = 'ljuba'

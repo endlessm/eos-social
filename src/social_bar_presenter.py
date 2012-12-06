@@ -40,7 +40,7 @@ class SocialBarPresenter:
                 return None
             
             if result:
-                pprint.pprint(result)
+#                pprint.pprint(result)
                 result = FacebookPosts(result)
             
             if callback:

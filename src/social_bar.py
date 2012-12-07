@@ -6,5 +6,6 @@ from social_bar_model import SocialBarModel
 
 if __name__ == "__main__":
     presenter = SocialBarPresenter(SocialBarView(), SocialBarModel())
+    presenter.get_view().set_presenter(presenter)
     presenter.get_view().main()
 

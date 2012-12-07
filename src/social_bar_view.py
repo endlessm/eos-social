@@ -14,6 +14,7 @@ class SocialBarView(MainWindow):
         self.connect('destroy', lambda w: gtk.main_quit())
 
         self._fb_auth_view = FBAuthView()
+        self._presenter = None
 
         btn_add = gtk.Button()
         btn_add.set_size_request(64, 64)
@@ -33,6 +34,9 @@ class SocialBarView(MainWindow):
 
     def show_popup_notification(self, notification_text):
         SimplePopUp(notification_text).show()
+       
+    def set_presenter(self, presenter):
+        self._presenter = presenter
 
     def main(self):
         gobject.threads_init()

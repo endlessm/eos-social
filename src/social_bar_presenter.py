@@ -1,3 +1,6 @@
+import time
+import json
+
 from social_bar_model import SocialBarModel
 from util.http_request_handler import FBHTTPRequestHandler
 from util.social_bar_http_server import SocialBarHttpServer
@@ -6,10 +9,11 @@ from facebook.facebook import GraphAPIError, GraphAPI
 import webbrowser
 import pprint
 from facebook.facebook_posts import FacebookPosts
+from webgui import SocialBarView
 
 
 class SocialBarPresenter:
-    
+
     def __init__(self, view=None, model=None):
         self._view = view
         self._model = model
@@ -32,12 +36,12 @@ class SocialBarPresenter:
 
     def get_model(self):
         return self._model
-        
+
     def get_fb_news_feed(self, callback):
         if self._fb_access_token:
             if not self._graph_api:
                 self._graph_api = GraphAPI(access_token=self._fb_access_token)
-            
+
             try:
                 result = self._graph_api.request('/me/home')
             except GraphAPIError as error:
@@ -45,11 +49,11 @@ class SocialBarPresenter:
                 # Do I need to show login/auth automatically or just to inform a user?
                 # This decision obviously depends on error received!
                 return None
-            
+
             if result:
 #                pprint.pprint(result)
                 result = FacebookPosts(result)
-            
+
             if callback:
                 callback(result)
             else:
@@ -58,10 +62,7 @@ class SocialBarPresenter:
 #                self._view.show_popup_notification('Message text.')
 #        else:
 #            self._view.show_fb_auth_popup()
-    
-            
-                
-    
+
     def fb_login(self, callback=None):
         url = fb_auth_url(self._app_id, self._webserver_url, ['read_stream','publish_stream'])
         # self._view.show_fb_auth_popup(url)
@@ -71,11 +72,11 @@ class SocialBarPresenter:
 
         if callback:
             callback()
-    
+
     def post_to_fb(self, text):
         print 'Post to Facebook.'
         self._graph_api = GraphAPI(access_token=self._fb_access_token)
-        
+
         try:
             self._graph_api.put_wall_post(text)
             return True
@@ -86,7 +87,7 @@ class SocialBarPresenter:
     def post_fb_like(self, id):
         print 'Posting like to post with id', id
         self._graph_api = GraphAPI(access_token=self._fb_access_token)
-        
+
         try:
             self._graph_api.put_like(id)
             return True
@@ -97,14 +98,14 @@ class SocialBarPresenter:
     def post_fb_comment(self, id, comment):
         print 'Posting comment (',comment,') to post with id', id
         self._graph_api = GraphAPI(access_token=self._fb_access_token)
-        
+
         try:
             self._graph_api.put_comment(id, comment)
             return True
         except GraphAPIError as error:
             print error.result
             return False
-        
+
     def get_new_fb_posts(self, callback, url):
         print 'Getting new facebook posts...'
         if self._fb_access_token:
@@ -119,25 +120,25 @@ class SocialBarPresenter:
                 callback(result)
             else:
                 return result
-    
+
     def show_fb_login(self):
         self._view.show_fb_auth_popup()
-    
+
     def blah(self, *args):
         print '*args:', args
         return None
-    
+
     def close_fb_auth_view(self):
         print 'Should close FB login dialogue.'
 #        self._view.close_fb_auth_popup()
-    
+
     def http_handler(self, *args):
         FBHTTPRequestHandler(self, *args)
-    
+
     def set_fb_access_token(self, token):
         self._fb_access_token = token
         self._model.save_fb_access_token(token)
-    
+
     def print_posts(self, result):
         print 'FOUND', str(len(result.posts)), 'POSTS...'
         print '='*80
@@ -147,3 +148,30 @@ class SocialBarPresenter:
         print '='*80
         print 'previous_url :', result.previous_url
         print '='*80
+
+    def main(self, quit_obj=None):
+        self._quit_obj = quit_obj
+        last_second = time.time()
+        uptime_seconds = 1
+        clicks = 0
+
+        while not self._quit_obj.quit:
+            current_time = time.time()
+            again = False
+            msg = self._view.web_recv()
+            if msg:
+                msg = json.loads(msg)
+                again = True
+
+            if msg == "got-a-click":
+                self._view.show_popup_notification("Simple PopUp")
+
+            if current_time - last_second >= 1.0:
+                self._view.web_send(
+                    'document.getElementById("uptime-value").innerHTML = %s' % 
+                    json.dumps('%d' % current_time)
+                    )
+                last_second += 1.0
+
+            if not again:
+                time.sleep(0.1)

@@ -9,7 +9,6 @@ from facebook.facebook import GraphAPIError, GraphAPI
 import webbrowser
 import pprint
 from facebook.facebook_posts import FacebookPosts
-from webgui import SocialBarView
 
 
 class SocialBarPresenter:

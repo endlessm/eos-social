@@ -4,6 +4,7 @@ from facebook.facebook_posts import FacebookPosts
 from facebook.fb_auth_window import FBAuthWindow
 import subprocess
 from urllib2 import URLError
+from Cheetah.Template import Template
 
 
 class SocialBarPresenter:
@@ -32,8 +33,11 @@ class SocialBarPresenter:
         return self._model
         
     def get_fb_news_feed(self, callback=None):
+        print 'In presenter.get_fb_news_feed...'
         try:
+            print 'Going to FB for posts...'
             result = self._graph_api.request('/me/home')
+            print 'DONE getting posts from FB, result =', result
         except GraphAPIError as error:
             self.oauth_exception_handler(error.result)
             return None
@@ -42,7 +46,14 @@ class SocialBarPresenter:
             return None
         
         if result:
+            print 'Converting facebook data to py objects...'
             result = FacebookPosts(result)
+            print 'DONE converting. Result:', result
+            print 'Generating html...'
+            html = str(self.render_posts_to_html(result.posts))
+            print 'DONE generating html.'
+#            self._view.load_html(html)
+            return result
         
         if callback:
             callback(result)
@@ -157,3 +168,8 @@ class SocialBarPresenter:
         print '='*80
         print 'previous_url :', result.previous_url
         print '='*80
+        
+    def render_posts_to_html(self, posts):
+        page = Template(file = 'templates/news-feed.html', searchList = [{ 'posts':posts }])
+        self._view.load_html(str(page))
+        

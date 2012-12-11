@@ -27,7 +27,8 @@ class SocialBarView(MainWindow):
         self.show_all()
 
     def __on_button_press(self, widget, event):
-        self.show_popup_notification("test")
+#        self.show_popup_notification("test")
+        self._presenter.fb_login()
 
     def show_fb_auth_popup(self):
         self._fb_auth_view.open('')

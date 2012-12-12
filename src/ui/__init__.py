@@ -1,4 +1,5 @@
 import gtk
+import gobject
 
 
 class MainWindow(gtk.Window):
@@ -62,6 +63,198 @@ class SimplePopUp(gtk.Window):
         message_text = self._message_text or ''
         self._label.set_text(message_text)
         super(SimplePopUp, self).show_all()
+
+
+class PostMessageSendArea(gtk.Alignment):
+
+
+    SIZE = {
+        'fb': (32, 32), 
+        'send': (46, 32), 
+        }
+
+    __gsignals__ = {
+        'post-panel-action': (
+            gobject.SIGNAL_RUN_FIRST, 
+            gobject.TYPE_NONE,
+            (gobject.TYPE_STRING, )
+            ),
+    }
+
+    def _emit_action(self, widget, action):
+        self.emit('post-panel-action', action)
+
+    def _create_button(self, button_name, width=40, height=20):
+        width, height = self.SIZE[button_name]
+        button = gtk.Button()
+        button.connect('clicked', self._emit_action, button_name)
+        button.set_size_request(width, height)
+        self._buttons[button_name] = button
+        return button
+
+    def _realize(self, widget):
+        print '<<', widget
+        print '>>', widget.allocation
+
+    def _focus_in(self, widget, event):
+        self.text_area.get_buffer().set_text('')
+
+    def _focus_out(self, widget, event):
+        self.text_area.get_buffer().set_text('Type status here')
+
+    def __init__(self):
+        super(PostMessageSendArea, self).__init__()
+        self._buttons = {}
+        self.set_size_request(400, 100)
+        self.text_area = gtk.TextView()
+        self.connect('realize', self._realize)
+
+        self.text_area.set_size_request(400, 100)
+        ##self.text_area.set_size_request(380, self.COLLAPSED_HEIGHT) #390
+        self.text_area.set_wrap_mode(gtk.WRAP_WORD_CHAR)
+        self.text_area.get_buffer().set_text('Type status here')
+        self.text_area.connect('focus-in-event', self._focus_in)
+        self.text_area.connect('focus-out-event', self._focus_out)
+
+
+        self.text_area_wraper = gtk.HBox(True)
+        self.text_area_wraper.pack_start(self.text_area, True, True, 10)
+
+        self.post_toolbar = gtk.HBox()
+        self.post_toolbar.pack_start(self._create_button('fb'), False, False, 10)
+        self.post_toolbar.pack_end(self._create_button('send'), False, False, 10)
+
+        self.post_wraper = gtk.VBox()
+        self.post_wraper.pack_start(self.text_area_wraper, True, True)
+        self.post_wraper.pack_end(self.post_toolbar, False, False, 3)
+
+        self.add(self.post_wraper)
+
+    def get_text_area(self):
+        return self.text_area
+
+    def show(self):
+        super(PostMessageSendArea, self).show()
+        self.post_toolbar.show()
+
+    def hide(self):
+        self.post_toolbar.hide()
+        super(PostMessageSendArea, self).hide()
+
+
+
+class PostMessage(gtk.Alignment):
+
+    COLLAPSED_HEIGHT = 50
+    EXPANDED_HEIGHT = 150
+
+    LOC = {
+        'post': (5, 15), 
+        'chat': (100, 15), 
+        'feed': (140, 15), 
+        'settings': (220, 15), 
+        'close': (260, 15), 
+        }
+
+    SIZE = {
+        'post': (40, 20), 
+        'chat': (40, 20), 
+        'feed': (40, 20), 
+        'settings': (40, 20), 
+        'close': (40, 20), 
+        'fb': (32, 32), 
+        'send': (46, 32), 
+        }
+
+    __gsignals__ = {
+        'post-panel-action': (
+            gobject.SIGNAL_RUN_FIRST, 
+            gobject.TYPE_NONE,
+            (gobject.TYPE_STRING, )
+            ),
+    }
+
+    def _emit_action(self, widget, action):
+        self.emit('post-panel-action', action)
+
+    def _create_button(self, button_name, width=40, height=20):
+        width, height = self.SIZE[button_name]
+        button = gtk.Button()
+        button.connect('clicked', self._emit_action, button_name)
+        button.set_size_request(width, height)
+        self._buttons[button_name] = button
+        return button
+
+    def _get_button(self, button_name):
+        button = self._buttons.get(button_name, None)
+        return button
+
+    def __init__(self, post_send_area):
+        super(PostMessage, self).__init__()
+        self.set_size_request(-1, self.COLLAPSED_HEIGHT)
+        self._buttons = {}
+
+        self.toolbar = gtk.Fixed()
+        self.toolbar.set_size_request(-1, self.COLLAPSED_HEIGHT)
+
+        self.post_wraper = post_send_area
+
+        self.toolbar_wraper = gtk.VBox()
+        self.toolbar_wraper.pack_start(self.toolbar, False, False)
+        self.toolbar_wraper.pack_start(self.post_wraper, True, True)
+
+        ##self.add(self.toolbar)
+        self.add(self.toolbar_wraper)
+
+        self.toolbar.put(self._create_button('post'), *self.LOC['post'])
+        self.toolbar.put(self._create_button('chat'), *self.LOC['chat'])
+        self.toolbar.put(self._create_button('feed'), *self.LOC['feed'])
+        self.toolbar.put(self._create_button('settings'), *self.LOC['settings'])
+        self.toolbar.put(self._create_button('close'), *self.LOC['close'])
+
+        self.collapse_text_field()
+
+    def show(self):
+        self.toolbar.show()
+        ##self.text_area.hide()
+        self.post_wraper.get_text_area().hide()
+        super(PostMessage, self).show()
+
+    def hide(self):
+        super(PostMessage, self).hide()
+        self.toolbar.hide()
+
+    def expand_text_field(self):
+        def animate():
+            self.set_size_request(-1, self.allocation.height+10)
+            not_done = self.allocation.height < self.EXPANDED_HEIGHT
+            if not_done:
+                self.post_wraper.hide()
+                #self.text_area.hide()
+            else:
+                self.post_wraper.show()
+                #self.text_area.show()
+            return not_done
+        gobject.timeout_add(2, animate)
+
+    def collapse_text_field(self):
+        self.post_wraper.hide()
+        def animate():
+            h = self.allocation.height-10
+            h = h if h > 0 else 0
+            self.set_size_request(-1, h)
+            not_done = self.allocation.height > self.COLLAPSED_HEIGHT
+            if not not_done:
+                self.post_wraper.hide()
+            return not_done
+        gobject.timeout_add(2, animate)
+
+    def toggle_text_field(self):
+        if self.allocation.height < self.EXPANDED_HEIGHT:
+            self.expand_text_field()
+        else:
+            self.collapse_text_field()
+
 
 
 

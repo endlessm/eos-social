@@ -1,0 +1,80 @@
+<html>
+	<head>
+	</head>
+	<body style="height:500px;background-image:url(../../images/ng-birds.jpg);">
+	<!-- facebook js api load and initialization -->
+	<div id="fb-root"></div>
+	<script>
+	  window.fbAsyncInit = function() {
+	    // init the FB JS SDK
+	    FB.init({
+	      appId      : '393860344022808', // App ID from the App Dashboard
+	      status     : true, // check the login status upon init?
+	      cookie     : true, // set sessions cookies to allow your server to access the session?
+	      xfbml      : true  // parse XFBML tags on this page?
+	    });
+	
+	    // Additional initialization code such as adding Event Listeners goes here
+	
+	  };
+	
+	  // Load the SDK's source Asynchronously
+	  // Note that the debug version is being actively developed and might 
+	  // contain some type checks that are overly strict. 
+	  // Please report such bugs using the bugs tool.
+	  (function(d, debug){
+	     var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+	     if (d.getElementById(id)) {return;}
+	     js = d.createElement('script'); js.id = id; js.async = true;
+	     js.src = "//connect.facebook.net/en_US/all" + (debug ? "/debug" : "") + ".js";
+	     ref.parentNode.insertBefore(js, ref);
+	   }(document, /*debug*/ false));
+	</script>
+	
+	<!-- end facebook js api load and initialization -->
+		<div id="top-container"style="overflow:scroll;height=500px;">
+			<div id="scroller">
+				<!-- here comes the list of posts -->
+				#for $post in $posts
+				<div class="post" id=$post.id style="padding-top:5px;display:block;">
+					<div class="user" style="width:70px;float:left;">
+						<!-- image -->
+						<img src="$post.poster_image"/>
+						<!-- time -->
+						<br/>
+						##$post.date_updated
+					</div>
+					<div class="post-content" style="width:280px;float:left;padding:10px;background:#ffff66">
+						<!-- username -->
+						<span style="color:blue;"><b>$post.poster on Facebook</b></span><br/>
+						<!-- subject (TODO: add check if subject is existant -->
+						#if $post.subject
+							<b>$post.subject</b><br/>
+						#end if
+						<!-- Post text -->
+						#if $post.text
+							$post.text<br/>
+						#end if
+						<!-- Post image -->
+						#if $post.image
+							<div class="imagecls" style="text-align:center;"><img src="$post.image"/></div><br/>
+						#end if
+						<br/><br/>
+						<div id="fb-root"></div>
+						<script>(function(d, s, id) {
+	  var js, fjs = d.getElementsByTagName(s)[0];
+	  if (d.getElementById(id)) return;
+	  js = d.createElement(s); js.id = id;
+	  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=393860344022808";
+	  fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));
+	</script>
+						<div class="fb-like" data-href="https://graph.facebook.com/313449204401/likes" data-send="false" data-layout="button_count" data-width="50" data-show-faces="true"></div>
+					</div>
+				</div>
+				<div class="clearer" style="clear:both;"></div>
+				#end for
+			</div>
+		</div>
+	</body>
+</html>

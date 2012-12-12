@@ -7,7 +7,7 @@ class MainWindow(gtk.Window):
     DEFAULT_WINDOW_WIDTH = 400
     def __init__(self, transparent=False, dock=None):
         super(MainWindow, self).__init__(gtk.WINDOW_TOPLEVEL)
-        screen_height = gtk.gdk.screen_height()
+        screen_height = gtk.gdk.screen_height() - 80
         screen_width = gtk.gdk.screen_width()
         self.set_app_paintable(True)
         if transparent:

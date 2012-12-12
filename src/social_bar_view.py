@@ -17,6 +17,7 @@ class SocialBarView(MainWindow):
 #        self._fb_auth_view = FBAuthView()
         self._presenter = None
         self._browser = webkit.WebView()
+        self._browser.set_size_request(-1, 600)
 
         self.btn_add = gtk.Button('FB Login')
         self.btn_add.set_size_request(64, 64)
@@ -33,10 +34,12 @@ class SocialBarView(MainWindow):
 
     def __on_button_press(self, widget, event):
 #        self.show_popup_notification("test")
-        print 'Button clicked, calling self._presenter.get_fb_news_feed()...'
-        self._presenter.get_fb_news_feed()
-        print 'DONE in click handler.'
-#        self._presenter.fb_login(callback=self._presenter.get_fb_news_feed)
+        if self.btn_add.get_label() == 'FB Login':
+#            print 'Button clicked, calling self._presenter.get_fb_news_feed()...'
+            self._presenter.fb_login(callback=self._presenter.get_fb_news_feed)
+#            print 'DONE in click handler.'
+        else:
+            self._presenter.get_fb_news_feed()
 
 #    def show_fb_auth_popup(self):
 #        self._fb_auth_view.open('')

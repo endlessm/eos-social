@@ -71,7 +71,10 @@ class PostMessageSendArea(gtk.Alignment):
     SIZE = {
         'fb': (32, 32), 
         'send': (46, 32), 
+        'cancel': (32, 32), 
         }
+
+    DEFAULT_TEXT = 'Type status here'
 
     __gsignals__ = {
         'post-panel-action': (
@@ -84,9 +87,9 @@ class PostMessageSendArea(gtk.Alignment):
     def _emit_action(self, widget, action):
         self.emit('post-panel-action', action)
 
-    def _create_button(self, button_name, width=40, height=20):
+    def _create_button(self, button_name, width=40, height=20, title=''):
         width, height = self.SIZE[button_name]
-        button = gtk.Button()
+        button = gtk.Button(title)
         button.connect('clicked', self._emit_action, button_name)
         button.set_size_request(width, height)
         self._buttons[button_name] = button
@@ -97,32 +100,33 @@ class PostMessageSendArea(gtk.Alignment):
         print '>>', widget.allocation
 
     def _focus_in(self, widget, event):
-        self.text_area.get_buffer().set_text('')
+        self.clear_text()
 
     def _focus_out(self, widget, event):
-        self.text_area.get_buffer().set_text('Type status here')
+        ##self.text_area.get_buffer().set_text('Type status here')
+        pass
 
     def __init__(self):
         super(PostMessageSendArea, self).__init__()
         self._buttons = {}
         self.set_size_request(400, 100)
         self.text_area = gtk.TextView()
+        self.text_area.set_editable(True)
         self.connect('realize', self._realize)
 
         self.text_area.set_size_request(400, 100)
         ##self.text_area.set_size_request(380, self.COLLAPSED_HEIGHT) #390
         self.text_area.set_wrap_mode(gtk.WRAP_WORD_CHAR)
-        self.text_area.get_buffer().set_text('Type status here')
+        self.text_area.get_buffer().set_text(self.DEFAULT_TEXT)
         self.text_area.connect('focus-in-event', self._focus_in)
         self.text_area.connect('focus-out-event', self._focus_out)
-
 
         self.text_area_wraper = gtk.HBox(True)
         self.text_area_wraper.pack_start(self.text_area, True, True, 10)
 
         self.post_toolbar = gtk.HBox()
-        self.post_toolbar.pack_start(self._create_button('fb'), False, False, 10)
-        self.post_toolbar.pack_end(self._create_button('send'), False, False, 10)
+        self.post_toolbar.pack_end(self._create_button('cancel', title='x'), False, False, 10)
+        self.post_toolbar.pack_end(self._create_button('send', title='send'), False, False, 10)
 
         self.post_wraper = gtk.VBox()
         self.post_wraper.pack_start(self.text_area_wraper, True, True)
@@ -130,8 +134,23 @@ class PostMessageSendArea(gtk.Alignment):
 
         self.add(self.post_wraper)
 
+    def get_post_message(self):
+        text_buffer = self.text_area.get_buffer()
+        start, end = text_buffer.get_bounds()
+        #text = text_buffer.get_slice(start, end, False)
+        text = text_buffer.get_text(start, end, False)
+        if text == '' or text == self.DEFAULT_TEXT:
+            return None
+        return text
+
     def get_text_area(self):
         return self.text_area
+
+    def clear_text(self):
+        self.text_area.get_buffer().set_text('')
+
+    def set_default_text(self):
+        self.text_area.get_buffer().set_text(self.DEFAULT_TEXT)
 
     def show(self):
         super(PostMessageSendArea, self).show()
@@ -149,21 +168,19 @@ class PostMessage(gtk.Alignment):
     EXPANDED_HEIGHT = 150
 
     LOC = {
-        'post': (5, 15), 
-        'chat': (100, 15), 
-        'feed': (140, 15), 
-        'settings': (220, 15), 
-        'close': (260, 15), 
+        'post': (5, 12), 
+        'chat': (100, 12), 
+        'feed': (145, 12), 
+        'settings': (220, 12), 
+        'close': (345, 12), 
         }
 
     SIZE = {
-        'post': (40, 20), 
-        'chat': (40, 20), 
-        'feed': (40, 20), 
-        'settings': (40, 20), 
-        'close': (40, 20), 
-        'fb': (32, 32), 
-        'send': (46, 32), 
+        'post': (45, 26), 
+        'chat': (45, 26), 
+        'feed': (45, 26), 
+        'settings': (65, 26), 
+        'close': (48, 26),  
         }
 
     __gsignals__ = {
@@ -177,9 +194,9 @@ class PostMessage(gtk.Alignment):
     def _emit_action(self, widget, action):
         self.emit('post-panel-action', action)
 
-    def _create_button(self, button_name, width=40, height=20):
+    def _create_button(self, button_name, width=40, height=20, title=''):
         width, height = self.SIZE[button_name]
-        button = gtk.Button()
+        button = gtk.Button(title)
         button.connect('clicked', self._emit_action, button_name)
         button.set_size_request(width, height)
         self._buttons[button_name] = button
@@ -206,11 +223,10 @@ class PostMessage(gtk.Alignment):
         ##self.add(self.toolbar)
         self.add(self.toolbar_wraper)
 
-        self.toolbar.put(self._create_button('post'), *self.LOC['post'])
-        self.toolbar.put(self._create_button('chat'), *self.LOC['chat'])
-        self.toolbar.put(self._create_button('feed'), *self.LOC['feed'])
-        self.toolbar.put(self._create_button('settings'), *self.LOC['settings'])
-        self.toolbar.put(self._create_button('close'), *self.LOC['close'])
+        self.toolbar.put(self._create_button('post', title='post'), 
+          *self.LOC['post'])
+        self.toolbar.put(self._create_button('close', title='close'), 
+          *self.LOC['close'])
 
         self.collapse_text_field()
 

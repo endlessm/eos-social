@@ -27,7 +27,9 @@ class SocialBarView(MainWindow):
         self.btn_add.connect("button-press-event", self.__on_button_press)
         self.btn_add.show()
 
-        self.post_message = PostMessage(PostMessageSendArea())
+        self.post_message_area = PostMessageSendArea()
+        self.post_message_area.connect('post-panel-action', self._on_action)
+        self.post_message = PostMessage(self.post_message_area)
         self.post_message.connect('post-panel-action', self._on_action)
 
         # pack web container
@@ -44,9 +46,21 @@ class SocialBarView(MainWindow):
         self.show_all()
 
     def _on_action(self, widget, action):
-        print '_on_action', action
         if action == 'post':
             self.post_message.toggle_text_field()
+            self.post_message_area.set_default_text()
+        elif action == 'cancel':
+            self.post_message.collapse_text_field()
+            self.post_message_area.set_default_text()
+        elif action == 'close':
+            gtk.main_quit()
+        elif action == 'send':
+            text = self.post_message_area.get_post_message()
+            self.post_message_area.set_default_text()
+            if text is not None:
+                self._presenter.post_to_fb(text)
+        else:
+            pass
 
     #def _print(self):
     #    print '!'

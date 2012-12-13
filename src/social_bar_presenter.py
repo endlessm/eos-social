@@ -8,6 +8,7 @@ from Cheetah.Template import Template
 import urlparse
 import json
 import pprint
+import webbrowser
 
 
 class SocialBarPresenter:
@@ -214,6 +215,9 @@ class SocialBarPresenter:
 #            pprint.pprint(result)
             script = 'unlike_success(%s);' % json.dumps(parsed_query['id'][0])
             self._view._browser.execute_script(script)
+        elif parsed.path == 'VIEWPOST':
+            print "Launching external browser..."
+            webbrowser.open('http://www.facebook.com/'+parsed_query['id'][0])
         
         # execute javascript in feed web view if necessary
         return 1

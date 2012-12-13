@@ -40,7 +40,7 @@ class SocialBarPresenter:
         try:
             print 'Going to FB for posts...'
             result = self._graph_api.request('/me/home')
-            print 'DONE getting posts from FB, result =', result
+            print 'DONE getting posts from FB, result ='#, result
         except GraphAPIError as error:
             self.oauth_exception_handler(error.result)
             return None
@@ -50,13 +50,14 @@ class SocialBarPresenter:
         
         if result:
             print 'Converting facebook data to py objects...'
-            pprint.pprint(result)
+#            pprint.pprint(result)
             result = FacebookPosts(result)
 #            print 'DONE converting. Result:', result
             print 'Generating html...'
             html = str(self.render_posts_to_html(result.posts))
             print 'DONE generating html.'
 #            self._view.load_html(html)
+            self._view.load_html(html)
             return result
         
         if callback:
@@ -177,7 +178,8 @@ class SocialBarPresenter:
         
     def render_posts_to_html(self, posts):
         page = Template(file = 'templates/news-feed.html', searchList = [{ 'posts':posts }])
-        self._view.load_html(str(page))
+        print str(page)
+        return page
     
     def navigator(self, uri):
         print 'In presenter navigator function...'

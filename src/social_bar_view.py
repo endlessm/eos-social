@@ -22,7 +22,7 @@ class SocialBarView(MainWindow):
 #        self._browser.set_size_request(-1, 600)
         self._browser.connect("navigation-requested", self._navigation_handler)
 
-        self.btn_add = gtk.Button('Refresh')
+        self.btn_add = gtk.Button('Login')
         self.btn_add.set_size_request(64, 64)
         self.btn_add.set_events(gtk.gdk.BUTTON_PRESS_MASK)
         self.btn_add.connect("button-press-event", self.__on_button_press)
@@ -78,7 +78,7 @@ class SocialBarView(MainWindow):
     def __on_button_press(self, widget, event):
 
 #        self.show_popup_notification("test")
-        if self.btn_add.get_label() == 'FB Login':
+        if self.btn_add.get_label() == 'Login':
 #            print 'Button clicked, calling self._presenter.get_fb_news_feed()...'
             self._presenter.fb_login(callback=self._presenter.get_fb_news_feed)
 #            print 'DONE in click handler.'

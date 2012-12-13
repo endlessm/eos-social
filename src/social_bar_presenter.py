@@ -84,6 +84,7 @@ class SocialBarPresenter:
 #        print 'Post to Facebook.'
         try:
             self._graph_api.put_wall_post(text)
+            self.get_fb_news_feed()
             return True
         except GraphAPIError as error:
             self.oauth_exception_handler(error.result)

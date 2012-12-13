@@ -3,9 +3,9 @@
 	
 	<script>
 	function like_success(id) {
-        document.getElementById("like-"+id).innerHTML = 'Unlike';
+        //document.getElementById("like-"+id).innerHTML = 'Unlike';
         //alert(document.getElementById("like-"+id).href);
-        document.getElementById("like-"+id).href = 'eossocialbar:UNLIKE?id='+id;
+        document.getElementById("like-"+id).href = 'eossocialbar:#';
         //alert(document.getElementById("like-"+id).href);
         number = parseInt(document.getElementById("likes-count-"+id).innerHTML);
         if (number) {

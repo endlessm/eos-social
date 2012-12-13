@@ -1,6 +1,7 @@
 import urllib
 import urllib2
 import json
+import httplib
 
 def get_data(url):
     try:
@@ -18,3 +19,10 @@ def fb_auth_url(app_id, redirect_url, permissions=None):
     auth_url = 'http://graph.facebook.com/oauth/authorize?'
     auth_url += encoded_parameters
     return auth_url
+
+def delete_like(token, post_id):
+    conn = httplib.HTTPSConnection('graph.facebook.com')
+    conn.request('DELETE', '/' + post_id + '/likes?access_token=' + token, '') 
+    resp = conn.getresponse()
+    content = resp.read()
+    print content

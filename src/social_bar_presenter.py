@@ -1,10 +1,13 @@
-from util.util import get_data
+from util.util import get_data, delete_like
 from facebook.facebook import GraphAPIError, GraphAPI
 from facebook.facebook_posts import FacebookPosts
 from facebook.fb_auth_window import FBAuthWindow
 import subprocess
 from urllib2 import URLError
 from Cheetah.Template import Template
+import urlparse
+import json
+import pprint
 
 
 class SocialBarPresenter:
@@ -47,8 +50,9 @@ class SocialBarPresenter:
         
         if result:
             print 'Converting facebook data to py objects...'
+            pprint.pprint(result)
             result = FacebookPosts(result)
-            print 'DONE converting. Result:', result
+#            print 'DONE converting. Result:', result
             print 'Generating html...'
             html = str(self.render_posts_to_html(result.posts))
             print 'DONE generating html.'
@@ -173,4 +177,41 @@ class SocialBarPresenter:
     def render_posts_to_html(self, posts):
         page = Template(file = 'templates/news-feed.html', searchList = [{ 'posts':posts }])
         self._view.load_html(str(page))
+    
+    def navigator(self, uri):
+        print 'In presenter navigator function...'
+        print uri
+        def register_scheme(scheme):
+            for method in filter(lambda s: s.startswith('uses_'), dir(urlparse)):
+                getattr(urlparse, method).append(scheme)
+
+        register_scheme('eossocialbar')
+        # parse uri
+        parsed = urlparse.urlparse(uri)
+        print parsed
+        print 'SCHEME:', parsed.scheme
+        print 'PATH  :', parsed.path
+        print 'QUERY :', parsed.query
+#        print 'PARAMS:', parsed.params
+        parsed_query = urlparse.parse_qs(parsed.query)
+        print parsed_query
+        # decide which action is needed and call appropriate function
+        if parsed.path == 'LIKE':
+            print 'got LIKE to perform on', parsed_query['id'][0]
+            result = self.post_fb_like(parsed_query['id'][0])
+            print 'result:', result
+            if result:
+                # increase the number of likes and change to Unlike
+                script = 'like_success(%s);' % json.dumps(parsed_query['id'][0])
+                print 'Script tp execute:', script
+                self._view._browser.execute_script(script)
+        elif parsed.path == 'UNLIKE':
+            print 'got UNLIKE to perform on', parsed_query['id'][0]
+#            result = delete_like(self._fb_access_token, parsed_query['id'][0])
+#            pprint.pprint(result)
+            script = 'unlike_success(%s);' % json.dumps(parsed_query['id'][0])
+            self._view._browser.execute_script(script)
+        
+        # execute javascript in feed web view if necessary
+        return 1
         

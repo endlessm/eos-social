@@ -17,9 +17,10 @@ class SocialBarView(MainWindow):
 #        self._fb_auth_view = FBAuthView()
         self._presenter = None
         self._browser = webkit.WebView()
-        self._browser.set_size_request(-1, 600)
+#        self._browser.set_size_request(-1, 600)
+        self._browser.connect("navigation-requested", self._navigation_handler)
 
-        self.btn_add = gtk.Button('FB Login')
+        self.btn_add = gtk.Button('Refresh')
         self.btn_add.set_size_request(64, 64)
         self.btn_add.set_events(gtk.gdk.BUTTON_PRESS_MASK)
         self.btn_add.connect("button-press-event", self.__on_button_press)
@@ -54,12 +55,16 @@ class SocialBarView(MainWindow):
         self._browser.show()
     
     def load_html(self, html):
-        print '='*80
-        print html
-        print '='*80
+#        print '='*80
+#        print html
+#        print '='*80
         result = self._browser.load_string(html, 'text/html', 'utf-8', '')
 #        print 'RESULT:', result
         self.show_browser()
+    
+    def _navigation_handler(self, view, frame, request, data=None):
+        print 'In navigation handler view function...'
+        return self._presenter.navigator(request.get_uri())
 
     def main(self):
         gobject.threads_init()

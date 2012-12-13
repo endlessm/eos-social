@@ -1,5 +1,34 @@
 <html>
 	<head>
+	
+	<script>
+	function like_success(id) {
+        document.getElementById("like-"+id).innerHTML = 'Unlike';
+        //alert(document.getElementById("like-"+id).href);
+        document.getElementById("like-"+id).href = 'eossocialbar:UNLIKE?id='+id;
+        //alert(document.getElementById("like-"+id).href);
+        number = parseInt(document.getElementById("likes-count-"+id).innerHTML);
+        if (number) {
+        number = number + 1;
+        } else {
+        number = 1
+        }
+        document.getElementById("likes-count-"+id).innerHTML = number
+    }
+    
+    function unlike_success(id) {
+        alert('Under construction.\nComing soon.');
+        //document.getElementById("like-"+id).innerHTML = 'Like';
+        //alert(document.getElementById("like-"+id).href);
+        //document.getElementById("like-"+id).href = 'eossocilabar:LIKE?id='+id;
+        //alert(document.getElementById("like-"+id).href);
+        //number = parseInt(document.getElementById("likes-count-"+id).innerHTML);
+        //if (number) {
+        //number = number - 1;
+        //}
+        //document.getElementById("likes-count-"+id).innerHTML = number
+    }
+	</script>
 	</head>
 	<body style="height:500px;background-image:url(../../images/ng-birds.jpg);">
 	<!-- facebook js api load and initialization -->
@@ -36,7 +65,7 @@
 			<div id="scroller">
 				<!-- here comes the list of posts -->
 				#for $post in $posts
-				<div class="post" id=$post.id style="padding-top:5px;display:block;">
+				<div class="post" id="$post.id" style="padding-top:5px;display:block;">
 					<div class="user" style="width:70px;float:left;">
 						<!-- image -->
 						<img src="$post.poster_image"/>
@@ -58,6 +87,29 @@
 						<!-- Post image -->
 						#if $post.image
 							<div class="imagecls" style="text-align:center;"><img src="$post.image"/></div><br/>
+						#end if
+						<!-- Like and Comment links/buttons and respective counts -->
+						<div class="clearer" style="clear:both;"></div>
+						<br/>
+						#if $post.actions
+						<!-- Like comes first -->
+						    #for $action in $post.actions
+						        #if $action['name'] == 'Like'
+						            <a href="eossocialbar:LIKE?id=$post.id" id="like-$post.id">Like</a>&nbsp;&nbsp;
+						            <span id="likes-count-$post.id">
+						            #if $post.likes and $post.likes['count'] > 0
+						                $post.likes['count']
+						            #end if
+						            </span>&nbsp;&nbsp;
+						        #else if $action['name'] == 'Comment'
+						            <a href="eossocialbar:COMMENT?id=$post.id" id="comment-$post.id">Comment</a>&nbsp;&nbsp;
+						            <span id="comments-count-$post.id">
+						            #if $post.comments and $post.comments['count'] > 0
+						                $post.comments['count']
+						            #end if
+						            </span>&nbsp;&nbsp;
+						        #end if
+						    #end for
 						#end if
 						<br/><br/>
 						<div id="fb-root"></div>

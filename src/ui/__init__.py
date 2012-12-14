@@ -18,7 +18,7 @@ class MainWindow(gtk.Window):
         self.set_default_size(self.DEFAULT_WINDOW_WIDTH, screen_height)
         self.set_size_request(self.DEFAULT_WINDOW_WIDTH, screen_height)
         self.stick() # this sticks on all desktops
-        self.set_keep_above(True)
+        #self.set_keep_above(True)
         self.set_modal(True)
         self.set_skip_pager_hint(True)
         self.move(screen_width-self.DEFAULT_WINDOW_WIDTH, 0)
@@ -95,10 +95,6 @@ class PostMessageSendArea(gtk.Alignment):
         self._buttons[button_name] = button
         return button
 
-    def _realize(self, widget):
-        print '<<', widget
-        print '>>', widget.allocation
-
     def _focus_in(self, widget, event):
         self.clear_text()
 
@@ -112,7 +108,6 @@ class PostMessageSendArea(gtk.Alignment):
         self.set_size_request(400, 100)
         self.text_area = gtk.TextView()
         self.text_area.set_editable(True)
-        self.connect('realize', self._realize)
 
         self.text_area.set_size_request(400, 100)
         ##self.text_area.set_size_request(380, self.COLLAPSED_HEIGHT) #390

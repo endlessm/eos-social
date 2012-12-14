@@ -28,6 +28,7 @@
         //}
         //document.getElementById("likes-count-"+id).innerHTML = number
     }
+<<<<<<< HEAD
     
     function show_comments(id, comments) {
         //alert(id);
@@ -83,6 +84,20 @@
         //osakati comment link
         document.getElementById("comment-"+id).setAttribute("href", "eossocialbar:#");
     }
+
+    function add_click_to_posts(){
+        posts = document.getElementsByClassName("post");
+        for (var i = 0; i < posts.length; i++) {
+            post = posts[i];
+            post.onclick = function (post_id) {
+                handler = function() {
+                    window.location.href = "eossocialbar:VIEWPOST?id=" + post_id;
+                }
+                return handler;
+            }(post.id)
+        }
+    }
+
 	</script>
 	</head>
 	<body>

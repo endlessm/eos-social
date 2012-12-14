@@ -218,7 +218,7 @@ class SocialBarPresenter:
         elif parsed.path == 'VIEWPOST':
             print "Launching external browser..."
             #@TODO: remove hardcoded server string to constant strings class/file
-            webbrowser.open('http://www.facebook.com/'+parsed_query['id'][0])
+            webbrowser.open('http://www.facebook.com/'+parsed_query['id'][0], new=1, autoraise=True)
         elif parsed.path == 'COMMENT':
             print 'User wants to comment on post, indulge him!'
             # go for last 4 comments
@@ -233,7 +233,6 @@ class SocialBarPresenter:
             self.get_fb_news_feed()
             # parse comments and execute js in self._view._browser
             # which will show comments and display text area and button
-            
         # execute javascript in feed web view if necessary
         return 1 #returning 1 prevents webkit to go to reqested uri, 0 will allow going to requested uri
         

@@ -85,7 +85,7 @@
     }
 	</script>
 	</head>
-	<body style="height:500px;background-image:url(../images/ng-birds.jpg);">
+	<body>
 	<!-- facebook js api load and initialization -->
 	<div id="fb-root"></div>
 	<script>
@@ -148,23 +148,31 @@
 						<br/>
 						#if $post.actions
 						<!-- Like comes first -->
+						    <!-- Like url -->
 						    #for $action in $post.actions
 						        #if $action['name'] == 'Like'
 						            <a href="eossocialbar:LIKE?id=$post.id" id="like-$post.id">Like</a>&nbsp;&nbsp;
-						            <span id="likes-count-$post.id">
-						            #if $post.likes and $post.likes['count'] > 0
-						                $post.likes['count']
-						            #end if
-						            </span>&nbsp;&nbsp;
-						        #else if $action['name'] == 'Comment'
-						            <a href="eossocialbar:COMMENT?id=$post.id" id="comment-$post.id">Comment</a>&nbsp;&nbsp;
-						            <span id="comments-count-$post.id">
-						            #if $post.comments and $post.comments['count'] > 0
-						                $post.comments['count']
-						            #end if
-						            </span>&nbsp;&nbsp;
 						        #end if
 						    #end for
+						    <!-- Comment url -->
+						    #for $action in $post.actions
+						        #if $action['name'] == 'Comment'
+						            <a href="eossocialbar:COMMENT?id=$post.id" id="like-$post.id">Comment</a>&nbsp;&nbsp;
+						        #end if
+						    #end for
+						    <!-- Like icon and count -->
+						        <span id="likes-count-$post.id">
+						        #if $post.likes and $post.likes['count'] > 0
+						            <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAOCAYAAAAi2ky3AAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9wMDgU3Euly/1EAAADVSURBVCjPY2CgJ7COnPHfP2vxf3xqmAgZklS19v+RZekELSNo0M37rxkYGBgY3rz/ilcdCz7J+evO/L9+9zVR3sdr0JzVZxiQvWUdOeM/AwMDg72pIkNbkTsjslpGWDjAvIAMcIWNTdRMhqPLMxgxXHTz/muGME9dBgYGBoZV2y8zEBO4OL329OUnipIIE7XSGtUMYsEVmAwMDAzWRvIMfk6aDNZG8ijy8lICDEfR9GCNtQ1TYxgYGBgYTl9+wnDg1H2Go+ceohgysdqHQVSIh5Em+REAl/lETgtJdhYAAAAASUVORK5CYII=" />&nbsp;&nbsp;
+						            $post.likes['count']
+						        #end if
+						        </span>&nbsp;&nbsp;
+						        <span id="comments-count-$post.id">
+						        #if $post.comments and $post.comments['count'] > 0
+						            <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAPCAYAAADphp8SAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9wMDgU4Hmdcr7UAAACcSURBVDjLY2CgEmBEF5i46Oj/XUdvE9ToZq3KkB9nzYhTgXf6gv/EAO/0Bf+R9TFRy2ssMMactRf+MzAwMKzfdYEsg6jmosFnEAu6gKO5GoNPxkIMhVtmxDMwMDDA5dysVRm2zsRjkAA/F4OjuRqGQT4ZC+GGbZ2ZwIhsCFaDYIYR61KcYM7aC/9hGJt8duPG/yQZRHHoU8UQSgAAARtZ3PPOdIYAAAAASUVORK5CYII=" />&nbsp;&nbsp;
+						            $post.comments['count']
+						        #end if
+						        </span>&nbsp;&nbsp;
 						#end if
 						<br/>
 						<div class="comments-container" id="comments-$post.id" style="visibility:hidden;">

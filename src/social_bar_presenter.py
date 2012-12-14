@@ -149,8 +149,8 @@ class SocialBarPresenter:
         server_error_codes = [1,2,4,17]
         oauth_error_codes = [102, 190]
         permissions_error_codes = range(200, 300)
-        
-        code = result['code']
+        pprint.pprint(result)
+        code = result['error']['code']
         if code in server_error_codes:
             #@TODO: Internationalization!
             message = 'Requested action is not possible at the moment. Please try again later.'
@@ -217,8 +217,29 @@ class SocialBarPresenter:
             self._view._browser.execute_script(script)
         elif parsed.path == 'VIEWPOST':
             print "Launching external browser..."
+            #@TODO: remove hardcoded server string to constant strings class/file
             webbrowser.open('http://www.facebook.com/'+parsed_query['id'][0])
-        
+        elif parsed.path == 'COMMENT':
+            print 'User wants to comment on post, indulge him!'
+            # go for last 4 comments
+            comments = self.get_commments(parsed_query['id'][0])
+            comments['data'].reverse()
+            script = 'show_comments(%s, %s);' % (json.dumps(parsed_query['id'][0]), json.dumps(comments['data']))
+            self._view._browser.execute_script(script)
+
+        elif parsed.path == 'POST_COMMENT':
+            result = self.post_fb_comment(parsed_query['id'][0], parsed_query['comment_text'][0])
+            print result
+            self.get_fb_news_feed()
+            # parse comments and execute js in self._view._browser
+            # which will show comments and display text area and button
+            
         # execute javascript in feed web view if necessary
-        return 1
+        return 1 #returning 1 prevents webkit to go to reqested uri, 0 will allow going to requested uri
+        
+    def get_commments(self, post_id):
+        print 'Getting comments for post', post_id
+        raw_comments = self._graph_api.request(post_id+'/comments')
+        pprint.pprint(raw_comments)
+        return raw_comments
         

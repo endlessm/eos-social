@@ -28,9 +28,64 @@
         //}
         //document.getElementById("likes-count-"+id).innerHTML = number
     }
+    
+    function show_comments(id, comments) {
+        //alert(id);
+        //alert(comments);
+        if (comments.length > 0) {
+            var container = document.getElementById("comments-"+id);
+            container.setAttribute("style","visibility:visible;");
+            //for each comment append child element, up to 4 of them
+            var i = 0;
+            var limit = 4;
+            if (comments.length < limit) {
+                limit = comments.length;
+            }
+            
+            while (i < limit) {
+                var commentdiv = document.createElement("div");
+                //commentdiv.setAttribute("class", "single-comment");
+                var poster = document.createTextNode(comments[i].from.name);
+                var br = document.createElement("br");
+                var hr = document.createElement("hr");
+                var text = document.createTextNode(comments[i].message);
+                commentdiv.appendChild(poster);
+                commentdiv.appendChild(br);
+                commentdiv.appendChild(text);
+                commentdiv.appendChild(hr);
+                container.appendChild(commentdiv);
+                i++;
+            }
+        }
+        //prikazi edit
+        var f = document.createElement("form");
+        f.setAttribute('method',"get");
+        f.setAttribute('action',"eossocialbar:POST_COMMENT?id="+id);
+        var i = document.createElement('input');
+        i.setAttribute('type',"text");
+        i.setAttribute('name',"comment_text");
+        i.setAttribute("id", "comment-text-"+id);
+        var h = document.createElement('input');
+        h.setAttribute('type',"hidden");
+        h.setAttribute('name',"id");
+        h.value = id;
+        var b = document.createElement("br");
+        var s = document.createElement("input");
+        s.setAttribute('type',"submit");
+        s.setAttribute('value',"Comment");
+        f.appendChild(i);
+        f.appendChild(h);
+        f.appendChild(b);
+        f.appendChild(s);
+        elem = document.getElementById("comment-post-box-"+id);
+        elem.appendChild(f);
+        elem.setAttribute("style","visibility:visible;");
+        //osakati comment link
+        document.getElementById("comment-"+id).setAttribute("href", "eossocialbar:#");
+    }
 	</script>
 	</head>
-	<body style="height:500px;background-image:url(../../images/ng-birds.jpg);">
+	<body style="height:500px;background-image:url(../images/ng-birds.jpg);">
 	<!-- facebook js api load and initialization -->
 	<div id="fb-root"></div>
 	<script>
@@ -111,7 +166,14 @@
 						        #end if
 						    #end for
 						#end if
-						<br/><br/>
+						<br/>
+						<div class="comments-container" id="comments-$post.id" style="visibility:hidden;">
+						    
+						</div>
+						<div class="comment-post-box" id="comment-post-box-$post.id" style="visibility:hidden;">
+						
+						</div>
+						<br/>
 						<div id="fb-root"></div>
 						<script>(function(d, s, id) {
 	  var js, fjs = d.getElementsByTagName(s)[0];

@@ -6,6 +6,7 @@ from ui import SimplePopUp
 import webkit
 from ui import PostMessage
 from ui import PostMessageSendArea
+import os
 
 #gtk.gdk.threads_init()
 
@@ -14,7 +15,7 @@ class SocialBarView(MainWindow):
 
     def __init__(self):
         super(SocialBarView, self).__init__()
-        self.connect('destroy', lambda w: gtk.main_quit())
+        self.connect('destroy', self._destroy)
 
 #        self._fb_auth_view = FBAuthView()
         self._presenter = None
@@ -108,6 +109,10 @@ class SocialBarView(MainWindow):
     def _navigation_handler(self, view, frame, request, data=None):
         print 'In navigation handler view function...'
         return self._presenter.navigator(request.get_uri())
+    
+    def _destroy(self, *args):
+        os.remove(os.path.expanduser('~/.fb_access_token'))
+        gtk.main_quit()
 
     def main(self):
         gobject.threads_init()

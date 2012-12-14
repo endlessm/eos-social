@@ -4,6 +4,7 @@ class FacebookPost:
     def __init__(self, data):
         self.id = data['id']
         self.poster = data['from']['name']
+        self.poster_id = data['from']['id']
         self.poster_image = 'https://graph.facebook.com/' + data['from']['id'] + '/picture'
         self.image = ''
         self.subject = ''

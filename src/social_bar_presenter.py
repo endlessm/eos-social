@@ -1,4 +1,4 @@
-from util.util import get_data, delete_like
+from util.util import get_data, CSS
 from facebook.facebook import GraphAPIError, GraphAPI
 from facebook.facebook_posts import FacebookPosts
 from facebook.fb_auth_window import FBAuthWindow
@@ -178,7 +178,7 @@ class SocialBarPresenter:
         print '='*80
         
     def render_posts_to_html(self, posts):
-        page = Template(file = 'templates/news-feed.html', searchList = [{ 'posts':posts }])
+        page = Template(file = 'templates/news-feed.html', searchList = [{ 'posts':posts }, {'css':CSS}])
         print str(page)
         return page
     
@@ -231,6 +231,8 @@ class SocialBarPresenter:
             result = self.post_fb_comment(parsed_query['id'][0], parsed_query['comment_text'][0])
             print result
             self.get_fb_news_feed()
+        elif parsed.path == 'VIEW_POSTER':
+            webbrowser.open('http://www.facebook.com/'+parsed_query['poster_id'][0], new=1, autoraise=True)
             # parse comments and execute js in self._view._browser
             # which will show comments and display text area and button
         # execute javascript in feed web view if necessary
@@ -241,4 +243,6 @@ class SocialBarPresenter:
         raw_comments = self._graph_api.request(post_id+'/comments')
         pprint.pprint(raw_comments)
         return raw_comments
-        
+    
+    def get_fb_user(self, fb_user_id='me'):
+        return

@@ -1,9 +1,11 @@
 <html>
 	<head>
-	
+	<style>
+	$css
+	</style>
 	<script>
 	function like_success(id) {
-        //document.getElementById("like-"+id).innerHTML = 'Unlike';
+        document.getElementById("like-"+id).innerHTML = 'Liked';
         //alert(document.getElementById("like-"+id).href);
         document.getElementById("like-"+id).href = 'eossocialbar:#';
         //alert(document.getElementById("like-"+id).href);
@@ -11,7 +13,7 @@
         if (number) {
         number = number + 1;
         } else {
-        number = 1
+        number = 1;
         }
         document.getElementById("likes-count-"+id).innerHTML = number
     }
@@ -28,12 +30,11 @@
         //}
         //document.getElementById("likes-count-"+id).innerHTML = number
     }
-<<<<<<< HEAD
     
     function show_comments(id, comments) {
         //alert(id);
         //alert(comments);
-        if (comments.length > 0) {
+        if (comments != null && comments.length > 0) {
             var container = document.getElementById("comments-"+id);
             container.setAttribute("style","visibility:visible;");
             //for each comment append child element, up to 4 of them
@@ -97,6 +98,11 @@
             }(post.id)
         }
     }
+    
+    function show_post_details(post_id) {
+        //alert("eossocialbar:VIEWPOST?id=" + post_id);
+        window.location.href = "eossocialbar:VIEWPOST?id=" + post_id;
+    }
 
 	</script>
 	</head>
@@ -138,14 +144,17 @@
 				<div class="post" id="$post.id" style="padding-top:5px;display:block;">
 					<div class="user" style="width:70px;float:left;">
 						<!-- image -->
+						<a href="eossocialbar:VIEW_POSTER?poster_id=$post.poster_id">
 						<img src="$post.poster_image"/>
+						</a>
 						<!-- time -->
 						<br/>
 						##$post.date_updated
 					</div>
 					<div class="post-content" style="width:280px;float:left;padding:10px;background:#ffff66">
 						<!-- username -->
-						<span style="color:blue;"><b>$post.poster on Facebook</b></span><br/>
+						<span style="color:blue;"><a href="eossocialbar:VIEW_POSTER?poster_id=$post.poster_id"><b>$post.poster</b></a></span><br/>
+						<span class="clickable" onclick="show_post_details('$post.id');">
 						<!-- subject (TODO: add check if subject is existant -->
 						#if $post.subject
 							<b>$post.subject</b><br/>
@@ -159,6 +168,7 @@
 							<div class="imagecls" style="text-align:center;"><img src="$post.image"/></div><br/>
 						#end if
 						<!-- Like and Comment links/buttons and respective counts -->
+						</span>
 						<div class="clearer" style="clear:both;"></div>
 						<br/>
 						#if $post.actions
@@ -176,15 +186,15 @@
 						        #end if
 						    #end for
 						    <!-- Like icon and count -->
+						        <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAOCAYAAAAi2ky3AAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9wMDgU3Euly/1EAAADVSURBVCjPY2CgJ7COnPHfP2vxf3xqmAgZklS19v+RZekELSNo0M37rxkYGBgY3rz/ilcdCz7J+evO/L9+9zVR3sdr0JzVZxiQvWUdOeM/AwMDg72pIkNbkTsjslpGWDjAvIAMcIWNTdRMhqPLMxgxXHTz/muGME9dBgYGBoZV2y8zEBO4OL329OUnipIIE7XSGtUMYsEVmAwMDAzWRvIMfk6aDNZG8ijy8lICDEfR9GCNtQ1TYxgYGBgYTl9+wnDg1H2Go+ceohgysdqHQVSIh5Em+REAl/lETgtJdhYAAAAASUVORK5CYII=" />&nbsp;&nbsp;
 						        <span id="likes-count-$post.id">
 						        #if $post.likes and $post.likes['count'] > 0
-						            <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAOCAYAAAAi2ky3AAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9wMDgU3Euly/1EAAADVSURBVCjPY2CgJ7COnPHfP2vxf3xqmAgZklS19v+RZekELSNo0M37rxkYGBgY3rz/ilcdCz7J+evO/L9+9zVR3sdr0JzVZxiQvWUdOeM/AwMDg72pIkNbkTsjslpGWDjAvIAMcIWNTdRMhqPLMxgxXHTz/muGME9dBgYGBoZV2y8zEBO4OL329OUnipIIE7XSGtUMYsEVmAwMDAzWRvIMfk6aDNZG8ijy8lICDEfR9GCNtQ1TYxgYGBgYTl9+wnDg1H2Go+ceohgysdqHQVSIh5Em+REAl/lETgtJdhYAAAAASUVORK5CYII=" />&nbsp;&nbsp;
 						            $post.likes['count']
 						        #end if
 						        </span>&nbsp;&nbsp;
+						        <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAPCAYAAADphp8SAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9wMDgU4Hmdcr7UAAACcSURBVDjLY2CgEmBEF5i46Oj/XUdvE9ToZq3KkB9nzYhTgXf6gv/EAO/0Bf+R9TFRy2ssMMactRf+MzAwMKzfdYEsg6jmosFnEAu6gKO5GoNPxkIMhVtmxDMwMDDA5dysVRm2zsRjkAA/F4OjuRqGQT4ZC+GGbZ2ZwIhsCFaDYIYR61KcYM7aC/9hGJt8duPG/yQZRHHoU8UQSgAAARtZ3PPOdIYAAAAASUVORK5CYII=" />&nbsp;&nbsp;
 						        <span id="comments-count-$post.id">
 						        #if $post.comments and $post.comments['count'] > 0
-						            <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAPCAYAAADphp8SAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9wMDgU4Hmdcr7UAAACcSURBVDjLY2CgEmBEF5i46Oj/XUdvE9ToZq3KkB9nzYhTgXf6gv/EAO/0Bf+R9TFRy2ssMMactRf+MzAwMKzfdYEsg6jmosFnEAu6gKO5GoNPxkIMhVtmxDMwMDDA5dysVRm2zsRjkAA/F4OjuRqGQT4ZC+GGbZ2ZwIhsCFaDYIYR61KcYM7aC/9hGJt8duPG/yQZRHHoU8UQSgAAARtZ3PPOdIYAAAAASUVORK5CYII=" />&nbsp;&nbsp;
 						            $post.comments['count']
 						        #end if
 						        </span>&nbsp;&nbsp;

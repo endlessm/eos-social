@@ -28,9 +28,23 @@
         //}
         //document.getElementById("likes-count-"+id).innerHTML = number
     }
+
+    function add_click_to_posts(){
+        posts = document.getElementsByClassName("post");
+        for (var i = 0; i < posts.length; i++) {
+            post = posts[i];
+            post.onclick = function (post_id) {
+                handler = function() {
+                    window.location.href = "eossocialbar:VIEWPOST?id=" + post_id;
+                }
+                return handler;
+            }(post.id)
+        }
+    }
+
 	</script>
 	</head>
-	<body style="height:500px;background-image:url(../../images/ng-birds.jpg);">
+	<body style="height:500px;background-image:url(../../images/ng-birds.jpg);" onload="add_click_to_posts();">
 	<!-- facebook js api load and initialization -->
 	<div id="fb-root"></div>
 	<script>

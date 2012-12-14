@@ -217,7 +217,7 @@ class SocialBarPresenter:
             self._view._browser.execute_script(script)
         elif parsed.path == 'VIEWPOST':
             print "Launching external browser..."
-            webbrowser.open('http://www.facebook.com/'+parsed_query['id'][0])
+            webbrowser.open('http://www.facebook.com/'+parsed_query['id'][0], new=1, autoraise=True)
         
         # execute javascript in feed web view if necessary
         return 1

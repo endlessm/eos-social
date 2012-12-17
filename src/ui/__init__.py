@@ -18,7 +18,7 @@ class MainWindow(gtk.Window):
         self.set_default_size(self.DEFAULT_WINDOW_WIDTH, screen_height)
         self.set_size_request(self.DEFAULT_WINDOW_WIDTH, screen_height)
         self.stick() # this sticks on all desktops
-        self.set_keep_above(True)
+        #self.set_keep_above(True)
         self.set_modal(True)
         self.set_skip_pager_hint(True)
         self.move(screen_width-self.DEFAULT_WINDOW_WIDTH, 0)
@@ -65,6 +65,43 @@ class SimplePopUp(gtk.Window):
         super(SimplePopUp, self).show_all()
 
 
+class UserAvatar(gtk.Alignment):
+
+
+    SIZE = {
+        'user_avatar': (24, 24), 
+        'user_name': (80, 20), 
+        }
+
+    def __init__(self):
+        super(UserAvatar, self).__init__()
+        self._container = gtk.HBox(spacing=15)
+        self._user_avatar = gtk.Image()
+        self._user_avatar.set_size_request(*self.SIZE['user_avatar'])
+        self._user_name = gtk.Label()
+        #self._user_avatar.set_size_request(*self.SIZE['user_name'])
+        self._container.pack_start(self._user_avatar, expand=False, fill=False, padding=0)
+        self._container.pack_start(self._user_name, expand=True, fill=True, padding=0)
+        self.add(self._container)
+
+    def show(self):
+        super(UserAvatar, self).show()
+        self._container.show()
+        self._user_avatar.show()
+        self._user_name.show()
+
+    def hide(self):
+        self._user_name.hide()
+        self._user_avatar.hide()
+        self._container.hide()
+        super(UserAvatar, self).hide()
+
+    def set_avatar(self, image_path, name):
+        self._user_name.set_text(name.upper())
+        self._user_avatar.set_from_file(image_path)
+
+
+
 class PostMessageSendArea(gtk.Alignment):
 
 
@@ -95,10 +132,6 @@ class PostMessageSendArea(gtk.Alignment):
         self._buttons[button_name] = button
         return button
 
-    def _realize(self, widget):
-        print '<<', widget
-        print '>>', widget.allocation
-
     def _focus_in(self, widget, event):
         self.clear_text()
 
@@ -112,7 +145,6 @@ class PostMessageSendArea(gtk.Alignment):
         self.set_size_request(400, 100)
         self.text_area = gtk.TextView()
         self.text_area.set_editable(True)
-        self.connect('realize', self._realize)
 
         self.text_area.set_size_request(400, 100)
         ##self.text_area.set_size_request(380, self.COLLAPSED_HEIGHT) #390
@@ -173,6 +205,7 @@ class PostMessage(gtk.Alignment):
         'feed': (145, 12), 
         'settings': (220, 12), 
         'close': (345, 12), 
+        'avatar': (120, 12), 
         }
 
     SIZE = {
@@ -180,7 +213,7 @@ class PostMessage(gtk.Alignment):
         'chat': (45, 26), 
         'feed': (45, 26), 
         'settings': (65, 26), 
-        'close': (48, 26),  
+        'close': (48, 26), 
         }
 
     __gsignals__ = {
@@ -206,7 +239,7 @@ class PostMessage(gtk.Alignment):
         button = self._buttons.get(button_name, None)
         return button
 
-    def __init__(self, post_send_area):
+    def __init__(self, post_send_area, user_avatar):
         super(PostMessage, self).__init__()
         self.set_size_request(-1, self.COLLAPSED_HEIGHT)
         self._buttons = {}
@@ -215,6 +248,9 @@ class PostMessage(gtk.Alignment):
         self.toolbar.set_size_request(-1, self.COLLAPSED_HEIGHT)
 
         self.post_wraper = post_send_area
+        self.user_avatar = user_avatar
+
+        self.toolbar.put(self.user_avatar, *self.LOC['avatar'])
 
         self.toolbar_wraper = gtk.VBox()
         self.toolbar_wraper.pack_start(self.toolbar, False, False)

@@ -9,6 +9,7 @@ import urlparse
 import json
 import pprint
 import webbrowser
+import multiprocessing
 
 
 class SocialBarPresenter:
@@ -242,4 +243,51 @@ class SocialBarPresenter:
         raw_comments = self._graph_api.request(post_id+'/comments')
         pprint.pprint(raw_comments)
         return raw_comments
-        
+
+    def show_profil_page(self):
+        if self._graph_api is None:
+            self.show_fb_login()
+            return
+        profile = self._graph_api.get_object("me")
+        webbrowser.open('http://www.facebook.com/' + profile['id'])
+
+    def get_profil_picture(self, callback):
+        image_url = None
+        if self._graph_api is None:
+            self.show_fb_login()
+            return image_url
+        profile = self._graph_api.get_object("me")
+        image_url = 'https://graph.facebook.com/' + profile['id'] + '/picture'
+        print 'image_url', image_url
+        p = multiprocessing.Process(target=get_image_dwn, args=(image_url, callback))
+        p.start()
+        image_url = None
+        return image_url
+
+    def get_stored_picture_file_path(self):
+        return '/opt/social_bar/social-draft/src/avatar'
+
+def get_image_dwn(image_url, callback):
+    print 'get_image_dwn', image_url
+    import urllib2
+    url_response = urllib2.urlopen(image_url)
+    image_final_url = url_response.geturl()
+    if image_final_url[-3:] in ('jpg', 'png'):
+        image_data = url_response.read()
+        print 'store to file'
+        with open('/opt/social_bar/social-draft/src/avatar', 'w') as f:
+            f.write(image_data)
+            f.close()
+        import time
+        time.sleep(7)
+        callback()
+    else:
+        print 'error:', 'no image', image_final_url
+    print 'done'
+    return
+
+
+
+
+
+

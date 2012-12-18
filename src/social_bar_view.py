@@ -31,7 +31,7 @@ class SocialBarView(MainWindow):
 
         self.post_message_area = PostMessageSendArea()
         self.user_avatar = UserAvatar()
-        self.user_avatar.set_avatar('avatar.png', 'Raphael Moras')
+        #self.user_avatar.set_avatar('avatar.png')
         self.post_message_area.connect('post-panel-action', self._on_action)
         self.post_message = PostMessage(self.post_message_area, self.user_avatar)
         self.post_message.connect('post-panel-action', self._on_action)
@@ -63,6 +63,8 @@ class SocialBarView(MainWindow):
             self.post_message_area.set_default_text()
             if text is not None:
                 self._presenter.post_to_fb(text)
+        elif action == 'avatar':
+            self._presenter.show_profil_page()
         else:
             pass
 
@@ -96,6 +98,11 @@ class SocialBarView(MainWindow):
        
     def set_presenter(self, presenter):
         self._presenter = presenter
+        def _update_image():
+            print 'update image'
+            self.user_avatar.set_avatar(self._presenter.get_stored_picture_file_path())
+        user_image = self._presenter.get_profil_picture(callback=_update_image)
+        self.user_avatar.set_avatar(self._presenter.get_stored_picture_file_path())
     
     def show_browser(self):
         self._browser.show()

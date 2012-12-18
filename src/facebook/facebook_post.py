@@ -1,4 +1,5 @@
 import datetime
+from math import floor
 
 class FacebookPost:
     def __init__(self, data):
@@ -29,6 +30,8 @@ class FacebookPost:
         
         self.date_created = str(datetime.datetime.strptime(data['created_time'],'%Y-%m-%dT%H:%M:%S+0000'))
         self.date_updated = str(datetime.datetime.strptime(data['updated_time'],'%Y-%m-%dT%H:%M:%S+0000'))
+        self.time_elapsed = datetime.datetime.utcnow() - datetime.datetime.strptime(data['created_time'],'%Y-%m-%dT%H:%M:%S+0000')
+        self.time_elapsed_string = self.get_elapsed_string(self.time_elapsed)
         
         if data.has_key('actions'):
             self.actions = data['actions']
@@ -53,6 +56,41 @@ class FacebookPost:
         rv += 'actions : ' + unicode(self.actions) + '\n'
         rv += '-'*80
         return rv
+    
+    def get_elapsed_string(self, delta):
+        if delta.days:
+            return self.pluralize(delta.days, 'DAY')
+        if int(floor(delta.seconds/3600)):
+            return self.pluralize(int(floor(delta.seconds/3600)), 'HOUR')
+        if int(floor(delta.seconds/60)):
+            return self.pluralize(int(floor(delta.seconds/60)), 'MINUTE')
+        return self.pluralize(delta.seconds, 'SECOND')
+    
+    def pluralize(self, num, period_name):
+        if num == 1:
+            return self.singular(num, period_name)
+        else:
+            return self.plural(num, period_name)
+    
+    def singular(self, num, period_name):
+        if period_name == 'DAY':
+            return str(num) + ' ' + 'day ago'
+        if period_name == 'HOUR':
+            return str(num) + ' ' + 'hour ago'
+        if period_name == 'MINUTE':
+            return str(num) + ' ' + 'minute ago'
+        if period_name == 'SECOND':
+            return str(num) + ' ' + 'second ago'
+    
+    def plural(self, num, period_name):
+        if period_name == 'DAY':
+            return str(num) + ' ' + 'days ago'
+        if period_name == 'HOUR':
+            return str(num) + ' ' + 'hours ago'
+        if period_name == 'MINUTE':
+            return str(num) + ' ' + 'minutes ago'
+        if period_name == 'SECOND':
+            return str(num) + ' ' + 'seconds ago'    
 #    poster = 'ljuba'
 #    avatar = 'http://facebook.com/ljuba.nedeljkovic.7/picture'
 #    subject = 'Dummy subject'

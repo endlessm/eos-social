@@ -218,7 +218,14 @@ class SocialBarPresenter:
         elif parsed.path == 'VIEWPOST':
             print "Launching external browser..."
             #@TODO: remove hardcoded server string to constant strings class/file
-            webbrowser.open('http://www.facebook.com/'+parsed_query['id'][0], new=1, autoraise=True)
+            id = parsed_query['id'][0]
+            if '_' in id:
+                who = id.split('_')[0]
+                what = id.split('_')[1]
+                webbrowser.open('http://www.facebook.com/'+who+'/posts/'+what, new=1, autoraise=True)
+            else:
+                webbrowser.open('http://www.facebook.com/'+parsed_query['id'][0], new=1, autoraise=True)
+#            webbrowser.open('https://graph.facebook.com/'+parsed_query['id'][0]+'/?access_token='+self._fb_access_token, new=1, autoraise=True)
         elif parsed.path == 'COMMENT':
             print 'User wants to comment on post, indulge him!'
             # go for last 4 comments

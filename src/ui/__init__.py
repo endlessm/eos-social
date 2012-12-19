@@ -1,5 +1,6 @@
 import gtk
 import gobject
+import os
 
 
 class MainWindow(gtk.Window):
@@ -87,9 +88,16 @@ class UserAvatar(gtk.EventBox):
         super(UserAvatar, self).hide()
 
     def set_avatar(self, image_path):
-        pixbuf = gtk.gdk.pixbuf_new_from_file(image_path)
-        self._user_avatar.set_from_pixbuf(pixbuf)
-
+        if os.path.isfile(image_path):
+            try:
+                pixbuf = gtk.gdk.pixbuf_new_from_file(image_path)
+                w, h = self.SIZE['user_avatar']
+                pixbuf_scaled = pixbuf.scale_simple(w, h, gtk.gdk.INTERP_BILINEAR)
+                del pixbuf
+                self._user_avatar.set_from_pixbuf(pixbuf_scaled)
+                del scaled_pixbuf
+            except:
+                pass
 
 
 class PostMessageSendArea(gtk.Alignment):

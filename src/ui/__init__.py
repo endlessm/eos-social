@@ -65,6 +65,33 @@ class SimplePopUp(gtk.Window):
         super(SimplePopUp, self).show_all()
 
 
+class UserAvatar(gtk.EventBox):
+
+
+    SIZE = {
+        'user_avatar': (24, 24), 
+        }
+
+    def __init__(self):
+        super(UserAvatar, self).__init__()
+        self._user_avatar = gtk.Image()
+        self._user_avatar.set_size_request(*self.SIZE['user_avatar'])
+        self.add(self._user_avatar)
+
+    def show(self):
+        super(UserAvatar, self).show()
+        self._user_avatar.show()
+
+    def hide(self):
+        self._user_avatar.hide()
+        super(UserAvatar, self).hide()
+
+    def set_avatar(self, image_path):
+        pixbuf = gtk.gdk.pixbuf_new_from_file(image_path)
+        self._user_avatar.set_from_pixbuf(pixbuf)
+
+
+
 class PostMessageSendArea(gtk.Alignment):
 
 
@@ -168,6 +195,7 @@ class PostMessage(gtk.Alignment):
         'feed': (145, 12), 
         'settings': (220, 12), 
         'close': (345, 12), 
+        'avatar': (370, 12), 
         }
 
     SIZE = {
@@ -175,7 +203,7 @@ class PostMessage(gtk.Alignment):
         'chat': (45, 26), 
         'feed': (45, 26), 
         'settings': (65, 26), 
-        'close': (48, 26),  
+        'close': (48, 26), 
         }
 
     __gsignals__ = {
@@ -201,7 +229,7 @@ class PostMessage(gtk.Alignment):
         button = self._buttons.get(button_name, None)
         return button
 
-    def __init__(self, post_send_area):
+    def __init__(self, post_send_area, user_avatar):
         super(PostMessage, self).__init__()
         self.set_size_request(-1, self.COLLAPSED_HEIGHT)
         self._buttons = {}
@@ -210,6 +238,11 @@ class PostMessage(gtk.Alignment):
         self.toolbar.set_size_request(-1, self.COLLAPSED_HEIGHT)
 
         self.post_wraper = post_send_area
+        self.user_avatar = user_avatar
+
+        self.toolbar.put(self.user_avatar, *self.LOC['avatar'])
+        self.user_avatar.connect('button-press-event', 
+          lambda w, e: self._emit_action(w, 'avatar'))
 
         self.toolbar_wraper = gtk.VBox()
         self.toolbar_wraper.pack_start(self.toolbar, False, False)
@@ -220,8 +253,6 @@ class PostMessage(gtk.Alignment):
 
         self.toolbar.put(self._create_button('post', title='post'), 
           *self.LOC['post'])
-        self.toolbar.put(self._create_button('close', title='close'), 
-          *self.LOC['close'])
 
         self.collapse_text_field()
 

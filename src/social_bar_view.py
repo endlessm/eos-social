@@ -30,74 +30,6 @@ class SocialBarView(MainWindow):
             return x
         return fun2
 
-<<<<<<< HEAD
-    def __init__(self):
-        super(SocialBarView, self).__init__()
-        self.connect('destroy', self._destroy)
-
-#        self._fb_auth_view = FBAuthView()
-        self._presenter = None
-        self._browser = webkit.WebView()
-#        self._browser.set_size_request(-1, 600)
-        self._browser.connect("navigation-requested", self._navigation_handler)
-
-        self.btn_add = gtk.Button('Login')
-        self.btn_add.set_size_request(64, 64)
-        self.btn_add.set_events(gtk.gdk.BUTTON_PRESS_MASK)
-        self.btn_add.connect("button-press-event", self.__on_button_press)
-        self.btn_add.show()
-
-        self.post_message_area = PostMessageSendArea()
-        self.user_avatar = UserAvatar()
-        #self.user_avatar.set_avatar('avatar.png')
-        self.post_message_area.connect('post-panel-action', self._on_action)
-        self.post_message = PostMessage(self.post_message_area, self.user_avatar)
-        self.post_message.connect('post-panel-action', self._on_action)
-
-        # pack web container
-        self.web_container = gtk.VBox()
-        self.web_container.pack_start(self.btn_add, expand=False, fill=False, padding=0)
-        self.web_container.pack_start(self._browser, expand=True, fill=True, padding=0)
-
-        # pack main container
-        self.main_container = gtk.VBox()
-        self.main_container.pack_start(self.post_message, expand=False, fill=False, padding=0)
-        self.main_container.pack_start(self.web_container, expand=True, fill=True, padding=0)
-        self.add(self.main_container)
-        self.main_container.show()
-        self.show_all()
-
-    def _on_action(self, widget, action):
-        if action == 'post':
-            self.post_message.toggle_text_field()
-            self.post_message_area.set_default_text()
-        elif action == 'cancel':
-            self.post_message.collapse_text_field()
-            self.post_message_area.set_default_text()
-        elif action == 'close':
-            gtk.main_quit()
-        elif action == 'send':
-            text = self.post_message_area.get_post_message()
-            self.post_message_area.set_default_text()
-            if text is not None:
-                self._presenter.post_to_fb(text)
-        elif action == 'avatar':
-            self._presenter.show_profil_page()
-        else:
-            pass
-
-    #def _print(self):
-    #    print '!'
-    #    return True
-
-    #def _animate(self):
-    #    self._h += 5
-    #    self.post_message.set_size_request(-1, self._h)
-    #    if self._h < 200:
-    #        return True
-    #    self.post_message.show_text_field()
-    #    return False
-=======
     @classmethod
     def start_gtk_thread(cls):
         # Start GTK in its own thread:
@@ -157,11 +89,8 @@ class SocialBarView(MainWindow):
 
         self.connect_title_changed(title_changed)
         self.open_uri(self._uri)
->>>>>>> github/dev
 
     def __on_button_press(self, widget, event):
-
-<<<<<<< HEAD
 #        self.show_popup_notification("test")
         if self.btn_add.get_label() == 'Login':
 #            print 'Button clicked, calling self._presenter.get_fb_news_feed()...'
@@ -173,10 +102,8 @@ class SocialBarView(MainWindow):
 
 #    def show_fb_auth_popup(self):
 #        self._fb_auth_view.open('')
-=======
     def show_fb_auth_popup(self):
         FBAuthView().open('')
->>>>>>> github/dev
 
     def show_popup_notification(self, notification_text):
         SimplePopUp(notification_text).show()

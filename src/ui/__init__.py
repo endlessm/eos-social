@@ -1,6 +1,7 @@
 import gtk
 import gobject
 import os
+import pango
 
 
 class MainWindow(gtk.Window):
@@ -9,6 +10,7 @@ class MainWindow(gtk.Window):
     DEFAULT_WINDOW_WIDTH = 400
     def __init__(self, transparent=False, dock=None):
         super(MainWindow, self).__init__(gtk.WINDOW_TOPLEVEL)
+        self.image_path = None
         screen_height = gtk.gdk.screen_height() - 80
         screen_width = gtk.gdk.screen_width()
         self.set_app_paintable(True)
@@ -23,6 +25,7 @@ class MainWindow(gtk.Window):
         self.set_modal(True)
         self.set_skip_pager_hint(True)
         self.move(screen_width-self.DEFAULT_WINDOW_WIDTH, 0)
+        self.connect('expose-event', self._on_draw)
 
         position = self._get_position_by_dock(dock)
         if position is not None:
@@ -32,6 +35,17 @@ class MainWindow(gtk.Window):
               gtk.gdk.PROP_MODE_REPLACE, position)
         else:
             self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
+
+    def _on_draw(self, widget, event):
+        if os.path.isfile(self.image_path):
+            try:
+                pixbuf = gtk.gdk.pixbuf_new_from_file(self.image_path)
+                pixbuf_scaled = pixbuf.scale_simple(event.area.width, event.area.height, gtk.gdk.INTERP_BILINEAR)
+                widget.window.draw_pixbuf(widget.style.bg_gc[gtk.STATE_NORMAL], pixbuf_scaled, 0, 0, 0,0)
+                del pixbuf_scaled
+                del pixbuf
+            except:
+                pass
 
     def _get_position_by_dock(self, dock):
         position = None
@@ -43,6 +57,9 @@ class MainWindow(gtk.Window):
         else:
             pass
         return position
+
+    def set_background_image(self, image_path):
+        self.image_path = image_path
 
 
 class SimplePopUp(gtk.Window):
@@ -304,6 +321,94 @@ class PostMessage(gtk.Alignment):
             self.expand_text_field()
         else:
             self.collapse_text_field()
+
+
+class WelcomePanel(gtk.Alignment):
+
+
+    __gsignals__ = {
+        'welcome-panel-action': (
+            gobject.SIGNAL_RUN_FIRST, 
+            gobject.TYPE_NONE,
+            (gobject.TYPE_STRING, )
+            ),
+    }
+
+    def _emit_action(self, widget, action):
+        self.emit('welcome-panel-action', action)
+
+    def __init__(self):
+        super(WelcomePanel, self).__init__(xalign=0.5, yalign=0.5)
+        self._container = gtk.VBox()
+        self.add(self._container)
+        self.welcome_text_h1 = gtk.Label()
+        self.welcome_text_h1.set_markup(
+          """<span foreground="white">Welcome!</span>""")
+        self.welcome_text_h1.modify_font(pango.FontDescription("sans 16"))
+        self.welcome_text_h2 = gtk.Label()
+        self.welcome_text_h2.set_markup(
+          """<span foreground="white">We've brought Facebook to your</span>""")
+        self.welcome_text_h3 = gtk.Label()
+        self.welcome_text_h3.set_markup(
+          """<span foreground="white">desktop. Please Login below.</span>""")
+        self.welcome_button = gtk.Button('Login')
+        self.fb_button = gtk.Image()
+        self.fb_button.set_from_file(
+            '/usr/share/endlessm_social_bar/images/login_button_normal.png')
+        self.fb_button.show()
+        self.welcome_button_wraper = gtk.Alignment(xalign=0.5, yalign=0.5)
+        self.welcome_button_wraper.add(self.welcome_button)
+        self.welcome_button.connect('button-press-event', 
+          lambda w, e: self._emit_action(w, 'login'))
+        self._container.pack_start(self.welcome_text_h1)
+        self._container.pack_start(self.welcome_text_h2)
+        self._container.pack_start(self.welcome_text_h3)
+        self._container.pack_start(self.welcome_button_wraper)
+        self._container.pack_start(self.fb_button)
+
+
+class MultiPanel(gtk.Alignment):
+
+
+    def __init__(self):
+        super(MultiPanel, self).__init__(xalign=0.0, yalign=0.0, xscale=1.0, 
+          yscale=1.0)
+        self._map = {}
+        self._container = gtk.VBox()
+        self.add(self._container)
+        self._container.hide()
+        self.hide()
+
+    def add_panel(self, panel, panel_name):
+        self._map[panel_name] = panel
+        self._container.pack_start(panel, expand=True, fill=True, padding=0)
+        panel.hide()
+
+    def _show_panel(self, panel):
+        for current_panel in self._map.values():
+            if current_panel is panel:
+                current_panel.show()
+            else:
+                current_panel.hide()
+
+    def show_panel(self, panel_name):
+        panel = self._map.get(panel_name, None)
+        if panel is not None:
+            self._show_panel(panel)
+
+    def hide_all(self):
+        for current_panel in self._map.values():
+            current_panel.hide()
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,4 +1,4 @@
-from util.util import get_data, CSS
+from util.util import get_data, CSS, SLICKSCROLL_CSS, SLICKSCROLL_JS, MOUSE_WHEEL_JS
 from facebook.facebook import GraphAPIError, GraphAPI
 from facebook.facebook_posts import FacebookPosts
 from facebook.fb_auth_window import FBAuthWindow
@@ -9,8 +9,7 @@ import urlparse
 import json
 import pprint
 import webbrowser
-import multiprocessing
-
+import simplejson
 
 class SocialBarPresenter:
     
@@ -56,7 +55,7 @@ class SocialBarPresenter:
             result = FacebookPosts(result)
 #            print 'DONE converting. Result:', result
             print 'Generating html...'
-            html = str(self.render_posts_to_html(result.posts))
+            html = str(self.render_posts_to_html(result.posts, result.previous_url, result.next_url))
             print 'DONE generating html.'
 #            self._view.load_html(html)
             self._view.load_html(html)
@@ -178,9 +177,10 @@ class SocialBarPresenter:
         print 'previous_url :', result.previous_url
         print '='*80
         
-    def render_posts_to_html(self, posts):
-        page = Template(file = 'templates/news-feed.html', searchList = [{ 'posts':posts }, {'css':CSS}])
-        print str(page)
+    def render_posts_to_html(self, posts, newer_url='', older_url=''):
+        #pprint.pprint(posts)
+        page = Template(file = 'templates/news-feed.html', searchList = [{ 'posts':posts }, {'css':CSS}, {'mousewheel_js':MOUSE_WHEEL_JS},{'slickscroll_js':SLICKSCROLL_JS}, {'slickscroll_css':SLICKSCROLL_CSS}, {'newer':newer_url}, {'older':older_url}])
+        #print str(page)
         return page
     
     def navigator(self, uri):
@@ -241,9 +241,14 @@ class SocialBarPresenter:
             self.get_fb_news_feed()
         elif parsed.path == 'VIEW_POSTER':
             webbrowser.open('http://www.facebook.com/'+parsed_query['poster_id'][0], new=1, autoraise=True)
-            # parse comments and execute js in self._view._browser
-            # which will show comments and display text area and button
-        # execute javascript in feed web view if necessary
+        elif parsed.path.startswith('GET_OLDER_POSTS'):
+            url = parsed.path.split('?url=')[1]
+            result = self.get_new_fb_posts(None, url)
+            html = self.generate_posts_elements(result.posts)
+            script = 'show_older_posts(%s);' % simplejson.dumps(str(html))
+            self._view._browser.execute_script(script)
+        elif parsed.path.startswith('GET_NEWER_POSTS'):
+            self.get_fb_news_feed()
         return 1 #returning 1 prevents webkit to go to reqested uri, 0 will allow going to requested uri
         
     def get_commments(self, post_id):
@@ -252,6 +257,10 @@ class SocialBarPresenter:
         pprint.pprint(raw_comments)
         return raw_comments
     
+    def generate_posts_elements(self, posts):
+        page = Template(file = 'templates/posts-array.html', searchList = [{ 'posts':posts }])
+        return page
+
     def get_fb_user(self, fb_user_id='me'):
         return
 

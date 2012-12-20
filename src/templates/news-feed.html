@@ -1,5 +1,20 @@
 <html>
 	<head>
+	<!-- script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script -->
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+	<script>
+	$mousewheel_js
+	</script>
+	
+	<script>
+	$slickscroll_js
+	</script>
+	
+	<style>
+	$slickscroll_css
+	</style>
+	
 	<style>
 	$css
 	</style>
@@ -85,7 +100,7 @@
         //osakati comment link
         document.getElementById("comment-"+id).setAttribute("href", "eossocialbar:#");
     }
-
+    /*
     function add_click_to_posts(){
         posts = document.getElementsByClassName("post");
         for (var i = 0; i < posts.length; i++) {
@@ -98,13 +113,33 @@
             }(post.id)
         }
     }
-    
+    */
     function show_post_details(post_id) {
         //alert("eossocialbar:VIEWPOST?id=" + post_id);
         window.location.href = "eossocialbar:VIEWPOST?id=" + post_id;
     }
+    
+    function show_older_posts(posts) {
+        //alert(posts);
+        \$('.older').before(posts);
+        scroll1.InValidate();
+    }
 
 	</script>
+	
+	<script type="text/javascript">
+
+    var scroll1
+
+    \$(document).ready(function () {
+	    scroll1 = \$('#scroller').slickscroll({ "verticalscrollbar": true });
+	    //\$('#scroller').css('height', \$(document).heightt() - 5);
+        //alert("WIDTH: " + \$(document).width());
+        //alert("HEIGHT: " + \$(document).height());
+    });
+
+    </script>
+	
 	</head>
 	<body>
 	<!-- facebook js api load and initialization -->
@@ -137,14 +172,17 @@
 	</script>
 	
 	<!-- end facebook js api load and initialization -->
-		<div id="top-container"style="overflow:scroll;height=500px;">
-			<div id="scroller">
+		<div id="top-container">
+			<div id="scroller" class="slickscroll" style="height:610px;overflow:hidden;">
+			    <br/>
+				<a href="eossocial:GET_NEWER_POSTS:?url=$newer" style="text-align:center;">Get latest posts</a>
+				<br/>
 				<!-- here comes the list of posts -->
 				#for $post in $posts
 				<div class="post" id="$post.id" style="padding-top:5px;display:block;">
 					<div class="user" style="width:70px;float:left;">
 						<!-- image -->
-						<a href="eossocialbar:VIEW_POSTER?poster_id=$post.poster_id">
+						<a href="eossocialbar:VIEW_POSTER?poster_id=$post.poster_id" style="text-decoration:none;">
 						<img src="$post.poster_image"/>
 						</a>
 						<!-- time -->
@@ -192,43 +230,47 @@
 						        #end if
 						    #end for
 						    <!-- Like icon and count -->
-						        <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAOCAYAAAAi2ky3AAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9wMDgU3Euly/1EAAADVSURBVCjPY2CgJ7COnPHfP2vxf3xqmAgZklS19v+RZekELSNo0M37rxkYGBgY3rz/ilcdCz7J+evO/L9+9zVR3sdr0JzVZxiQvWUdOeM/AwMDg72pIkNbkTsjslpGWDjAvIAMcIWNTdRMhqPLMxgxXHTz/muGME9dBgYGBoZV2y8zEBO4OL329OUnipIIE7XSGtUMYsEVmAwMDAzWRvIMfk6aDNZG8ijy8lICDEfR9GCNtQ1TYxgYGBgYTl9+wnDg1H2Go+ceohgysdqHQVSIh5Em+REAl/lETgtJdhYAAAAASUVORK5CYII=" />&nbsp;&nbsp;
+						    <div class="wrapper">
+                              <div class="like">
+						        <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAOCAYAAAAi2ky3AAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9wMDgU3Euly/1EAAADVSURBVCjPY2CgJ7COnPHfP2vxf3xqmAgZklS19v+RZekELSNo0M37rxkYGBgY3rz/ilcdCz7J+evO/L9+9zVR3sdr0JzVZxiQvWUdOeM/AwMDg72pIkNbkTsjslpGWDjAvIAMcIWNTdRMhqPLMxgxXHTz/muGME9dBgYGBoZV2y8zEBO4OL329OUnipIIE7XSGtUMYsEVmAwMDAzWRvIMfk6aDNZG8ijy8lICDEfR9GCNtQ1TYxgYGBgYTl9+wnDg1H2Go+ceohgysdqHQVSIh5Em+REAl/lETgtJdhYAAAAASUVORK5CYII=" />
 						        <span id="likes-count-$post.id">
 						        #if $post.likes and $post.likes['count'] > 0
 						            $post.likes['count']
 						        #end if
 						        </span>&nbsp;&nbsp;
+						      </div> <!-- end class="like" -->
+						      
+						      <div class="comment">
 						        <a href="eossocialbar:COMMENT?id=$post.id" id="like-$post.id">
 						        <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAPCAYAAADphp8SAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9wMDgU4Hmdcr7UAAACcSURBVDjLY2CgEmBEF5i46Oj/XUdvE9ToZq3KkB9nzYhTgXf6gv/EAO/0Bf+R9TFRy2ssMMactRf+MzAwMKzfdYEsg6jmosFnEAu6gKO5GoNPxkIMhVtmxDMwMDDA5dysVRm2zsRjkAA/F4OjuRqGQT4ZC+GGbZ2ZwIhsCFaDYIYR61KcYM7aC/9hGJt8duPG/yQZRHHoU8UQSgAAARtZ3PPOdIYAAAAASUVORK5CYII=" />
-						        </a>&nbsp;&nbsp;
+						        </a>
 						        <span id="comments-count-$post.id">
 						        #if $post.comments and $post.comments['count'] > 0
 						            $post.comments['count']
 						        #end if
 						        </span>&nbsp;&nbsp;
-						#end if
+						
 						<br/>
 						<div class="comments-container" id="comments-$post.id" style="visibility:hidden;">
 						    
 						</div>
+						</div> <!-- end class="comment" -->
+                        </div> <!-- end class="wrapper" -->
 						<div class="comment-post-box" id="comment-post-box-$post.id" style="visibility:hidden;">
 						
 						</div>
+						#end if
 						<br/>
-						<div id="fb-root"></div>
-						<script>(function(d, s, id) {
-	  var js, fjs = d.getElementsByTagName(s)[0];
-	  if (d.getElementById(id)) return;
-	  js = d.createElement(s); js.id = id;
-	  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=393860344022808";
-	  fjs.parentNode.insertBefore(js, fjs);
-	}(document, 'script', 'facebook-jssdk'));
-	</script>
-						<div class="fb-like" data-href="https://graph.facebook.com/313449204401/likes" data-send="false" data-layout="button_count" data-width="50" data-show-faces="true"></div>
+						
 					</div>
 				</div>
 				<div class="clearer" style="clear:both;"></div>
 				#end for
+				<span class="older">
+				<br/>
+				<a href="eossocial:GET_OLDER_POSTS?url=$older" style="text-allign:center;">Get older posts</a>
+				<br/>
+				</span>
 			</div>
 		</div>
 	</body>

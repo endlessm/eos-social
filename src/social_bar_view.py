@@ -166,6 +166,7 @@ class SocialBarView(MainWindow):
         if self.btn_add.get_label() == 'Login':
 #            print 'Button clicked, calling self._presenter.get_fb_news_feed()...'
             self._presenter.fb_login(callback=self._presenter.get_fb_news_feed)
+#            self._presenter.get_fb_news_feed()
 #            print 'DONE in click handler.'
         else:
             self._presenter.get_fb_news_feed()
@@ -204,7 +205,7 @@ class SocialBarView(MainWindow):
         return self._presenter.navigator(request.get_uri())
     
     def _destroy(self, *args):
-        os.remove(os.path.expanduser('~/.fb_access_token'))
+        #os.remove(os.path.expanduser('~/.fb_access_token'))
         gtk.main_quit()
 
     def connect_title_changed(self, callback):

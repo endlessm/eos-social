@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+      PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:svg="http://www.w3.org/2000/svg"
+      xmlns:xlink="http://www.w3.org/1999/xlink">
+
+  <head>
+    <title></title>
+    <script type="text/javascript">
+        function send(msg) {
+            document.title = "null";
+            document.title = msg;
+        }
+        
+        function got_a_click() {
+            send('"got-a-click"');
+        }
+
+        function document_ready() {
+            send('"document-ready"');
+            document.getElementById('messages').addEventListener(
+                'click', 
+                got_a_click, 
+                false
+                );
+        }
+
+        document.addEventListener('DOMContentLoaded', document_ready, false);
+    </script>
+  </head>
+
+  <body>
+    <h2>Simple python - HTML</h2>
+    <p>
+        TS: <span id="uptime-value">?</span>
+    </p>
+    <p id="messages" style="background-color:#eeffee;">
+      Click here. Show popup<br/>
+    </p>
+
+  </body>
+
+</html>

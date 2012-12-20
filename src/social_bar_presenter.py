@@ -180,9 +180,9 @@ class SocialBarPresenter:
         print '='*80
         
     def render_posts_to_html(self, posts, newer_url='', older_url=''):
-        #pprint.pprint(posts)
         page = Template(file = 'templates/news-feed.html', searchList = [{ 'posts':posts }, {'css':CSS}, {'mousewheel_js':MOUSE_WHEEL_JS},{'slickscroll_js':SLICKSCROLL_JS}, {'slickscroll_css':SLICKSCROLL_CSS}, {'newer':newer_url}, {'older':older_url}])
-        #print str(page)
+#        page = Template(file = 'templates/news-feed.html', searchList = [{ 'posts':posts }, {'css':CSS}])
+        print str(page)
         return page
     
     def navigator(self, uri):
@@ -273,38 +273,36 @@ class SocialBarPresenter:
         profile = self._graph_api.get_object("me")
         webbrowser.open('http://www.facebook.com/' + profile['id'])
 
-    def get_profil_picture(self, callback):
-        image_url = None
+    def get_profil_picture(self):
         if self._graph_api is None:
-            self.show_fb_login()
-            return image_url
+            return None
         profile = self._graph_api.get_object("me")
         image_url = 'https://graph.facebook.com/' + profile['id'] + '/picture'
-        print 'image_url', image_url
-        p = multiprocessing.Process(target=get_image_dwn, args=(image_url, callback))
-        p.start()
-        image_url = None
-        return image_url
+        self.get_image_dwn(image_url)
+        return
 
     def get_stored_picture_file_path(self):
-        return '/opt/social_bar/social-draft/src/avatar'
+        return self._model.get_stored_picture_file_path()
 
-def get_image_dwn(image_url, callback):
-    print 'get_image_dwn', image_url
-    import urllib2
-    url_response = urllib2.urlopen(image_url)
-    image_final_url = url_response.geturl()
-    if image_final_url[-3:] in ('jpg', 'png'):
-        image_data = url_response.read()
-        print 'store to file'
-        with open('/opt/social_bar/social-draft/src/avatar', 'w') as f:
-            f.write(image_data)
-            f.close()
-        import time
-        time.sleep(7)
-        callback()
-    else:
+    def get_no_picture_file_path(self):
+        return self._model.get_no_picture_file_path()
+
+    def get_image_dwn(self, image_url):
+        url_response = urllib2.urlopen(image_url)
+        image_final_url = url_response.geturl()
+        if image_final_url[-3:] in ('jpg', 'png'):
+            image_data = url_response.read()
+            try:
+                with open(self.get_stored_picture_file_path(), 'w') as f:
+                    f.write(image_data)
+                    f.close()
+                return
+            except:
+                pass
         print 'error:', 'no image', image_final_url
-    print 'done'
-    return
+        return
+
+    def generate_posts_elements(self, posts):
+        page = Template(file = 'templates/posts-array.html', searchList = [{ 'posts':posts }])
+        return page
 

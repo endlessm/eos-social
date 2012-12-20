@@ -29,7 +29,6 @@ class SocialBarView(MainWindow):
 
         self.post_message_area = PostMessageSendArea()
         self.user_avatar = UserAvatar()
-        self.user_avatar.set_avatar('avatar.png')
         self.post_message_area.connect('post-panel-action', self._on_action)
         self.post_message = PostMessage(self.post_message_area, self.user_avatar)
         self.post_message.connect('post-panel-action', self._on_action)

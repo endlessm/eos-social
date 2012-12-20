@@ -8,6 +8,8 @@ from ui import PostMessage
 from ui import PostMessageSendArea
 import os
 from ui import UserAvatar
+from ui import WelcomePanel
+from ui import MultiPanel
 
 #gtk.gdk.threads_init()
 
@@ -17,18 +19,13 @@ class SocialBarView(MainWindow):
     def __init__(self):
         super(SocialBarView, self).__init__()
         self.connect('destroy', self._destroy)
+        super(SocialBarView, self).set_background_image(
+          '/usr/share/endlessm_social_bar/images/bg-right.png')
 
-#        self._fb_auth_view = FBAuthView()
         self._presenter = None
         self._browser = webkit.WebView()
 #        self._browser.set_size_request(-1, 600)
         self._browser.connect("navigation-requested", self._navigation_handler)
-
-        self.btn_add = gtk.Button('Login')
-        self.btn_add.set_size_request(64, 64)
-        self.btn_add.set_events(gtk.gdk.BUTTON_PRESS_MASK)
-        self.btn_add.connect("button-press-event", self.__on_button_press)
-        self.btn_add.show()
 
         self.post_message_area = PostMessageSendArea()
         self.user_avatar = UserAvatar()
@@ -37,18 +34,20 @@ class SocialBarView(MainWindow):
         self.post_message = PostMessage(self.post_message_area, self.user_avatar)
         self.post_message.connect('post-panel-action', self._on_action)
 
-        # pack web container
-        self.web_container = gtk.VBox()
-        self.web_container.pack_start(self.btn_add, expand=False, fill=False, padding=0)
-        self.web_container.pack_start(self._browser, expand=True, fill=True, padding=0)
-
         # pack main container
         self.main_container = gtk.VBox()
         self.main_container.pack_start(self.post_message, expand=False, fill=False, padding=0)
-        self.main_container.pack_start(self.web_container, expand=True, fill=True, padding=0)
-        self.add(self.main_container)
-        self.main_container.show()
+        self.main_container.pack_start(self._browser, expand=True, fill=True, padding=0)
+
+        self.welcome_panel = WelcomePanel()
+        self.welcome_panel.connect('welcome-panel-action', self._on_action)
+
+        self.wraper_main = MultiPanel()
+        self.wraper_main.add_panel(self.main_container, 'main_container')
+        self.wraper_main.add_panel(self.welcome_panel, 'welcome_panel')
+        self.add(self.wraper_main)
         self.show_all()
+        self.wraper_main.show_panel('welcome_panel')
 
     def _on_action(self, widget, action):
         if action == 'post':
@@ -66,41 +65,24 @@ class SocialBarView(MainWindow):
                 self._presenter.post_to_fb(text)
         elif action == 'avatar':
             self._presenter.show_profil_page()
+        elif action == 'login':
+            self._perform_login()
         else:
             pass
 
-    #def _print(self):
-    #    print '!'
-    #    return True
-
-    #def _animate(self):
-    #    self._h += 5
-    #    self.post_message.set_size_request(-1, self._h)
-    #    if self._h < 200:
-    #        return True
-    #    self.post_message.show_text_field()
-    #    return False
-
-    def __on_button_press(self, widget, event):
-
-#        self.show_popup_notification("test")
+    def _perform_login(self):
 
         def _callback():
             self._presenter.get_fb_news_feed()
             self._presenter.get_profil_picture()
             file_path = self._presenter.get_stored_picture_file_path()
             self.user_avatar.set_avatar(file_path)
+            self.wraper_main.show_panel('main_container')
 
-        if self.btn_add.get_label() == 'Login':
-#            print 'Button clicked, calling self._presenter.get_fb_news_feed()...'
-            self._presenter.fb_login(callback=_callback)
-#            print 'DONE in click handler.'
-        else:
+        if self._presenter.is_user_loged_in():
             _callback()
-        
-
-#    def show_fb_auth_popup(self):
-#        self._fb_auth_view.open('')
+        else:
+            self._presenter.fb_login(callback=_callback)
 
     def show_popup_notification(self, notification_text):
         SimplePopUp(notification_text).show()

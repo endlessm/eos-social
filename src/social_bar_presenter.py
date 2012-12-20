@@ -77,7 +77,7 @@ class SocialBarPresenter:
                 token = line.split(':')[1]
                 self.set_fb_access_token(token)
                 self._graph_api = GraphAPI(access_token=self._fb_access_token)
-                self._view.btn_add.set_label('Refresh')
+                #self._view.btn_add.set_label('Refresh')
             elif line.startswith('FAILURE'):
                 self._view.show_popup_notification('Something went wrong when authenticating app.')
 
@@ -302,7 +302,8 @@ class SocialBarPresenter:
         print 'error:', 'no image', image_final_url
         return
 
-    def generate_posts_elements(self, posts):
-        page = Template(file = 'templates/posts-array.html', searchList = [{ 'posts':posts }])
-        return page
+    def is_user_loged_in(self):
+        if self._fb_access_token is None:
+            return False
+        return True
 

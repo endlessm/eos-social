@@ -214,6 +214,8 @@ class PostMessage(gtk.Alignment):
     COLLAPSED_HEIGHT = 50
     EXPANDED_HEIGHT = 150
 
+    IMG_PATH = '/usr/share/endlessm_social_bar/images/'
+
     LOC = {
         'post': (5, 12), 
         'chat': (100, 12), 
@@ -221,6 +223,15 @@ class PostMessage(gtk.Alignment):
         'settings': (220, 12), 
         'close': (345, 12), 
         'avatar': (370, 12), 
+        }
+
+    IMG = {
+        'post': {'normal', 'publish_button_normal.png', }, 
+        'chat': '', 
+        'feed': '', 
+        'settings': '', 
+        'close': '', 
+        'avatar': '', 
         }
 
     SIZE = {
@@ -244,8 +255,11 @@ class PostMessage(gtk.Alignment):
 
     def _create_button(self, button_name, width=40, height=20, title=''):
         width, height = self.SIZE[button_name]
-        button = gtk.Button(title)
-        button.connect('clicked', self._emit_action, button_name)
+        #button = gtk.Button(title)
+        button = SimpleButton()
+        #button.connect('clicked', self._emit_action, button_name)
+        button.connect('button-press-event', 
+          lambda w, e: self._emit_action(w, button_name))
         button.set_size_request(width, height)
         self._buttons[button_name] = button
         return button
@@ -276,8 +290,23 @@ class PostMessage(gtk.Alignment):
         ##self.add(self.toolbar)
         self.add(self.toolbar_wraper)
 
-        self.toolbar.put(self._create_button('post', title='post'), 
-          *self.LOC['post'])
+        #self.toolbar.put(self._create_button('post', title='post'), 
+        #  *self.LOC['post'])
+
+        post = SimpleButton()
+        self.toolbar.put(post, *self.LOC['post'])
+        post.connect('button-press-event', 
+          lambda w, e: self._emit_action(w, 'post'))
+        post.show_image(
+          '/usr/share/endlessm_social_bar/images/publish_button_normal.png')
+        post.set_image('click', 
+          '/usr/share/endlessm_social_bar/images/publish_button_down.png')
+        post.set_image('release', 
+          '/usr/share/endlessm_social_bar/images/publish_button_normal.png')
+        post.set_image('enter', 
+          '/usr/share/endlessm_social_bar/images/publish_button_hover.png')
+        post.set_image('leave', 
+          '/usr/share/endlessm_social_bar/images/publish_button_normal.png')
 
         self.collapse_text_field()
 
@@ -352,19 +381,33 @@ class WelcomePanel(gtk.Alignment):
         self.welcome_text_h3.set_markup(
           """<span foreground="white">desktop. Please Login below.</span>""")
         self.welcome_button = gtk.Button('Login')
-        self.fb_button = gtk.Image()
-        self.fb_button.set_from_file(
-            '/usr/share/endlessm_social_bar/images/login_button_normal.png')
+        self.fb_button = SimpleButton()
+        self.fb_button.set_size_request(128, 34)
+        self.fb_button.set_image('leave', 
+          '/usr/share/endlessm_social_bar/images/login_button_normal.png')
+        self.fb_button.set_image('enter', 
+          '/usr/share/endlessm_social_bar/images/login_button_hover.png')
+        self.fb_button.show_image(
+          '/usr/share/endlessm_social_bar/images/login_button_normal.png')
+        self.fb_button.connect('button-press-event', 
+          lambda w, e: self._emit_action(w, 'login'))
+
         self.fb_button.show()
+        self.fb_button_wraper = gtk.Alignment(xalign=0.5, yalign=0.5)
+        self.fb_button_wraper.add(self.fb_button)
+        self.fb_button_wraper.show()
+
         self.welcome_button_wraper = gtk.Alignment(xalign=0.5, yalign=0.5)
         self.welcome_button_wraper.add(self.welcome_button)
         self.welcome_button.connect('button-press-event', 
           lambda w, e: self._emit_action(w, 'login'))
         self._container.pack_start(self.welcome_text_h1)
+        self._container.pack_start(gtk.Label())
         self._container.pack_start(self.welcome_text_h2)
         self._container.pack_start(self.welcome_text_h3)
-        self._container.pack_start(self.welcome_button_wraper)
-        self._container.pack_start(self.fb_button)
+        #self._container.pack_start(self.welcome_button_wraper)
+        self._container.pack_start(gtk.Label())
+        self._container.pack_start(self.fb_button_wraper)
 
 
 class MultiPanel(gtk.Alignment):
@@ -399,6 +442,52 @@ class MultiPanel(gtk.Alignment):
     def hide_all(self):
         for current_panel in self._map.values():
             current_panel.hide()
+
+
+class SimpleButton(gtk.EventBox):
+
+
+    def __init__(self):
+        super(SimpleButton, self).__init__()
+        #self.connect("expose-event", self._on_draw)
+        self._image_map = {}
+        self.set_visible_window(False)
+        self.image = gtk.Image()
+        self.add(self.image)
+        self.connect('button-press-event', self._on_click)
+        self.connect('button_release_event', self._on_release)
+        self.connect('enter_notify_event', self._on_enter)
+        self.connect('leave_notify_event', self._on_leave)
+        self.set_events(gtk.gdk.EXPOSURE_MASK
+                            | gtk.gdk.LEAVE_NOTIFY_MASK
+                            | gtk.gdk.ENTER_NOTIFY_MASK
+                            | gtk.gdk.BUTTON_PRESS_MASK
+                            | gtk.gdk.BUTTON_RELEASE_MASK
+                            )
+
+    def set_image(self, image_name, image_file):
+        self._image_map[image_name] = image_file
+
+    def show_image(self, image_file):
+        if image_file:
+            self.image.set_from_file(image_file)
+
+    def _on_click(self, w, e):
+        self.show_image(self._image_map.get('click', None))
+
+    def _on_release(self, w, e):
+        self.show_image(self._image_map.get('release', None))
+
+    def _on_enter(self, w, e):
+        self.show_image(self._image_map.get('enter', None))
+
+    def _on_leave(self, w, e):
+        self.show_image(self._image_map.get('leave', None))
+
+
+    #def _on_draw(self, widget, event):
+    #    print 'draw'
+
 
 
 

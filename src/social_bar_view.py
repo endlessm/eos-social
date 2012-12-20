@@ -107,7 +107,7 @@ class SocialBarView(MainWindow):
         return self._presenter.navigator(request.get_uri())
     
     def _destroy(self, *args):
-        #os.remove(os.path.expanduser('~/.fb_access_token'))
+        os.remove(os.path.expanduser('~/.fb_access_token'))
         gtk.main_quit()
 
     def main(self):

@@ -2,67 +2,10 @@ import gtk
 import gobject
 import os
 import pango
+import cairo
 
-
-class MainWindow(gtk.Window):
-
-
-    DEFAULT_WINDOW_WIDTH = 400
-    def __init__(self, transparent=False, dock=None):
-        super(MainWindow, self).__init__(gtk.WINDOW_TOPLEVEL)
-        self.image_path = None
-        screen_height = gtk.gdk.screen_height() - 80
-        screen_width = gtk.gdk.screen_width()
-        self.set_app_paintable(True)
-        if transparent:
-            self.set_colormap(win.get_screen().get_rgba_colormap())
-
-        self.set_resizable(False)
-        self.set_default_size(self.DEFAULT_WINDOW_WIDTH, screen_height)
-        self.set_size_request(self.DEFAULT_WINDOW_WIDTH, screen_height)
-        self.stick() # this sticks on all desktops
-        #self.set_keep_above(True)
-        self.set_modal(True)
-        self.set_skip_pager_hint(True)
-        self.move(screen_width-self.DEFAULT_WINDOW_WIDTH, 0)
-        self.connect('expose-event', self._on_draw)
-
-        position = self._get_position_by_dock(dock)
-        if position is not None:
-            self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DOCK)
-            self.show() # must call show() before property_change()
-            self.window.property_change("_NET_WM_STRUT", "CARDINAL", 32, 
-              gtk.gdk.PROP_MODE_REPLACE, position)
-        else:
-            self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
-
-    def _on_draw(self, widget, event):
-        if os.path.isfile(self.image_path):
-            try:
-                cr = widget.window.cairo_create()
-                pixbuf = gtk.gdk.pixbuf_new_from_file(self.image_path)
-                pixbuf_scaled = pixbuf.scale_simple(event.area.width, event.area.height, gtk.gdk.INTERP_BILINEAR)
-                #widget.window.draw_pixbuf(widget.style.bg_gc[gtk.STATE_NORMAL], pixbuf_scaled, 0, 0, 0,0)
-                cr.set_source_pixbuf(pixbuf, 0, 0)
-                del pixbuf_scaled
-                del pixbuf
-                cr.paint()
-            except:
-                pass
-
-    def _get_position_by_dock(self, dock):
-        position = None
-        if dock == 'right':
-            position = [0, self.DEFAULT_WINDOW_WIDTH, 0, 0]
-        elif dock == 'left':
-            #TODO: make it dockable to left side
-            pass
-        else:
-            pass
-        return position
-
-    def set_background_image(self, image_path):
-        self.image_path = image_path
+from simple_button import SimpleButton
+from main_window import MainWindow
 
 
 class SimplePopUp(gtk.Window):
@@ -421,8 +364,11 @@ class WelcomePanel(gtk.Alignment):
         self.welcome_text_h3.set_markup(
           """<span foreground="white">desktop. Please Login below.</span>""")
         self.welcome_button = gtk.Button('Login')
-        self.fb_button = SimpleButton()
-        self.fb_button.set_size_request(128, 34)
+        #self.fb_button = SimpleButton()
+        self.fb_button = LabelButton()
+        self.fb_button.set_text('connect', x=50, y=30)
+        #self.fb_button.set_size_request(128, 34)
+        self.fb_button.set_size_request(144, 50)
         self.fb_button.set_image('leave', 
           '/usr/share/endlessm_social_bar/images/login_button_normal.png')
         self.fb_button.set_image('enter', 
@@ -484,16 +430,17 @@ class MultiPanel(gtk.Alignment):
             current_panel.hide()
 
 
-class SimpleButton(gtk.EventBox):
+class LabelButton(gtk.EventBox):
 
 
     def __init__(self):
-        super(SimpleButton, self).__init__()
-        #self.connect("expose-event", self._on_draw)
+        super(LabelButton, self).__init__()
         self._image_map = {}
+        self._text_x_offset = 0
+        self._text_y_offset = 0
+        self._text = ''
         self.set_visible_window(False)
-        self.image = gtk.Image()
-        self.add(self.image)
+        self.image_path = None
         self.connect('button-press-event', self._on_click)
         self.connect('button_release_event', self._on_release)
         self.connect('enter_notify_event', self._on_enter)
@@ -504,13 +451,45 @@ class SimpleButton(gtk.EventBox):
                             | gtk.gdk.BUTTON_PRESS_MASK
                             | gtk.gdk.BUTTON_RELEASE_MASK
                             )
+        self.connect('expose-event', self._on_draw)
+
+    def _on_draw(self, widget, event):
+        cr = self.window.cairo_create()
+        self._draw_image(cr, event)
+        cr.set_source_rgb(0.9, 0.9, 0.9)
+        cr.select_font_face("sans", cairo.FONT_SLANT_NORMAL, 
+          cairo.FONT_WEIGHT_NORMAL)
+        cr.set_font_size(16)
+        #cr.move_to(self.allocation.x, self.allocation.y)
+        x = event.area.x + self._text_x_offset
+        y = event.area.y + self._text_y_offset
+        cr.move_to(x, y)
+        cr.show_text(self._text)
+
+    def _draw_image(self, cr, event):
+        if os.path.isfile(self.image_path):
+            try:
+                pixbuf = gtk.gdk.pixbuf_new_from_file(self.image_path)
+                pixbuf_scaled = pixbuf.scale_simple(event.area.width, event.area.height, gtk.gdk.INTERP_BILINEAR)
+                cr.set_source_pixbuf(pixbuf, event.area.x, event.area.y)
+                del pixbuf_scaled
+                del pixbuf
+                cr.paint()
+            except:
+                pass
+
+    def set_text(self, text, x=0, y=0):
+        self._text = text
+        self._text_x_offset = x
+        self._text_y_offset = y
 
     def set_image(self, image_name, image_file):
         self._image_map[image_name] = image_file
 
     def show_image(self, image_file):
         if image_file:
-            self.image.set_from_file(image_file)
+            self.image_path = image_file
+            self.queue_draw()
 
     def _on_click(self, w, e):
         self.show_image(self._image_map.get('click', None))
@@ -525,8 +504,9 @@ class SimpleButton(gtk.EventBox):
         self.show_image(self._image_map.get('leave', None))
 
 
-    #def _on_draw(self, widget, event):
-    #    print 'draw'
+
+
+
 
 
 

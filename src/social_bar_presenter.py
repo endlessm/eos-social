@@ -182,7 +182,7 @@ class SocialBarPresenter:
     def render_posts_to_html(self, posts, newer_url='', older_url=''):
         page = Template(file = 'templates/news-feed.html', searchList = [{ 'posts':posts }, {'css':CSS}, {'mousewheel_js':MOUSE_WHEEL_JS},{'slickscroll_js':SLICKSCROLL_JS}, {'slickscroll_css':SLICKSCROLL_CSS}, {'newer':newer_url}, {'older':older_url}])
 #        page = Template(file = 'templates/news-feed.html', searchList = [{ 'posts':posts }, {'css':CSS}])
-        print str(page)
+        #print str(page)
         return page
     
     def navigator(self, uri):
@@ -236,7 +236,10 @@ class SocialBarPresenter:
             comments['data'].reverse()
             script = 'show_comments(%s, %s);' % (json.dumps(parsed_query['id'][0]), json.dumps(comments['data']))
             self._view._browser.execute_script(script)
-
+#            h = self.get_html()
+#            print '+'*80
+#            print h
+#            print '+'*80
         elif parsed.path == 'POST_COMMENT':
             result = self.post_fb_comment(parsed_query['id'][0], parsed_query['comment_text'][0])
             print result
@@ -247,7 +250,7 @@ class SocialBarPresenter:
             url = parsed.path.split('?url=')[1]
             result = self.get_new_fb_posts(None, url)
             html = self.generate_posts_elements(result.posts)
-            script = 'show_older_posts(%s);' % simplejson.dumps(str(html))
+            script = 'show_older_posts(%s, %s);' % (simplejson.dumps(str(html)), simplejson.dumps(result.next_url))
             self._view._browser.execute_script(script)
         elif parsed.path.startswith('GET_NEWER_POSTS'):
             self.get_fb_news_feed()
@@ -306,4 +309,9 @@ class SocialBarPresenter:
         if self._fb_access_token is None:
             return False
         return True
+    
+    def get_html(self):
+        self._view._browser.execute_script('oldtitle=document.title;document.title=document.documentElement.innerHTML;')
+        html = self._view._browser.get_main_frame().get_title()
+        return html
 

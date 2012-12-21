@@ -90,7 +90,7 @@ class UserAvatar(gtk.EventBox):
 
 
     SIZE = {
-        'user_avatar': (24, 24), 
+        'user_avatar': (32, 33), 
         }
 
     def __init__(self):
@@ -125,9 +125,32 @@ class PostMessageSendArea(gtk.Alignment):
 
     SIZE = {
         'fb': (32, 32), 
-        'send': (46, 32), 
-        'cancel': (32, 32), 
+        'send': (20, 21), 
+        'cancel': (20, 21), 
         }
+
+    IMG = {
+        # normal, click, release, enter, leave
+        'send': (
+          'send_button_normal.png', 
+          'send_button_down.png', 
+          'send_button_normal.png', 
+          'send_button_hover.png', 
+          'send_button_normal.png', 
+          ), 
+        'cancel': (
+          'cancel_button_normal.png', 
+          'cancel_button_down.png', 
+          'cancel_button_normal.png', 
+          'cancel_button_hover.png', 
+          'cancel_button_normal.png', 
+          ), 
+        }
+
+    IMG_PATH = '/usr/share/endlessm_social_bar/images/'
+    def _img(cls, key):
+        images = cls.IMG[key]
+        return [cls.IMG_PATH + img for img in images]
 
     DEFAULT_TEXT = 'Type status here'
 
@@ -142,13 +165,21 @@ class PostMessageSendArea(gtk.Alignment):
     def _emit_action(self, widget, action):
         self.emit('post-panel-action', action)
 
-    def _create_button(self, button_name, width=40, height=20, title=''):
+    def _make_button(self, button_name, button, width=40, height=20):
         width, height = self.SIZE[button_name]
-        button = gtk.Button(title)
-        button.connect('clicked', self._emit_action, button_name)
+        button.connect('button-press-event', 
+          lambda w, e: self._emit_action(w, button_name))
         button.set_size_request(width, height)
         self._buttons[button_name] = button
         return button
+
+    def _skin_it(self, button_name, button):
+        images = self._img(button_name)
+        button.show_image(images[0])
+        button.set_image('click', images[1])
+        button.set_image('release', images[2])
+        button.set_image('enter', images[3])
+        button.set_image('leave', images[4])
 
     def _focus_in(self, widget, event):
         self.clear_text()
@@ -174,9 +205,15 @@ class PostMessageSendArea(gtk.Alignment):
         self.text_area_wraper = gtk.HBox(True)
         self.text_area_wraper.pack_start(self.text_area, True, True, 10)
 
+        send = self._make_button('send', SimpleButton())
+        self._skin_it('send', send)
+
+        cancel = self._make_button('cancel', SimpleButton())
+        self._skin_it('cancel', cancel)
+
         self.post_toolbar = gtk.HBox()
-        self.post_toolbar.pack_end(self._create_button('cancel', title='x'), False, False, 10)
-        self.post_toolbar.pack_end(self._create_button('send', title='send'), False, False, 10)
+        self.post_toolbar.pack_end(send, False, False, 5)
+        self.post_toolbar.pack_end(cancel, False, False, 5)
 
         self.post_wraper = gtk.VBox()
         self.post_wraper.pack_start(self.text_area_wraper, True, True)
@@ -211,21 +248,20 @@ class PostMessageSendArea(gtk.Alignment):
         super(PostMessageSendArea, self).hide()
 
 
-
 class PostMessage(gtk.Alignment):
 
-    COLLAPSED_HEIGHT = 50
-    EXPANDED_HEIGHT = 150
+    COLLAPSED_HEIGHT = 70
+    EXPANDED_HEIGHT = 160
 
     IMG_PATH = '/usr/share/endlessm_social_bar/images/'
 
     LOC = {
-        'post': (5, 12), 
+        'post': (10, 12), 
         'chat': (100, 12), 
         'feed': (145, 12), 
         'settings': (220, 12), 
         'close': (345, 12), 
-        'avatar': (370, 12), 
+        'avatar': (350, 12), 
         }
 
     IMG = {
@@ -238,11 +274,12 @@ class PostMessage(gtk.Alignment):
         }
 
     SIZE = {
-        'post': (45, 26), 
+        'post': (32, 33), 
         'chat': (45, 26), 
         'feed': (45, 26), 
         'settings': (65, 26), 
         'close': (48, 26), 
+        'avatar': (32, 33), 
         }
 
     __gsignals__ = {

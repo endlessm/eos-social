@@ -6,6 +6,7 @@ import cairo
 
 from simple_button import SimpleButton
 from main_window import MainWindow
+from user_profile_menu import UserProfileMenu
 
 
 class SimplePopUp(gtk.Window):
@@ -32,15 +33,28 @@ class SimplePopUp(gtk.Window):
 class UserAvatar(gtk.EventBox):
 
 
+    __gsignals__ = {
+        'user-profile-action': (
+            gobject.SIGNAL_RUN_FIRST, 
+            gobject.TYPE_NONE,
+            (gobject.TYPE_STRING, )
+            ),
+    }
+
     SIZE = {
         'user_avatar': (32, 33), 
         }
 
-    def __init__(self):
+    def __init__(self, menu):
         super(UserAvatar, self).__init__()
+        self._presenter = None
         self._user_avatar = gtk.Image()
         self._user_avatar.set_size_request(*self.SIZE['user_avatar'])
         self.add(self._user_avatar)
+        self.menu = menu
+        self.menu.connect('user-profile-action', 
+          lambda w, a: self.emit('user-profile-action', a))
+        self.connect('button-press-event', self._on_click)
 
     def show(self):
         super(UserAvatar, self).show()
@@ -49,6 +63,10 @@ class UserAvatar(gtk.EventBox):
     def hide(self):
         self._user_avatar.hide()
         super(UserAvatar, self).hide()
+
+    def set_presenter(self, presenter):
+        self._presenter = presenter
+        self.set_avatar(self._presenter.get_no_picture_file_path())
 
     def set_avatar(self, image_path):
         if os.path.isfile(image_path):
@@ -61,6 +79,18 @@ class UserAvatar(gtk.EventBox):
                 del scaled_pixbuf
             except:
                 pass
+
+    def _on_click(self, widget, event):
+        top_level = self.get_toplevel()
+        top_level_x, top_level_y = top_level.get_window().get_origin()
+        pos_x = top_level_x + self.allocation.x
+        pos_y = top_level_y + self.allocation.y + self.allocation.height
+        # move to end of user profile
+        pos_x = pos_x + self.allocation.width
+        state = self._presenter.get_logout_on_shutdown_active()
+        self.menu.set_logout_on_shutdown_active(state)
+        self.menu.show(pos_x, pos_y)
+        self.menu.run()
 
 
 class PostMessageSendArea(gtk.Alignment):

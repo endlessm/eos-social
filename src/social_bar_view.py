@@ -10,6 +10,7 @@ import os
 from ui import UserAvatar
 from ui import WelcomePanel
 from ui import MultiPanel
+from ui import UserProfileMenu
 
 #gtk.gdk.threads_init()
 
@@ -28,7 +29,10 @@ class SocialBarView(MainWindow):
         self._browser.connect("navigation-requested", self._navigation_handler)
 
         self.post_message_area = PostMessageSendArea()
-        self.user_avatar = UserAvatar()
+        self.user_avatar_menu = UserProfileMenu(self._presenter)
+        self.user_avatar_menu.connect('user-profile-action', self._on_action)
+        self.user_avatar = UserAvatar(self.user_avatar_menu)
+        #self.user_avatar.connect('user-profile-action', self._on_action)
         self.post_message_area.connect('post-panel-action', self._on_action)
         self.post_message = PostMessage(self.post_message_area, self.user_avatar)
         self.post_message.connect('post-panel-action', self._on_action)
@@ -63,11 +67,20 @@ class SocialBarView(MainWindow):
             if text is not None:
                 self._presenter.post_to_fb(text)
         elif action == 'avatar':
+            pass
+        elif action == 'user_profile':
             self._presenter.show_profil_page()
         elif action == 'login':
             self._perform_login()
+        elif action == 'logout_on_shutdown_active':
+            self._presenter.set_logout_on_shutdown_active(True)
+        elif action == 'logout_on_shutdown_inactive':
+            self._presenter.set_logout_on_shutdown_active(False)
+        elif action == 'logout':
+            self.wraper_main.show_panel('welcome_panel')
+            self._presenter.logout()
         else:
-            pass
+            print 'no action ->', action
 
     def _perform_login(self):
 
@@ -88,7 +101,7 @@ class SocialBarView(MainWindow):
        
     def set_presenter(self, presenter):
         self._presenter = presenter
-        self.user_avatar.set_avatar(self._presenter.get_no_picture_file_path())
+        self.user_avatar.set_presenter(self._presenter)
     
     def show_browser(self):
         self._browser.show()
@@ -106,7 +119,8 @@ class SocialBarView(MainWindow):
         return self._presenter.navigator(request.get_uri())
     
     def _destroy(self, *args):
-        os.remove(os.path.expanduser('~/.fb_access_token'))
+        if self._presenter.get_logout_on_shutdown_active():
+            self._presenter.logout()
         gtk.main_quit()
 
     def main(self):

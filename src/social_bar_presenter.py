@@ -315,3 +315,14 @@ class SocialBarPresenter:
         html = self._view._browser.get_main_frame().get_title()
         return html
 
+    def get_logout_on_shutdown_active(self):
+        return self._model.get_logout_on_shutdown_active()
+
+    def set_logout_on_shutdown_active(self, state):
+        self._model.set_logout_on_shutdown_active(state)
+
+    def logout(self):
+        self._fb_access_token = None
+        self._model.logout()
+
+

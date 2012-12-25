@@ -195,19 +195,23 @@ class PostMessageSendArea(gtk.Alignment):
         self.add(self.post_wraper)
 
     def get_post_message(self):
-        text_buffer = self.text_area.get_buffer()
-        start, end = text_buffer.get_bounds()
-        #text = text_buffer.get_slice(start, end, False)
-        text = text_buffer.get_text(start, end, False)
+        text = self._get_text()
         if text == '' or text == self.DEFAULT_TEXT:
             return None
         return text
 
+    def _get_text(self):
+        text_buffer = self.text_area.get_buffer()
+        start, end = text_buffer.get_bounds()
+        #text = text_buffer.get_slice(start, end, False)
+        return text_buffer.get_text(start, end, False)
+
     def get_text_area(self):
         return self.text_area
 
-    def clear_text(self):
-        self.text_area.get_buffer().set_text('')
+    def clear_text(self, force=False):
+        if force or self._get_text() == self.DEFAULT_TEXT:
+            self.text_area.get_buffer().set_text('')
 
     def set_default_text(self):
         self.text_area.get_buffer().set_text(self.DEFAULT_TEXT)

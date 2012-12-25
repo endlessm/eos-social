@@ -63,7 +63,8 @@ class SocialBarView(MainWindow):
             gtk.main_quit()
         elif action == 'send':
             text = self.post_message_area.get_post_message()
-            self.post_message_area.set_default_text()
+            #self.post_message_area.set_default_text()
+            self.post_message_area.clear_text(True)
             if text is not None:
                 self._presenter.post_to_fb(text)
         elif action == 'avatar':

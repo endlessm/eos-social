@@ -7,7 +7,12 @@ install:
 	mkdir -p $(BINDIR)
 	cp -R src/* $(LIBDIR)
 	cp eos-social $(BINDIR)
-	chmod +X $(BINDIR)/eos-social	
+	chmod +X $(BINDIR)/eos-social
+	python -m compileall $(LIBDIR)
+	rm -f $(LIBDIR)/*.py
+	rm -f $(LIBDIR)/facebook/*.py
+	rm -f $(LIBDIR)/util/*.py
+	rm -f $(LIBDIR)/ui/*.py
 uninstall:
 	rm -rf $(LIBDIR)
 	rm -f $(BINDIR)/eos-social

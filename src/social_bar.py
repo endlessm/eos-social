@@ -16,7 +16,8 @@ class Global(object):
 if __name__ == "__main__":
     SocialBarView.start_gtk_thread()
 
-    uri = 'file://' + urllib.pathname2url(os.path.abspath('demo.xhtml'))
+    # uri = 'file://' + urllib.pathname2url(os.path.abspath('demo.xhtml'))
+    uri = 'file://' + '/usr/share/eos-social/demo.xhtml';
     view = SocialBarView.synchronous_gtk_message(SocialBarView)(
         uri, 
         quit_function=Global.set_quit

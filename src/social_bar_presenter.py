@@ -57,7 +57,7 @@ class SocialBarPresenter:
     
     def fb_login(self, callback=None):
 #        url = fb_auth_url(self._app_id, self._webserver_url, ['read_stream','publish_stream'])
-        proc = subprocess.Popen(['python', 'facebook/fb_auth_window.py'], stdout=subprocess.PIPE)
+        proc = subprocess.Popen(['python', 'facebook/fb_auth_window.pyc'], stdout=subprocess.PIPE)
         for line in proc.stdout:
             print line
             if line.startswith('ACCESS_TOKEN:'):

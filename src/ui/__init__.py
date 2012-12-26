@@ -125,7 +125,7 @@ class PostMessageSendArea(gtk.Alignment):
         images = cls.IMG[key]
         return [cls.IMG_PATH + img for img in images]
 
-    DEFAULT_TEXT = 'Type status here'
+    DEFAULT_TEXT = _('Type status here')
 
     __gsignals__ = {
         'post-panel-action': (
@@ -389,15 +389,15 @@ class WelcomePanel(gtk.Alignment):
         self.add(self._container)
         self.welcome_text_h1 = gtk.Label()
         self.welcome_text_h1.set_markup(
-          """<span foreground="white">Welcome!</span>""")
+          """<span foreground="white">""" + _('Welcome!') + """</span>""")
         self.welcome_text_h1.modify_font(pango.FontDescription("sans 16"))
         self.welcome_text_h2 = gtk.Label()
         self.welcome_text_h2.set_markup(
-          """<span foreground="white">We've brought Facebook to your</span>""")
+          """<span foreground="white">""" + _("We've brought Facebook to your") + """</span>""")
         self.welcome_text_h3 = gtk.Label()
         self.welcome_text_h3.set_markup(
-          """<span foreground="white">desktop. Please Login below.</span>""")
-        self.welcome_button = gtk.Button('Login')
+          """<span foreground="white">""" + _('desktop. Please Login below.') + """</span>""")
+        self.welcome_button = gtk.Button(_('Login'))
         #self.fb_button = SimpleButton()
         self.fb_button = LabelButton()
         self.fb_button.set_text('connect', x=50, y=30)

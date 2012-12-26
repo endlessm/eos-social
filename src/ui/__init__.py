@@ -3,11 +3,13 @@ import gobject
 import os
 import pango
 import cairo
+import gettext
 
 from simple_button import SimpleButton
 from main_window import MainWindow
 from user_profile_menu import UserProfileMenu
 
+gettext.install('endlessm_social_bar', '/usr/share/locale', unicode=True, names=['ngettext'])
 
 class SimplePopUp(gtk.Window):
 

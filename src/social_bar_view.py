@@ -11,6 +11,9 @@ from ui import UserAvatar
 from ui import WelcomePanel
 from ui import MultiPanel
 from ui import UserProfileMenu
+import gettext
+
+gettext.install('endlessm_social_bar', '/usr/share/locale', unicode=True, names=['ngettext'])
 
 #gtk.gdk.threads_init()
 

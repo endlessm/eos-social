@@ -53,13 +53,10 @@ class SocialBarPresenter:
         
         if result:
             print 'Converting facebook data to py objects...'
-#            pprint.pprint(result)
             result = FacebookPosts(result)
-#            print 'DONE converting. Result:', result
             print 'Generating html...'
             html = str(self.render_posts_to_html(result.posts, result.previous_url, result.next_url))
             print 'DONE generating html.'
-#            self._view.load_html(html)
             self._view.load_html(html)
             return result
         
@@ -69,7 +66,6 @@ class SocialBarPresenter:
             return result
     
     def fb_login(self, callback=None):
-#        url = fb_auth_url(self._app_id, self._webserver_url, ['read_stream','publish_stream'])
         proc = subprocess.Popen(['python', 'facebook/fb_auth_window.py'], stdout=subprocess.PIPE)
         for line in proc.stdout:
             print line
@@ -77,15 +73,13 @@ class SocialBarPresenter:
                 token = line.split(':')[1]
                 self.set_fb_access_token(token)
                 self._graph_api = GraphAPI(access_token=self._fb_access_token)
-                #self._view.btn_add.set_label('Refresh')
             elif line.startswith('FAILURE'):
-                self._view.show_popup_notification('Something went wrong when authenticating app.')
+                self._view.show_popup_notification(_('Something went wrong when authenticating app.'))
 
         if callback:
             callback()
     
     def post_to_fb(self, text):
-#        print 'Post to Facebook.'
         try:
             self._graph_api.put_wall_post(text)
             self.get_fb_news_feed()
@@ -100,7 +94,6 @@ class SocialBarPresenter:
             return False
     
     def post_fb_like(self, id):
-#        print 'Posting like to post with id', id        
         try:
             self._graph_api.put_like(id)
             return True
@@ -114,12 +107,10 @@ class SocialBarPresenter:
             return False
     
     def post_fb_comment(self, id, comment):
-#        print 'Posting comment (',comment,') to post with id', id        
         try:
             self._graph_api.put_comment(id, comment)
             return True
         except GraphAPIError as error:
-#            print error.result
             self.oauth_exception_handler(error.result)
             return False
         except URLError as e:
@@ -129,7 +120,6 @@ class SocialBarPresenter:
             return False
         
     def get_new_fb_posts(self, callback, url):
-#        print 'Getting new facebook posts...'
             result = get_data(url)
             if result:
                 result = FacebookPosts(result)
@@ -154,15 +144,13 @@ class SocialBarPresenter:
         pprint.pprint(result)
         code = result['error']['code']
         if code in server_error_codes:
-            #@TODO: Internationalization!
-            message = 'Requested action is not possible at the moment. Please try again later.'
+            message = _('Requested action is not possible at the moment. Please try again later.')
             self._view.show_popup_notification(message)
         if code in oauth_error_codes or code in permissions_error_codes:
             self.fb_login()
     
     def url_exception_handler(self):
-        #@TODO: Internationalization!
-        message = 'Network problem detected. Please check your internet connection and try again.'
+        message = _('Network problem detected. Please check your internet connection and try again.')
         self._view.show_popup_notification(message)
     
     def print_posts(self, result):
@@ -180,9 +168,15 @@ class SocialBarPresenter:
         print '='*80
         
     def render_posts_to_html(self, posts, newer_url='', older_url=''):
-        page = Template(file = 'templates/news-feed.html', searchList = [{ 'posts':posts }, {'css':CSS}, {'mousewheel_js':MOUSE_WHEEL_JS},{'slickscroll_js':SLICKSCROLL_JS}, {'slickscroll_css':SLICKSCROLL_CSS}, {'newer':newer_url}, {'older':older_url}])
-#        page = Template(file = 'templates/news-feed.html', searchList = [{ 'posts':posts }, {'css':CSS}])
-        #print str(page)
+        params = [{'posts':posts},
+                  {'css':CSS},
+                  {'mousewheel_js':MOUSE_WHEEL_JS},
+                  {'slickscroll_js':SLICKSCROLL_JS},
+                  {'slickscroll_css':SLICKSCROLL_CSS},
+                  {'newer':newer_url}, {'older':older_url},
+                  {'like_string':_('like')},
+                  {'comment_string':_('comment')}]
+        page = Template(file = 'templates/news-feed.html', searchList = params)
         return page
     
     def navigator(self, uri):
@@ -209,7 +203,7 @@ class SocialBarPresenter:
             print 'result:', result
             if result:
                 # increase the number of likes and change to Unlike
-                script = 'like_success(%s);' % json.dumps(parsed_query['id'][0])
+                script = 'like_success(%s, %s);' % (json.dumps(parsed_query['id'][0]), json.dumps(_('liked')))
                 print 'Script tp execute:', script
                 self._view._browser.execute_script(script)
         elif parsed.path == 'UNLIKE':
@@ -263,7 +257,10 @@ class SocialBarPresenter:
         return raw_comments
     
     def generate_posts_elements(self, posts):
-        page = Template(file = 'templates/posts-array.html', searchList = [{ 'posts':posts }])
+        params = [{'posts':posts},
+                  {'like_string':_('like')},
+                  {'comment_string':_('comment')}]
+        page = Template(file = 'templates/posts-array.html', searchList = params)
         return page
 
     def get_fb_user(self, fb_user_id='me'):
@@ -311,6 +308,7 @@ class SocialBarPresenter:
         return True
     
     def get_html(self):
+        #@TODO: FOR DEBUGGING, NOT NEEDED IN PRODUCTION
         self._view._browser.execute_script('oldtitle=document.title;document.title=document.documentElement.innerHTML;')
         html = self._view._browser.get_main_frame().get_title()
         return html

@@ -59,7 +59,10 @@ class FacebookPost:
     
     def get_elapsed_string(self, delta):
         if delta.days:
-            return self.pluralize(delta.days, 'DAY')
+            if delta.days > 0:
+                return self.pluralize(delta.days, 'DAY')
+            else:
+                return _('less than a minute ago')
         if int(floor(delta.seconds/3600)):
             return self.pluralize(int(floor(delta.seconds/3600)), 'HOUR')
         if int(floor(delta.seconds/60)):
@@ -74,27 +77,20 @@ class FacebookPost:
     
     def singular(self, num, period_name):
         if period_name == 'DAY':
-            return str(num) + ' ' + 'day ago'
+            return str(num) + ' ' + _('day ago')
         if period_name == 'HOUR':
-            return str(num) + ' ' + 'hour ago'
+            return str(num) + ' ' + _('hour ago')
         if period_name == 'MINUTE':
-            return str(num) + ' ' + 'minute ago'
+            return str(num) + ' ' + _('minute ago')
         if period_name == 'SECOND':
-            return str(num) + ' ' + 'second ago'
+            return _('less than a minute ago')
     
     def plural(self, num, period_name):
         if period_name == 'DAY':
-            return str(num) + ' ' + 'days ago'
+            return str(num) + ' ' + _('days ago')
         if period_name == 'HOUR':
-            return str(num) + ' ' + 'hours ago'
+            return str(num) + ' ' + _('hours ago')
         if period_name == 'MINUTE':
-            return str(num) + ' ' + 'minutes ago'
+            return str(num) + ' ' + _('minutes ago')
         if period_name == 'SECOND':
-            return str(num) + ' ' + 'seconds ago'    
-#    poster = 'ljuba'
-#    avatar = 'http://facebook.com/ljuba.nedeljkovic.7/picture'
-#    subject = 'Dummy subject'
-#    text = 'Dummy text'
-#    image = 'http://url.to.image.com/image.jpg'
-#    date_created = '2012-12-9 11:25AM'
-#    date_updated = '2012-12-9 11:25AM'
+            return _('less than a minute ago')

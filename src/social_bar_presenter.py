@@ -248,6 +248,8 @@ class SocialBarPresenter:
         elif parsed.path.startswith('GET_OLDER_POSTS'):
             url = parsed.path.split('?url=')[1]
             result = self.get_new_fb_posts(None, url)
+            if not result.posts:
+                return 1
             html = self.generate_posts_elements(result.posts)
             script = 'show_older_posts(%s, %s);' % (simplejson.dumps(str(html)), simplejson.dumps(result.next_url))
             self._view._browser.execute_script(script)

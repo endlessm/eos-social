@@ -228,7 +228,12 @@ class SocialBarPresenter:
             # go for last 4 comments
             comments = self.get_commments(parsed_query['id'][0])
             comments['data'].reverse()
-            script = 'show_comments(%s, %s);' % (json.dumps(parsed_query['id'][0]), json.dumps(comments['data']))
+            if len(comments['data']) > 4:
+                to_show = comments['data'][:4]
+            else:
+                to_show = comments['data'][:len(comments['data'])]
+            to_show.reverse()
+            script = 'show_comments(%s, %s);' % (json.dumps(parsed_query['id'][0]), json.dumps(to_show))
             self._view._browser.execute_script(script)
 #            h = self.get_html()
 #            print '+'*80
@@ -253,7 +258,7 @@ class SocialBarPresenter:
     def get_commments(self, post_id):
         print 'Getting comments for post', post_id
         raw_comments = self._graph_api.request(post_id+'/comments')
-        pprint.pprint(raw_comments)
+        #pprint.pprint(raw_comments)
         return raw_comments
     
     def generate_posts_elements(self, posts):

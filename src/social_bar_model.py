@@ -5,7 +5,8 @@ class SocialBarModel:
     def __init__(self):
         print 'In __init__ method.'
         self.LOCAL_FACEBOOK_FILE = os.path.expanduser('~/.fb_access_token')
-        self.LOCAL_IMAGES_LOCATION = os.path.expanduser('~/.endlessm/social_bar/images/')
+        self.USER_IMAGES_LOCATION = os.path.expanduser('~/.endlessm/social_bar/images/')
+        self.LOCAL_IMAGES_LOCATION = os.path.expanduser('/usr/share/endlessm_social_bar/images/')
         self.LOCAL_SETTINGS_FILE = os.path.expanduser('~/.social_bar_settings')
         
     def get_stored_fb_access_token(self):
@@ -45,7 +46,7 @@ class SocialBarModel:
             pass
 
     def get_stored_picture_file_path(self):
-        return self.LOCAL_IMAGES_LOCATION + 'avatar'
+        return self.USER_IMAGES_LOCATION + 'avatar'
 
     def get_no_picture_file_path(self):
         return self.LOCAL_IMAGES_LOCATION + 'no_image.jpg'

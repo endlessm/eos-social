@@ -297,7 +297,7 @@ class SocialBarPresenter:
     def get_image_dwn(self, image_url):
         url_response = urllib2.urlopen(image_url)
         image_final_url = url_response.geturl()
-        if image_final_url[-3:] in ('jpg', 'png'):
+        if image_final_url[-3:] in ('jpg', 'png', 'gif'):
             image_data = url_response.read()
             try:
                 with open(self.get_stored_picture_file_path(), 'w') as f:

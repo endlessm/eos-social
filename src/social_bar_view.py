@@ -1,118 +1,134 @@
 import gtk
 import gobject
-import signal
-import time
-import Queue
-import thread
-import webkit
-
 from facebook.fb_auth_view import FBAuthView
 from ui import MainWindow
 from ui import SimplePopUp
+import webkit
+from ui import PostMessage
+from ui import PostMessageSendArea
+import os
+from ui import UserAvatar
+from ui import WelcomePanel
+from ui import MultiPanel
+from ui import UserProfileMenu
+import gettext
 
+gettext.install('endlessm_social_bar', '/usr/share/locale', unicode=True, names=['ngettext'])
+
+#gtk.gdk.threads_init()
 
 class SocialBarView(MainWindow):
 
-    @classmethod
-    def main_wraper(cls, fun, quit_obj=None):
-        signal.signal(signal.SIGINT, quit_obj.set_quit)
-        def fun2(*args, **kwargs):
-            try:
-                x = fun(*args, **kwargs) # equivalent to "apply"
-            finally:
-                cls.kill_gtk_thread()
-                quit_obj.set_quit()
-            return x
-        return fun2
 
-    @classmethod
-    def start_gtk_thread(cls):
-        # Start GTK in its own thread:
-        gtk.gdk.threads_init()
-        thread.start_new_thread(gtk.main, ())
-
-    @classmethod
-    def kill_gtk_thread(cls):
-        cls.asynchronous_gtk_message(gtk.main_quit)()
-
-    @classmethod
-    def asynchronous_gtk_message(cls, fun):
-        def worker((function, args, kwargs)):
-            apply(function, args, kwargs)
-        def fun2(*args, **kwargs):
-            gobject.idle_add(worker, (fun, args, kwargs))
-        return fun2
-
-    @classmethod
-    def synchronous_gtk_message(cls, fun):
-        class NoResult: pass
-        def worker((R, function, args, kwargs)):
-            R.result = apply(function, args, kwargs)
-        def fun2(*args, **kwargs):
-            class R: result = NoResult
-            gobject.idle_add(worker, (R, fun, args, kwargs))
-            while R.result is NoResult: time.sleep(0.01)
-            return R.result
-        return fun2
-
-    def __init__(self, uri, quit_function):
+    def __init__(self):
         super(SocialBarView, self).__init__()
-        self._browser = webkit.WebView()
-        self._uri = uri
-        self._quit_function = quit_function
-        #
+        self.connect('destroy', self._destroy)
+        super(SocialBarView, self).set_background_image(
+          '/usr/share/endlessm_social_bar/images/bg-right.png')
+
         self._presenter = None
-        #
-        self.message_queue = Queue.Queue()
-        if self._quit_function is not None:
-            self.connect('destroy', self._quit_function)
+        self._browser = webkit.WebView()
+#        self._browser.set_size_request(-1, 600)
+        self._browser.connect("navigation-requested", self._navigation_handler)
 
-        def title_changed(title):
-            if title != 'null': self.message_queue.put(title)
+        self.post_message_area = PostMessageSendArea()
+        self.user_avatar_menu = UserProfileMenu(self._presenter)
+        self.user_avatar_menu.connect('user-profile-action', self._on_action)
+        self.user_avatar = UserAvatar(self.user_avatar_menu)
+        #self.user_avatar.connect('user-profile-action', self._on_action)
+        self.post_message_area.connect('post-panel-action', self._on_action)
+        self.post_message = PostMessage(self.post_message_area, self.user_avatar)
+        self.post_message.connect('post-panel-action', self._on_action)
 
-        # create window layout
-        btn_add = gtk.Button()
-        btn_add.set_size_request(64, 64)
-        btn_add.set_events(gtk.gdk.BUTTON_PRESS_MASK)
-        btn_add.connect("button-press-event", self.__on_button_press)
+        # pack main container
+        self.main_container = gtk.VBox()
+        self.main_container.pack_start(self.post_message, expand=False, fill=False, padding=0)
+        self.main_container.pack_start(self._browser, expand=True, fill=True, padding=0)
 
-        main_container = gtk.VBox(homogeneous=False, spacing=0)
-        main_container.pack_start(btn_add, expand=False, fill=False, padding=0)
-        main_container.pack_start(self._browser, expand=True, fill=True, padding=0)
-        self.add(main_container)
+        self.welcome_panel = WelcomePanel()
+        self.welcome_panel.connect('welcome-panel-action', self._on_action)
+
+        self.wraper_main = MultiPanel()
+        self.wraper_main.add_panel(self.main_container, 'main_container')
+        self.wraper_main.add_panel(self.welcome_panel, 'welcome_panel')
+        self.add(self.wraper_main)
         self.show_all()
+        self.wraper_main.show_panel('welcome_panel')
 
-        self.connect_title_changed(title_changed)
-        self.open_uri(self._uri)
+    def _on_action(self, widget, action):
+        if action == 'post':
+            self.post_message.toggle_text_field()
+            self.post_message_area.set_default_text()
+        elif action == 'cancel':
+            self.post_message.collapse_text_field()
+            self.post_message_area.set_default_text()
+        elif action == 'close':
+            gtk.main_quit()
+        elif action == 'send':
+            text = self.post_message_area.get_post_message()
+            #self.post_message_area.set_default_text()
+            self.post_message_area.clear_text(True)
+            if text is not None:
+                self._presenter.post_to_fb(text)
+        elif action == 'avatar':
+            pass
+        elif action == 'user_profile':
+            self._presenter.show_profil_page()
+        elif action == 'login':
+            self._perform_login()
+        elif action == 'logout_on_shutdown_active':
+            self._presenter.set_logout_on_shutdown_active(True)
+        elif action == 'logout_on_shutdown_inactive':
+            self._presenter.set_logout_on_shutdown_active(False)
+        elif action == 'logout':
+            self.wraper_main.show_panel('welcome_panel')
+            self._presenter.logout()
+        else:
+            print 'no action ->', action
 
-    def __on_button_press(self, widget, event):
-        self.show_popup_notification("test")
+    def _perform_login(self):
 
-    def show_fb_auth_popup(self):
-        FBAuthView().open('')
+        def _callback():
+            self._presenter.get_fb_news_feed()
+            self._presenter.get_profil_picture()
+            file_path = self._presenter.get_stored_picture_file_path()
+            self.user_avatar.set_avatar(file_path)
+            self.wraper_main.show_panel('main_container')
+
+        if self._presenter.is_user_loged_in():
+            _callback()
+        else:
+            self._presenter.fb_login(callback=_callback)
 
     def show_popup_notification(self, notification_text):
         SimplePopUp(notification_text).show()
        
     def set_presenter(self, presenter):
         self._presenter = presenter
-
-    def connect_title_changed(self, callback):
-        self._browser.connect(
-            'title-changed', 
-            lambda widget, frame, title: callback(title)
-            )
-
-    def open_uri(self, uri):
-        self._browser.open(uri)
+        self.user_avatar.set_presenter(self._presenter)
     
-    def web_recv(self):
-        if self.message_queue.empty():
-            return None
-        msg = self.message_queue.get()
-        print '>>>', msg
-        return msg
+    def show_browser(self):
+        self._browser.show()
+    
+    def load_html(self, html):
+#        print '='*80
+#        print html
+#        print '='*80
+        result = self._browser.load_string(html, 'text/html', 'utf-8', '')
+#        print 'RESULT:', result
+        self.show_browser()
+    
+    def _navigation_handler(self, view, frame, request, data=None):
+        print 'In navigation handler view function...'
+        return self._presenter.navigator(request.get_uri())
+    
+    def _destroy(self, *args):
+        if self._presenter.get_logout_on_shutdown_active():
+            self._presenter.logout()
+        gtk.main_quit()
 
-    def web_send(self, msg):
-        print '<<<', msg
-        self.asynchronous_gtk_message(self._browser.execute_script)(msg)
+    def main(self):
+        gobject.threads_init()
+        gtk.threads_init()
+        gtk.main()
+

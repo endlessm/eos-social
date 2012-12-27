@@ -47,17 +47,6 @@ class FBAuthWindow(gtk.Window):
                 print 'ACCESS_TOKEN:' + token
                 self._authorized = True
             self.emit("delete-event", gtk.gdk.Event(gtk.gdk.DELETE))
-            
-#            path = '/oauth/access_token'
-#            params = {'client_id':self._presenter._app_id,
-#                      'redirect_uri':self._presenter._webserver_url,
-#                      'client_secret':self._presenter._app_secret,
-#                      'code':code}
-#            response = self.get(path, params)
-#            token = urlparse.parse_qs(response)['access_token'][0]
-            
-#            self._authorized = True
-            
         elif parsed_query.has_key('error'):
             print 'ERROR occured.'
             self.emit("delete-event", gtk.gdk.Event(gtk.gdk.DELETE))
@@ -81,19 +70,7 @@ class FBAuthWindow(gtk.Window):
         except:
             print 'EXCEPTION CAUGHT!!!'
             return None
-    
-#    def get_url(self, path, args=None):
-#        args = args or {}
-#        if self._presenter._fb_access_token:
-#            args['access_token'] = self._presenter._fb_access_token
-#        if 'access_token' in args or 'client_secret' in args:
-#            url = "https://"+self._presenter._fb_graph_url
-#        else:
-#            url = "http://"+self._presenter._fb_graph_url
-#        return url + path + '?' + urllib.urlencode(args)
-#    
-#    def get(self, path, args=None):
-#        return urllib2.urlopen(self.get_url(path, args=args)).read()
+
         
     
     def on_destroy(self, *args, **kwargs):

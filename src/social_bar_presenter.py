@@ -1,19 +1,20 @@
-import time
-import json
-
-from social_bar_model import SocialBarModel
-from util.http_request_handler import FBHTTPRequestHandler
-from util.social_bar_http_server import SocialBarHttpServer
-from util.util import get_data, fb_auth_url
+from util.util import get_data, CSS, SLICKSCROLL_CSS, SLICKSCROLL_JS, MOUSE_WHEEL_JS
 from facebook.facebook import GraphAPIError, GraphAPI
 from facebook.facebook_posts import FacebookPosts
 from facebook.fb_auth_window import FBAuthWindow
 import subprocess
 from urllib2 import URLError
+from Cheetah.Template import Template
+import urlparse
+import json
+import pprint
+import webbrowser
+import simplejson
+import urllib2
 
 
 class SocialBarPresenter:
-
+    
     def __init__(self, view=None, model=None):
         self._view = view
         self._model = model
@@ -36,10 +37,13 @@ class SocialBarPresenter:
 
     def get_model(self):
         return self._model
-
+        
     def get_fb_news_feed(self, callback=None):
+        print 'In presenter.get_fb_news_feed...'
         try:
+            print 'Going to FB for posts...'
             result = self._graph_api.request('/me/home')
+            print 'DONE getting posts from FB, result ='#, result
         except GraphAPIError as error:
             self.oauth_exception_handler(error.result)
             return None
@@ -48,7 +52,13 @@ class SocialBarPresenter:
             return None
         
         if result:
+            print 'Converting facebook data to py objects...'
             result = FacebookPosts(result)
+            print 'Generating html...'
+            html = str(self.render_posts_to_html(result.posts, result.previous_url, result.next_url))
+            print 'DONE generating html.'
+            self._view.load_html(html)
+            return result
         
         if callback:
             callback(result)
@@ -56,8 +66,7 @@ class SocialBarPresenter:
             return result
     
     def fb_login(self, callback=None):
-#        url = fb_auth_url(self._app_id, self._webserver_url, ['read_stream','publish_stream'])
-        proc = subprocess.Popen(['python', 'facebook/fb_auth_window.pyc'], stdout=subprocess.PIPE)
+        proc = subprocess.Popen(['python', 'facebook/fb_auth_window.py'], stdout=subprocess.PIPE)
         for line in proc.stdout:
             print line
             if line.startswith('ACCESS_TOKEN:'):
@@ -65,15 +74,15 @@ class SocialBarPresenter:
                 self.set_fb_access_token(token)
                 self._graph_api = GraphAPI(access_token=self._fb_access_token)
             elif line.startswith('FAILURE'):
-                self._view.show_popup_notification('Something went wrong when authenticating app.')
+                self._view.show_popup_notification(_('Something went wrong when authenticating app.'))
 
         if callback:
             callback()
-
+    
     def post_to_fb(self, text):
-#        print 'Post to Facebook.'
         try:
             self._graph_api.put_wall_post(text)
+            self.get_fb_news_feed()
             return True
         except GraphAPIError as error:
             self.oauth_exception_handler(error.result)
@@ -85,7 +94,6 @@ class SocialBarPresenter:
             return False
     
     def post_fb_like(self, id):
-#        print 'Posting like to post with id', id        
         try:
             self._graph_api.put_like(id)
             return True
@@ -99,12 +107,10 @@ class SocialBarPresenter:
             return False
     
     def post_fb_comment(self, id, comment):
-#        print 'Posting comment (',comment,') to post with id', id        
         try:
             self._graph_api.put_comment(id, comment)
             return True
         except GraphAPIError as error:
-#            print error.result
             self.oauth_exception_handler(error.result)
             return False
         except URLError as e:
@@ -114,7 +120,6 @@ class SocialBarPresenter:
             return False
         
     def get_new_fb_posts(self, callback, url):
-#        print 'Getting new facebook posts...'
             result = get_data(url)
             if result:
                 result = FacebookPosts(result)
@@ -124,30 +129,28 @@ class SocialBarPresenter:
                 callback(result)
             else:
                 return result
-
+    
     def show_fb_login(self):
         self._view.show_fb_auth_popup()
-
+    
     def set_fb_access_token(self, token):
         self._fb_access_token = token
         self._model.save_fb_access_token(token)
-
+    
     def oauth_exception_handler(self, result):
         server_error_codes = [1,2,4,17]
         oauth_error_codes = [102, 190]
         permissions_error_codes = range(200, 300)
-        
-        code = result['code']
+        pprint.pprint(result)
+        code = result['error']['code']
         if code in server_error_codes:
-            #@TODO: Internationalization!
-            message = 'Requested action is not possible at the moment. Please try again later.'
+            message = _('Requested action is not possible at the moment. Please try again later.')
             self._view.show_popup_notification(message)
         if code in oauth_error_codes or code in permissions_error_codes:
             self.fb_login()
     
     def url_exception_handler(self):
-        #@TODO: Internationalization!
-        message = 'Network problem detected. Please check your internet connection and try again.'
+        message = _('Network problem detected. Please check your internet connection and try again.')
         self._view.show_popup_notification(message)
     
     def print_posts(self, result):
@@ -163,30 +166,168 @@ class SocialBarPresenter:
         print '='*80
         print 'previous_url :', result.previous_url
         print '='*80
+        
+    def render_posts_to_html(self, posts, newer_url='', older_url=''):
+        params = [{'posts':posts},
+                  {'css':CSS},
+                  {'mousewheel_js':MOUSE_WHEEL_JS},
+                  {'slickscroll_js':SLICKSCROLL_JS},
+                  {'slickscroll_css':SLICKSCROLL_CSS},
+                  {'newer':newer_url}, {'older':older_url},
+                  {'like_string':_('like')},
+                  {'comment_string':_('comment')}]
+        page = Template(file = 'templates/news-feed.html', searchList = params)
+        return page
+    
+    def navigator(self, uri):
+        print 'In presenter navigator function...'
+        print uri
+        def register_scheme(scheme):
+            for method in filter(lambda s: s.startswith('uses_'), dir(urlparse)):
+                getattr(urlparse, method).append(scheme)
 
-    def main(self, quit_obj=None):
-        self._quit_obj = quit_obj
-        last_second = time.time()
-        uptime_seconds = 1
-        clicks = 0
+        register_scheme('eossocialbar')
+        # parse uri
+        parsed = urlparse.urlparse(uri)
+        print parsed
+        print 'SCHEME:', parsed.scheme
+        print 'PATH  :', parsed.path
+        print 'QUERY :', parsed.query
+#        print 'PARAMS:', parsed.params
+        parsed_query = urlparse.parse_qs(parsed.query)
+        print parsed_query
+        # decide which action is needed and call appropriate function
+        if parsed.path == 'LIKE':
+            print 'got LIKE to perform on', parsed_query['id'][0]
+            result = self.post_fb_like(parsed_query['id'][0])
+            print 'result:', result
+            if result:
+                # increase the number of likes and change to Unlike
+                script = 'like_success(%s, %s);' % (json.dumps(parsed_query['id'][0]), json.dumps(_('liked')))
+                print 'Script tp execute:', script
+                self._view._browser.execute_script(script)
+        elif parsed.path == 'UNLIKE':
+            print 'got UNLIKE to perform on', parsed_query['id'][0]
+#            result = delete_like(self._fb_access_token, parsed_query['id'][0])
+#            pprint.pprint(result)
+            script = 'unlike_success(%s);' % json.dumps(parsed_query['id'][0])
+            self._view._browser.execute_script(script)
+        elif parsed.path == 'VIEWPOST':
+            print "Launching external browser..."
+            #@TODO: remove hardcoded server string to constant strings class/file
+            id = parsed_query['id'][0]
+            if '_' in id:
+                who = id.split('_')[0]
+                what = id.split('_')[1]
+                webbrowser.open('http://www.facebook.com/'+who+'/posts/'+what, new=1, autoraise=True)
+            else:
+                webbrowser.open('http://www.facebook.com/'+parsed_query['id'][0], new=1, autoraise=True)
+#            webbrowser.open('https://graph.facebook.com/'+parsed_query['id'][0]+'/?access_token='+self._fb_access_token, new=1, autoraise=True)
+        elif parsed.path == 'COMMENT':
+            print 'User wants to comment on post, indulge him!'
+            # go for last 4 comments
+            comments = self.get_commments(parsed_query['id'][0])
+            comments['data'].reverse()
+            if len(comments['data']) > 4:
+                to_show = comments['data'][:4]
+            else:
+                to_show = comments['data'][:len(comments['data'])]
+            to_show.reverse()
+            script = 'show_comments(%s, %s);' % (json.dumps(parsed_query['id'][0]), json.dumps(to_show))
+            self._view._browser.execute_script(script)
+#            h = self.get_html()
+#            print '+'*80
+#            print h
+#            print '+'*80
+        elif parsed.path == 'POST_COMMENT':
+            result = self.post_fb_comment(parsed_query['id'][0], parsed_query['comment_text'][0])
+            print result
+            self.get_fb_news_feed()
+        elif parsed.path == 'VIEW_POSTER':
+            webbrowser.open('http://www.facebook.com/'+parsed_query['poster_id'][0], new=1, autoraise=True)
+        elif parsed.path.startswith('GET_OLDER_POSTS'):
+            url = parsed.path.split('?url=')[1]
+            result = self.get_new_fb_posts(None, url)
+            if not result.posts:
+                return 1
+            html = self.generate_posts_elements(result.posts)
+            script = 'show_older_posts(%s, %s);' % (simplejson.dumps(str(html)), simplejson.dumps(result.next_url))
+            self._view._browser.execute_script(script)
+        elif parsed.path.startswith('GET_NEWER_POSTS'):
+            self.get_fb_news_feed()
+        return 1 #returning 1 prevents webkit to go to reqested uri, 0 will allow going to requested uri
+        
+    def get_commments(self, post_id):
+        print 'Getting comments for post', post_id
+        raw_comments = self._graph_api.request(post_id+'/comments')
+        #pprint.pprint(raw_comments)
+        return raw_comments
+    
+    def generate_posts_elements(self, posts):
+        params = [{'posts':posts},
+                  {'like_string':_('like')},
+                  {'comment_string':_('comment')}]
+        page = Template(file = 'templates/posts-array.html', searchList = params)
+        return page
 
-        while not self._quit_obj.quit:
-            current_time = time.time()
-            again = False
-            msg = self._view.web_recv()
-            if msg:
-                msg = json.loads(msg)
-                again = True
+    def get_fb_user(self, fb_user_id='me'):
+        return
 
-            if msg == "got-a-click":
-                self._view.show_popup_notification("Simple PopUp")
+    def show_profil_page(self):
+        if self._graph_api is None:
+            self.show_fb_login()
+            return
+        profile = self._graph_api.get_object("me")
+        webbrowser.open('http://www.facebook.com/' + profile['id'])
 
-            if current_time - last_second >= 1.0:
-                self._view.web_send(
-                    'document.getElementById("uptime-value").innerHTML = %s' % 
-                    json.dumps('%d' % current_time)
-                    )
-                last_second += 1.0
+    def get_profil_picture(self):
+        if self._graph_api is None:
+            return None
+        profile = self._graph_api.get_object("me")
+        image_url = 'https://graph.facebook.com/' + profile['id'] + '/picture'
+        self.get_image_dwn(image_url)
+        return
 
-            if not again:
-                time.sleep(0.1)
+    def get_stored_picture_file_path(self):
+        return self._model.get_stored_picture_file_path()
+
+    def get_no_picture_file_path(self):
+        return self._model.get_no_picture_file_path()
+
+    def get_image_dwn(self, image_url):
+        url_response = urllib2.urlopen(image_url)
+        image_final_url = url_response.geturl()
+        if image_final_url[-3:] in ('jpg', 'png', 'gif'):
+            image_data = url_response.read()
+            try:
+                with open(self.get_stored_picture_file_path(), 'w') as f:
+                    f.write(image_data)
+                    f.close()
+                return
+            except:
+                pass
+        print 'error:', 'no image', image_final_url
+        return
+
+    def is_user_loged_in(self):
+        if self._fb_access_token is None:
+            return False
+        return True
+    
+    def get_html(self):
+        #@TODO: FOR DEBUGGING, NOT NEEDED IN PRODUCTION
+        self._view._browser.execute_script('oldtitle=document.title;document.title=document.documentElement.innerHTML;')
+        html = self._view._browser.get_main_frame().get_title()
+        return html
+
+    def get_logout_on_shutdown_active(self):
+        return self._model.get_logout_on_shutdown_active()
+
+    def set_logout_on_shutdown_active(self, state):
+        self._model.set_logout_on_shutdown_active(state)
+
+    def logout(self):
+        self._fb_access_token = None
+        self._model.logout()
+
+

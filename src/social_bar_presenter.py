@@ -120,7 +120,7 @@ class SocialBarPresenter:
                 self._graph_api = GraphAPI(access_token=self._fb_access_token)
             elif line.startswith('FAILURE'):
                 #self._view.show_popup_notification(_('Something went wrong when authenticating app.'))
-                pass
+                return
 
         if callback:
             callback()

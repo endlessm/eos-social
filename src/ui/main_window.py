@@ -16,13 +16,14 @@ class MainWindow(gtk.Window):
         screen_width = gtk.gdk.screen_width()
         self.set_app_paintable(True)
         if transparent:
-            self.set_colormap(win.get_screen().get_rgba_colormap())
+            self.set_colormap(self.get_screen().get_rgba_colormap())
 
         self.set_resizable(False)
         self.set_default_size(self.DEFAULT_WINDOW_WIDTH, screen_height)
         self.set_size_request(self.DEFAULT_WINDOW_WIDTH, screen_height)
         self.stick() # this sticks on all desktops
         #self.set_keep_above(True)
+        self.set_decorated(False)
         self.set_modal(True)
         self.set_skip_pager_hint(True)
         self.move(screen_width-self.DEFAULT_WINDOW_WIDTH, 0)
@@ -35,7 +36,9 @@ class MainWindow(gtk.Window):
             self.window.property_change("_NET_WM_STRUT", "CARDINAL", 32, 
               gtk.gdk.PROP_MODE_REPLACE, position)
         else:
-            self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
+            #self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
+            self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
+
 
     def _on_draw(self, widget, event):
         if os.path.isfile(self.image_path):

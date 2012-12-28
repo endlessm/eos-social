@@ -73,7 +73,6 @@ class SocialBarView(MainWindow):
             self.post_message.collapse_text_field()
             self.post_message_area.set_default_text()
         elif action == 'close':
-            print 'iconify'
             self.iconify()
             #gtk.main_quit()
         elif action == 'send':
@@ -84,14 +83,12 @@ class SocialBarView(MainWindow):
             if text is not None:
                 self._presenter.post_to_fb(text)
         elif action == 'avatar':
-            print 'avatar'
             if self.user_avatar.get_is_expanded():
-                print 'show profile'
+                self._presenter.show_profil_page()
                 self.user_avatar.set_is_expanded(False)
                 self.logout.hide()
                 self.user_name.hide()
             else:
-                print 'extended'
                 self.user_avatar.set_is_expanded(True)
                 x = self.user_avatar.allocation.x - self.user_name.allocation.width - 8
                 y = self.user_name.allocation.y
@@ -99,14 +96,10 @@ class SocialBarView(MainWindow):
                 x = self.user_avatar.allocation.x - self.logout.allocation.width - 8
                 y = self.logout.allocation.y
                 self.post_message.toolbar.move(self.logout, x, y)
-
-                #print 'self.logout', self.logout.allocation
                 self.logout.show()
-                #print 'self.user_name', self.user_name.allocation
                 self.user_name.show()
         elif action == 'user-name':
-            print 'show profile'
-            ##self._presenter.show_profil_page()
+            self._presenter.show_profil_page()
             self.user_avatar.set_is_expanded(False)
             self.logout.hide()
             self.user_name.hide()
@@ -123,8 +116,8 @@ class SocialBarView(MainWindow):
             self.user_avatar.set_is_expanded(False)
             self.logout.hide()
             self.user_name.hide()
-            ##self.wraper_main.show_panel('welcome_panel')
-            ##self._presenter.logout()
+            self.wraper_main.show_panel('welcome_panel')
+            self._presenter.logout()
         else:
             print 'no action ->', action
 

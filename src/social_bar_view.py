@@ -13,7 +13,7 @@ from ui import MultiPanel
 from ui import UserProfileMenu
 import gettext
 
-gettext.install('endlessm_social_bar', '/usr/share/locale', unicode=True, names=['ngettext'])
+gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 
 #gtk.gdk.threads_init()
 
@@ -63,11 +63,14 @@ class SocialBarView(MainWindow):
             self.post_message.collapse_text_field()
             self.post_message_area.set_default_text()
         elif action == 'close':
-            gtk.main_quit()
+            print 'iconify'
+            self.iconify()
+            #gtk.main_quit()
         elif action == 'send':
             text = self.post_message_area.get_post_message()
             #self.post_message_area.set_default_text()
             self.post_message_area.clear_text(True)
+            self.post_message.collapse_text_field()
             if text is not None:
                 self._presenter.post_to_fb(text)
         elif action == 'avatar':

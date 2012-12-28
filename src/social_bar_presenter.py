@@ -1,6 +1,7 @@
-from util.util import get_data, CSS, SLICKSCROLL_CSS, SLICKSCROLL_JS, MOUSE_WHEEL_JS
+from util.util import get_data, CSS, SLICKSCROLL_CSS, SLICKSCROLL_JS, MOUSE_WHEEL_JS, posts_query, users_query, older_posts_query
 from facebook.facebook import GraphAPIError, GraphAPI
 from facebook.facebook_posts import FacebookPosts
+from facebook.facebook_posts_fql import FacebookPostsFql
 from facebook.fb_auth_window import FBAuthWindow
 import subprocess
 from urllib2 import URLError
@@ -39,6 +40,7 @@ class SocialBarPresenter:
         return self._model
         
     def get_fb_news_feed(self, callback=None):
+        return self.get_fb_news_feed_fql(None)
         print 'In presenter.get_fb_news_feed...'
         try:
             print 'Going to FB for posts...'
@@ -65,6 +67,49 @@ class SocialBarPresenter:
         else:
             return result
     
+    def get_fb_news_feed_fql(self, callback=None):
+        print 'In presenter.get_fb_news_feed_fql...'
+        query = {'posts':posts_query,'users':users_query}
+        try:
+            print 'Going to FB for posts...'
+            result = self._graph_api.fql(query)
+            print 'DONE getting posts from FB, result ='#, result
+        except GraphAPIError as error:
+            self.oauth_exception_handler(error.result)
+            return None
+        except URLError as e:
+            self.url_exception_handler()
+            return None
+        
+        if result:
+            # add users to posts
+            posts = []
+            users = []
+            for res_set in result:
+                if res_set['name'] == 'posts':
+                    posts = res_set['fql_result_set']
+                else:
+                    users = res_set['fql_result_set']
+            
+            for post in posts:
+                for user in users:
+                    if post['actor_id'] == user['id']:
+                        post['who'] = user
+                        break
+            
+            print 'Converting facebook data to py objects...'
+            result = FacebookPostsFql(posts)
+            print 'Generating html...'
+            html = str(self.render_posts_to_html(result.posts, result.previous_url, result.next_url))
+            print 'DONE generating html.'
+            self._view.load_html(html)
+            return result
+        
+        if callback:
+            callback(result)
+        else:
+            return result
+    
     def fb_login(self, callback=None):
         proc = subprocess.Popen(['python', '/usr/share/eos-social/facebook/fb_auth_window.pyc'], stdout=subprocess.PIPE)
         for line in proc.stdout:
@@ -74,7 +119,8 @@ class SocialBarPresenter:
                 self.set_fb_access_token(token)
                 self._graph_api = GraphAPI(access_token=self._fb_access_token)
             elif line.startswith('FAILURE'):
-                self._view.show_popup_notification(_('Something went wrong when authenticating app.'))
+                #self._view.show_popup_notification(_('Something went wrong when authenticating app.'))
+                return
 
         if callback:
             callback()
@@ -119,16 +165,37 @@ class SocialBarPresenter:
         except:
             return False
         
-    def get_new_fb_posts(self, callback, url):
-            result = get_data(url)
-            if result:
-                result = FacebookPosts(result)
-            else:
-                self.url_exception_handler()
-            if callback:
-                callback(result)
-            else:
-                return result
+    def get_new_fb_posts(self, callback, stamp):
+        query = {'posts':older_posts_query % str(stamp),'users':users_query}
+        try:
+            print 'Going to FB for posts...'
+            result = self._graph_api.fql(query)
+            print 'DONE getting posts from FB, result ='#, result
+        except GraphAPIError as error:
+            self.oauth_exception_handler(error.result)
+            return None
+        except URLError as e:
+            self.url_exception_handler()
+            return None
+        
+        if result:
+            posts = []
+            users = []
+            for res_set in result:
+                if res_set['name'] == 'posts':
+                    posts = res_set['fql_result_set']
+                else:
+                    users = res_set['fql_result_set']
+            
+            for post in posts:
+                for user in users:
+                    if post['actor_id'] == user['id']:
+                        post['who'] = user
+                        break
+            
+            print 'Converting facebook data to py objects...'
+            result = FacebookPostsFql(posts)
+            return result
     
     def show_fb_login(self):
         self._view.show_fb_auth_popup()
@@ -176,7 +243,7 @@ class SocialBarPresenter:
                   {'newer':newer_url}, {'older':older_url},
                   {'like_string':_('like')},
                   {'comment_string':_('comment')}]
-        page = Template(file = '/usr/share/eos-social/templates/news-feed.html', searchList = params)
+        page = Template(file = '/usr/share/eos-social/templates/news-feed-fql.html', searchList = params)
         return page
     
     def navigator(self, uri):
@@ -213,16 +280,8 @@ class SocialBarPresenter:
             script = 'unlike_success(%s);' % json.dumps(parsed_query['id'][0])
             self._view._browser.execute_script(script)
         elif parsed.path == 'VIEWPOST':
-            print "Launching external browser..."
-            #@TODO: remove hardcoded server string to constant strings class/file
-            id = parsed_query['id'][0]
-            if '_' in id:
-                who = id.split('_')[0]
-                what = id.split('_')[1]
-                webbrowser.open('http://www.facebook.com/'+who+'/posts/'+what, new=1, autoraise=True)
-            else:
-                webbrowser.open('http://www.facebook.com/'+parsed_query['id'][0], new=1, autoraise=True)
-#            webbrowser.open('https://graph.facebook.com/'+parsed_query['id'][0]+'/?access_token='+self._fb_access_token, new=1, autoraise=True)
+            print "Launching external browser...", parsed.query[4:]
+            webbrowser.open(parsed.query[4:], new=1, autoraise=True)
         elif parsed.path == 'COMMENT':
             print 'User wants to comment on post, indulge him!'
             # go for last 4 comments
@@ -248,7 +307,7 @@ class SocialBarPresenter:
         elif parsed.path.startswith('GET_OLDER_POSTS'):
             url = parsed.path.split('?url=')[1]
             result = self.get_new_fb_posts(None, url)
-            if not result.posts:
+            if not result or not result.posts:
                 return 1
             html = self.generate_posts_elements(result.posts)
             script = 'show_older_posts(%s, %s);' % (simplejson.dumps(str(html)), simplejson.dumps(result.next_url))
@@ -267,7 +326,7 @@ class SocialBarPresenter:
         params = [{'posts':posts},
                   {'like_string':_('like')},
                   {'comment_string':_('comment')}]
-        page = Template(file = '/usr/share/eos-social/templates/posts-array.html', searchList = params)
+        page = Template(file = '/usr/share/eos-social/templates/posts-array-fql.html', searchList = params)
         return page
 
     def get_fb_user(self, fb_user_id='me'):

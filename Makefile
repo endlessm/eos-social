@@ -17,6 +17,6 @@ install:
 	rm -f $(LIBDIR)/ui/*.py
 uninstall:
 	rm -f /usr/lib/python2.7/dist-packages/eos-social
-	rm -rf $(LIBDIR)
+	rm -Rf $(LIBDIR)
 	rm -f $(BINDIR)/eos-social
-	rm -rf $(HOME)/.endlessm/social_bar/
+	rm -Rf $(HOME)/.endlessm/social_bar/

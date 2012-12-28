@@ -229,8 +229,9 @@ class PostMessageSendArea(gtk.Alignment):
 
 class PostMessage(gtk.Alignment):
 
-    COLLAPSED_HEIGHT = 70
-    EXPANDED_HEIGHT = 160
+    ANIMATION_STEP = 40
+    COLLAPSED_HEIGHT = 70 + ANIMATION_STEP
+    EXPANDED_HEIGHT = 160 - ANIMATION_STEP
 
     IMG_PATH = '/usr/share/endlessm_social_bar/images/'
 
@@ -293,7 +294,7 @@ class PostMessage(gtk.Alignment):
         self._buttons = {}
 
         self.toolbar = gtk.Fixed()
-        self.toolbar.set_size_request(-1, self.COLLAPSED_HEIGHT)
+        self.toolbar.set_size_request(-1, self.COLLAPSED_HEIGHT-self.ANIMATION_STEP)
 
         self.post_wraper = post_send_area
         self.user_avatar = user_avatar
@@ -356,8 +357,9 @@ class PostMessage(gtk.Alignment):
 
     def expand_text_field(self):
         def animate():
-            self.set_size_request(-1, self.allocation.height+10)
-            not_done = self.allocation.height < self.EXPANDED_HEIGHT
+            calc_h = self.allocation.height+self.ANIMATION_STEP
+            self.set_size_request(-1, calc_h)
+            not_done = calc_h < self.EXPANDED_HEIGHT
             if not_done:
                 self.post_wraper.hide()
                 #self.text_area.hide()
@@ -365,19 +367,19 @@ class PostMessage(gtk.Alignment):
                 self.post_wraper.show()
                 #self.text_area.show()
             return not_done
-        gobject.timeout_add(2, animate)
+        gobject.timeout_add(1, animate)
 
     def collapse_text_field(self):
         self.post_wraper.hide()
         def animate():
-            h = self.allocation.height-10
+            h = self.allocation.height-self.ANIMATION_STEP
             h = h if h > 0 else 0
             self.set_size_request(-1, h)
             not_done = self.allocation.height > self.COLLAPSED_HEIGHT
             if not not_done:
                 self.post_wraper.hide()
             return not_done
-        gobject.timeout_add(2, animate)
+        gobject.timeout_add(1, animate)
 
     def toggle_text_field(self):
         if self.allocation.height < self.EXPANDED_HEIGHT:

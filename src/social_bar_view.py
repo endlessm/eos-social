@@ -62,7 +62,12 @@ class SocialBarView(MainWindow):
         self.wraper_main.add_panel(self.welcome_panel, 'welcome_panel')
         self.add(self.wraper_main)
         self.show_all()
-        self.wraper_main.show_panel('welcome_panel')
+
+        if self._presenter.is_user_loged_in():
+            self.wraper_main.show_panel('main_container')
+            self._perform_login()
+        else:
+            self.wraper_main.show_panel('welcome_panel')
         self.logout.hide()
         self.user_name.hide()
 
@@ -161,8 +166,8 @@ class SocialBarView(MainWindow):
         return self._presenter.navigator(request.get_uri())
     
     def _destroy(self, *args):
-        if self._presenter.get_logout_on_shutdown_active():
-            self._presenter.logout()
+        #if self._presenter.get_logout_on_shutdown_active():
+        #    self._presenter.logout()
         gtk.main_quit()
 
     def main(self):

@@ -5,7 +5,9 @@ clean:
 install:
 	mkdir -p $(LIBDIR)
 	mkdir -p $(BINDIR)
+	mkdir -p $(LIBDIR)/images
 	cp -R src/* $(LIBDIR)
+	cp -R images/* $(LIBDIR)/images
 	cp eos-social $(BINDIR)
 	chmod +X $(BINDIR)/eos-social
 	python -m compileall $(LIBDIR)
@@ -14,5 +16,7 @@ install:
 	rm -f $(LIBDIR)/util/*.py
 	rm -f $(LIBDIR)/ui/*.py
 uninstall:
+	rm -f /usr/lib/python2.7/dist-packages/eos-social
 	rm -rf $(LIBDIR)
 	rm -f $(BINDIR)/eos-social
+	rm -rf $(HOME)/.endlessm/social_bar/

@@ -21,11 +21,11 @@
 						<span class="clickable" onclick="show_post_details('$post.url');" style="cursor:pointer;">
 						<!-- subject (TODO: add check if subject is existant -->
 						#if $post.subject
-							<br/><b>$post.subject</b><br/><br/>
+							<br/><b><span class="wrapable">$post.subject</span></b><br/><br/>
 						#end if
 						<!-- Post text -->
 						#if $post.text
-							$post.text<br/>
+							<span class="wrapable">$post.text</span><br/>
 						#end if
 						<!-- Post image -->
 						#if $post.image

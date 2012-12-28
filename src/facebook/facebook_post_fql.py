@@ -5,7 +5,7 @@ import pprint
 
 class FacebookPostFql:
     def __init__(self, data):
-        pprint.pprint(data)
+        #pprint.pprint(data)
         self.id = data['post_id']
         self.poster = data['who']['name']
         self.poster_id = data['actor_id']

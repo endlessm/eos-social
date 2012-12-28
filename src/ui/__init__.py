@@ -438,7 +438,7 @@ class WelcomePanel(gtk.Alignment):
         self.welcome_button = gtk.Button(_('Login'))
         #self.fb_button = SimpleButton()
         self.fb_button = LabelButton()
-        self.fb_button.set_text('connect', x=50, y=30)
+        self.fb_button.set_text(_('connect'), x=50, y=30)
         #self.fb_button.set_size_request(128, 34)
         self.fb_button.set_size_request(144, 50)
         self.fb_button.set_image('leave', 

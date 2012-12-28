@@ -50,17 +50,24 @@ class UserAvatar(gtk.EventBox):
     def __init__(self, menu):
         super(UserAvatar, self).__init__()
         self._presenter = None
+        self._avatar_expanded = False
         self._user_avatar = gtk.Image()
         self._user_avatar.set_size_request(*self.SIZE['user_avatar'])
         self.add(self._user_avatar)
         self.menu = menu
         self.menu.connect('user-profile-action', 
           lambda w, a: self.emit('user-profile-action', a))
-        self.connect('button-press-event', self._on_click)
+        ##self.connect('button-press-event', self._on_click)
 
     def show(self):
         super(UserAvatar, self).show()
         self._user_avatar.show()
+
+    def get_is_expanded(self):
+        return self._avatar_expanded
+
+    def set_is_expanded(self, value):
+        self._avatar_expanded = value
 
     def hide(self):
         self._user_avatar.hide()
@@ -247,6 +254,8 @@ class PostMessage(gtk.Alignment):
         'settings': (220, 15), 
         'avatar': (334, 15), 
         'close': (375, 5), 
+        'user_name': (200, 15), 
+        'logout': (200, 30), 
         }
 
     IMG = {
@@ -293,7 +302,7 @@ class PostMessage(gtk.Alignment):
         button = self._buttons.get(button_name, None)
         return button
 
-    def __init__(self, post_send_area, user_avatar):
+    def __init__(self, post_send_area, user_avatar, user_name, logout):
         super(PostMessage, self).__init__()
         self.set_size_request(-1, self.COLLAPSED_HEIGHT)
         self._buttons = {}
@@ -303,8 +312,13 @@ class PostMessage(gtk.Alignment):
 
         self.post_wraper = post_send_area
         self.user_avatar = user_avatar
+        self.user_name = user_name
+        self.logout = logout
 
         self.toolbar.put(self.user_avatar, *self.LOC['avatar'])
+        self.toolbar.put(self.user_name, *self.LOC['user_name'])
+        self.toolbar.put(self.logout, *self.LOC['logout'])
+
         self.user_avatar.connect('button-press-event', 
           lambda w, e: self._emit_action(w, 'avatar'))
 
@@ -561,6 +575,92 @@ class LabelButton(gtk.EventBox):
     def _on_leave(self, w, e):
         self.show_image(self._image_map.get('leave', None))
 
+
+class LogoutLabel(gtk.EventBox):
+
+
+    __gsignals__ = {
+        'logout-label-action': (
+            gobject.SIGNAL_RUN_FIRST, 
+            gobject.TYPE_NONE,
+            (gobject.TYPE_STRING, )
+            ),
+    }
+
+    def _emit_action(self, widget, action):
+        self.emit('logout-label-action', action)
+
+    def __init__(self, text):
+        super(LogoutLabel, self).__init__()
+        self.text = text
+        self.label = gtk.Label(self.text)
+        self.add(self.label)
+        self.set_visible_window(False)
+        self.label.set_markup(
+          """<span foreground="gray">""" + self.text + """</span>""")
+        self.set_events(gtk.gdk.EXPOSURE_MASK
+                            | gtk.gdk.LEAVE_NOTIFY_MASK
+                            | gtk.gdk.ENTER_NOTIFY_MASK
+                            | gtk.gdk.BUTTON_PRESS_MASK
+                            | gtk.gdk.BUTTON_RELEASE_MASK
+                            )
+        self.connect("button_release_event", 
+          lambda w, e: self._emit_action(w, 'logout'))
+        self.connect('button-press-event', self._on_click)
+        self.connect('button_release_event', self._on_release)
+        self.connect('enter_notify_event', self._on_enter)
+        self.connect('leave_notify_event', self._on_leave)
+
+    def _on_click(self, w, e):
+        self.label.set_markup(
+          """<span foreground="#880000">""" + self.text + """</span>""")
+
+    def _on_release(self, w, e):
+        self.label.set_markup(
+          """<span foreground="gray">""" + self.text + """</span>""")
+
+    def _on_enter(self, w, e):
+        self.label.set_markup(
+          """<span foreground="#FF0000">""" + self.text + """</span>""")
+
+    def _on_leave(self, w, e):
+        self.label.set_markup(
+          """<span foreground="gray">""" + self.text + """</span>""")
+
+
+class UserNameLabel(gtk.EventBox):
+
+
+    __gsignals__ = {
+        'user-name-action': (
+            gobject.SIGNAL_RUN_FIRST, 
+            gobject.TYPE_NONE,
+            (gobject.TYPE_STRING, )
+            ),
+    }
+
+    def _emit_action(self, widget, action):
+        self.emit('user-name-action', action)
+
+    def __init__(self, text):
+        super(UserNameLabel, self).__init__()
+        self.label = gtk.Label(text)
+        self.add(self.label)
+        self.set_visible_window(False)
+        self.label.set_markup(
+          """<span foreground="white">""" + text + """</span>""")
+        self.set_events(gtk.gdk.EXPOSURE_MASK
+                            | gtk.gdk.LEAVE_NOTIFY_MASK
+                            | gtk.gdk.ENTER_NOTIFY_MASK
+                            | gtk.gdk.BUTTON_PRESS_MASK
+                            | gtk.gdk.BUTTON_RELEASE_MASK
+                            )
+        self.connect("button-press-event", 
+          lambda w, e: self._emit_action(w, 'user-name'))
+
+    def set_text(self, text):
+        self.label.set_markup(
+          """<span foreground="white">""" + text + """</span>""")
 
 
 

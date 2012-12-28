@@ -11,6 +11,8 @@ from ui import UserAvatar
 from ui import WelcomePanel
 from ui import MultiPanel
 from ui import UserProfileMenu
+from ui import LogoutLabel
+from ui import UserNameLabel
 import gettext
 
 gettext.install('endlessm_social_bar', '/usr/share/locale', unicode=True, names=['ngettext'])
@@ -23,21 +25,27 @@ class SocialBarView(MainWindow):
     def __init__(self):
         super(SocialBarView, self).__init__()
         self.connect('destroy', self._destroy)
+        self._presenter = None
+
+    def set_presenter(self, presenter):
         super(SocialBarView, self).set_background_image(
           '/usr/share/endlessm_social_bar/images/bg-right.png')
-
-        self._presenter = None
+        self._presenter = presenter
         self._browser = webkit.WebView()
 #        self._browser.set_size_request(-1, 600)
         self._browser.connect("navigation-requested", self._navigation_handler)
-
         self.post_message_area = PostMessageSendArea()
         self.user_avatar_menu = UserProfileMenu(self._presenter)
         self.user_avatar_menu.connect('user-profile-action', self._on_action)
+        self.user_name = UserNameLabel(self._presenter.get_profil_display_name())
+        self.user_name.connect('user-name-action', self._on_action)
+        self.logout = LogoutLabel('x Logout')
+        self.logout.connect('logout-label-action', self._on_action)
         self.user_avatar = UserAvatar(self.user_avatar_menu)
+        self.user_avatar.set_presenter(self._presenter)
         #self.user_avatar.connect('user-profile-action', self._on_action)
         self.post_message_area.connect('post-panel-action', self._on_action)
-        self.post_message = PostMessage(self.post_message_area, self.user_avatar)
+        self.post_message = PostMessage(self.post_message_area, self.user_avatar, self.user_name, self.logout)
         self.post_message.connect('post-panel-action', self._on_action)
 
         # pack main container
@@ -54,6 +62,8 @@ class SocialBarView(MainWindow):
         self.add(self.wraper_main)
         self.show_all()
         self.wraper_main.show_panel('welcome_panel')
+        self.logout.hide()
+        self.user_name.hide()
 
     def _on_action(self, widget, action):
         if action == 'post':
@@ -74,7 +84,32 @@ class SocialBarView(MainWindow):
             if text is not None:
                 self._presenter.post_to_fb(text)
         elif action == 'avatar':
-            pass
+            print 'avatar'
+            if self.user_avatar.get_is_expanded():
+                print 'show profile'
+                self.user_avatar.set_is_expanded(False)
+                self.logout.hide()
+                self.user_name.hide()
+            else:
+                print 'extended'
+                self.user_avatar.set_is_expanded(True)
+                x = self.user_avatar.allocation.x - self.user_name.allocation.width - 8
+                y = self.user_name.allocation.y
+                self.post_message.toolbar.move(self.user_name, x, y)
+                x = self.user_avatar.allocation.x - self.logout.allocation.width - 8
+                y = self.logout.allocation.y
+                self.post_message.toolbar.move(self.logout, x, y)
+
+                #print 'self.logout', self.logout.allocation
+                self.logout.show()
+                #print 'self.user_name', self.user_name.allocation
+                self.user_name.show()
+        elif action == 'user-name':
+            print 'show profile'
+            ##self._presenter.show_profil_page()
+            self.user_avatar.set_is_expanded(False)
+            self.logout.hide()
+            self.user_name.hide()
         elif action == 'user_profile':
             self._presenter.show_profil_page()
         elif action == 'login':
@@ -84,8 +119,12 @@ class SocialBarView(MainWindow):
         elif action == 'logout_on_shutdown_inactive':
             self._presenter.set_logout_on_shutdown_active(False)
         elif action == 'logout':
-            self.wraper_main.show_panel('welcome_panel')
-            self._presenter.logout()
+            print 'logout'
+            self.user_avatar.set_is_expanded(False)
+            self.logout.hide()
+            self.user_name.hide()
+            ##self.wraper_main.show_panel('welcome_panel')
+            ##self._presenter.logout()
         else:
             print 'no action ->', action
 
@@ -105,10 +144,6 @@ class SocialBarView(MainWindow):
 
     def show_popup_notification(self, notification_text):
         SimplePopUp(notification_text).show()
-       
-    def set_presenter(self, presenter):
-        self._presenter = presenter
-        self.user_avatar.set_presenter(self._presenter)
     
     def show_browser(self):
         self._browser.show()

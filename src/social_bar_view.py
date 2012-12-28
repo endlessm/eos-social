@@ -39,6 +39,7 @@ class SocialBarView(MainWindow):
         self.user_avatar_menu.connect('user-profile-action', self._on_action)
         self.user_name = UserNameLabel(self._presenter.get_profil_display_name())
         self.user_name.connect('user-name-action', self._on_action)
+        self.user_name.connect("size-allocate", self._user_name_size_request)
         self.logout = LogoutLabel('x Logout')
         self.logout.connect('logout-label-action', self._on_action)
         self.user_avatar = UserAvatar(self.user_avatar_menu)
@@ -64,6 +65,11 @@ class SocialBarView(MainWindow):
         self.wraper_main.show_panel('welcome_panel')
         self.logout.hide()
         self.user_name.hide()
+
+    def _user_name_size_request(self, widget, allocation):
+        x = self.user_avatar.allocation.x - self.user_name.allocation.width - 8
+        y = self.user_name.allocation.y
+        self.post_message.toolbar.move(self.user_name, x, y)
 
     def _on_action(self, widget, action):
         if action == 'post':

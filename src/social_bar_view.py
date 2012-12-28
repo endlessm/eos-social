@@ -128,6 +128,7 @@ class SocialBarView(MainWindow):
             self._presenter.get_profil_picture()
             file_path = self._presenter.get_stored_picture_file_path()
             self.user_avatar.set_avatar(file_path)
+            self.user_name.set_text(self._presenter.get_profil_display_name())
             self.wraper_main.show_panel('main_container')
 
         if self._presenter.is_user_loged_in():

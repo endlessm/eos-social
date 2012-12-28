@@ -347,6 +347,19 @@ class SocialBarPresenter:
         self.get_image_dwn(image_url)
         return
 
+    def get_profil_display_name(self):
+        if self._graph_api is None:
+            return ''
+        profile = self._graph_api.get_object("me")
+        user_data_url = 'https://graph.facebook.com/' + profile['id']
+        try:
+            user_data_json = urllib2.urlopen(user_data_url).read()
+            user_data = json.loads(user_data_json)
+            return user_data['name']
+        except:
+            pass
+        return ''
+
     def get_stored_picture_file_path(self):
         return self._model.get_stored_picture_file_path()
 

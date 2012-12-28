@@ -271,9 +271,10 @@ SLICKSCROLL_CSS = '''
     height:30px;
 }
 .mCSB_scrollTools .mCSB_dragger .mCSB_dragger_bar{
-    width:12px;
+    width:11px;
     height:100%;
-    margin:0;
+    /* margin:0; */
+    margin-left: 3px;
     -webkit-border-radius:10px;
     -moz-border-radius:10px;
     border-radius:10px;

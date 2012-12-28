@@ -176,6 +176,11 @@ class PostMessageSendArea(gtk.Alignment):
         self.text_area.get_buffer().set_text(self.DEFAULT_TEXT)
         self.text_area.connect('focus-in-event', self._focus_in)
         self.text_area.connect('focus-out-event', self._focus_out)
+        self.text_area.set_left_margin(5)
+        self.text_area.set_right_margin(5)
+        self.text_area.set_pixels_inside_wrap(3)
+        self.text_area.set_pixels_below_lines(3)
+        self.text_area.set_pixels_above_lines(3)
 
         self.text_area_wraper = gtk.HBox(True)
         self.text_area_wraper.pack_start(self.text_area, True, True, 10)
@@ -229,18 +234,19 @@ class PostMessageSendArea(gtk.Alignment):
 
 class PostMessage(gtk.Alignment):
 
-    COLLAPSED_HEIGHT = 70
-    EXPANDED_HEIGHT = 160
+    ANIMATION_STEP = 40
+    COLLAPSED_HEIGHT = 70 + ANIMATION_STEP
+    EXPANDED_HEIGHT = 160 - ANIMATION_STEP
 
     IMG_PATH = '/usr/share/endlessm_social_bar/images/'
 
     LOC = {
-        'post': (10, 12), 
-        'chat': (100, 12), 
-        'feed': (145, 12), 
-        'settings': (220, 12), 
-        'close': (345, 12), 
-        'avatar': (350, 12), 
+        'post': (10, 15), 
+        'chat': (100, 15), 
+        'feed': (145, 15), 
+        'settings': (220, 15), 
+        'avatar': (334, 15), 
+        'close': (375, 5), 
         }
 
     IMG = {
@@ -257,7 +263,7 @@ class PostMessage(gtk.Alignment):
         'chat': (45, 26), 
         'feed': (45, 26), 
         'settings': (65, 26), 
-        'close': (48, 26), 
+        'close': (20, 21), 
         'avatar': (32, 33), 
         }
 
@@ -293,7 +299,7 @@ class PostMessage(gtk.Alignment):
         self._buttons = {}
 
         self.toolbar = gtk.Fixed()
-        self.toolbar.set_size_request(-1, self.COLLAPSED_HEIGHT)
+        self.toolbar.set_size_request(-1, self.COLLAPSED_HEIGHT-self.ANIMATION_STEP)
 
         self.post_wraper = post_send_area
         self.user_avatar = user_avatar
@@ -327,6 +333,21 @@ class PostMessage(gtk.Alignment):
         post.set_image('leave', 
           '/usr/share/endlessm_social_bar/images/publish_button_normal.png')
 
+        close = SimpleButton()
+        self.toolbar.put(close, *self.LOC['close'])
+        close.connect('button-press-event', 
+          lambda w, e: self._emit_action(w, 'close'))
+        close.show_image(
+          '/usr/share/endlessm_social_bar/images/cancel_button_normal.png')
+        close.set_image('click', 
+          '/usr/share/endlessm_social_bar/images/cancel_button_down.png')
+        close.set_image('release', 
+          '/usr/share/endlessm_social_bar/images/cancel_button_normal.png')
+        close.set_image('enter', 
+          '/usr/share/endlessm_social_bar/images/cancel_button_hover.png')
+        close.set_image('leave', 
+          '/usr/share/endlessm_social_bar/images/cancel_button_normal.png')
+
         self.collapse_text_field()
 
     def show(self):
@@ -341,8 +362,9 @@ class PostMessage(gtk.Alignment):
 
     def expand_text_field(self):
         def animate():
-            self.set_size_request(-1, self.allocation.height+10)
-            not_done = self.allocation.height < self.EXPANDED_HEIGHT
+            calc_h = self.allocation.height+self.ANIMATION_STEP
+            self.set_size_request(-1, calc_h)
+            not_done = calc_h < self.EXPANDED_HEIGHT
             if not_done:
                 self.post_wraper.hide()
                 #self.text_area.hide()
@@ -350,19 +372,19 @@ class PostMessage(gtk.Alignment):
                 self.post_wraper.show()
                 #self.text_area.show()
             return not_done
-        gobject.timeout_add(2, animate)
+        gobject.timeout_add(1, animate)
 
     def collapse_text_field(self):
         self.post_wraper.hide()
         def animate():
-            h = self.allocation.height-10
+            h = self.allocation.height-self.ANIMATION_STEP
             h = h if h > 0 else 0
             self.set_size_request(-1, h)
             not_done = self.allocation.height > self.COLLAPSED_HEIGHT
             if not not_done:
                 self.post_wraper.hide()
             return not_done
-        gobject.timeout_add(2, animate)
+        gobject.timeout_add(1, animate)
 
     def toggle_text_field(self):
         if self.allocation.height < self.EXPANDED_HEIGHT:

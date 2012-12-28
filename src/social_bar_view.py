@@ -64,6 +64,7 @@ class SocialBarView(MainWindow):
             self.post_message_area.set_default_text()
         elif action == 'close':
             print 'iconify'
+            self.iconify()
             #gtk.main_quit()
         elif action == 'send':
             text = self.post_message_area.get_post_message()

@@ -24,7 +24,7 @@ class SocialBarView(MainWindow):
         super(SocialBarView, self).__init__()
         self.connect('destroy', self._destroy)
         super(SocialBarView, self).set_background_image(
-          '/usr/share/endlessm_social_bar/images/bg-right.png')
+          '/usr/share/eos-social/images/bg-right.png')
 
         self._presenter = None
         self._browser = webkit.WebView()

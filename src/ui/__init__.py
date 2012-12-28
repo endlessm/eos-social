@@ -122,7 +122,7 @@ class PostMessageSendArea(gtk.Alignment):
           ), 
         }
 
-    IMG_PATH = '/usr/share/endlessm_social_bar/images/'
+    IMG_PATH = '/usr/share/eos-social/images/'
     def _img(cls, key):
         images = cls.IMG[key]
         return [cls.IMG_PATH + img for img in images]
@@ -232,7 +232,7 @@ class PostMessage(gtk.Alignment):
     COLLAPSED_HEIGHT = 70
     EXPANDED_HEIGHT = 160
 
-    IMG_PATH = '/usr/share/endlessm_social_bar/images/'
+    IMG_PATH = '/usr/share/eos-social/images/'
 
     LOC = {
         'post': (10, 12), 
@@ -317,15 +317,15 @@ class PostMessage(gtk.Alignment):
         post.connect('button-press-event', 
           lambda w, e: self._emit_action(w, 'post'))
         post.show_image(
-          '/usr/share/endlessm_social_bar/images/publish_button_normal.png')
+          '/usr/share/eos-social/images/publish_button_normal.png')
         post.set_image('click', 
-          '/usr/share/endlessm_social_bar/images/publish_button_down.png')
+          '/usr/share/eos-social/images/publish_button_down.png')
         post.set_image('release', 
-          '/usr/share/endlessm_social_bar/images/publish_button_normal.png')
+          '/usr/share/eos-social/images/publish_button_normal.png')
         post.set_image('enter', 
-          '/usr/share/endlessm_social_bar/images/publish_button_hover.png')
+          '/usr/share/eos-social/images/publish_button_hover.png')
         post.set_image('leave', 
-          '/usr/share/endlessm_social_bar/images/publish_button_normal.png')
+          '/usr/share/eos-social/images/publish_button_normal.png')
 
         self.collapse_text_field()
 
@@ -406,11 +406,11 @@ class WelcomePanel(gtk.Alignment):
         #self.fb_button.set_size_request(128, 34)
         self.fb_button.set_size_request(144, 50)
         self.fb_button.set_image('leave', 
-          '/usr/share/endlessm_social_bar/images/login_button_normal.png')
+          '/usr/share/eos-social/images/login_button_normal.png')
         self.fb_button.set_image('enter', 
-          '/usr/share/endlessm_social_bar/images/login_button_hover.png')
+          '/usr/share/eos-social/images/login_button_hover.png')
         self.fb_button.show_image(
-          '/usr/share/endlessm_social_bar/images/login_button_normal.png')
+          '/usr/share/eos-social/images/login_button_normal.png')
         self.fb_button.connect('button-press-event', 
           lambda w, e: self._emit_action(w, 'login'))
 

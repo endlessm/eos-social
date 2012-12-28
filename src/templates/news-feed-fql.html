@@ -1,7 +1,16 @@
 <html>
 	<head>
 	<!-- script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script -->
+	<style>
+	$slickscroll_css
+	</style>
+	
+	<style>
+	$css
+	</style>
+	
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
 	
 	<script>
 	$mousewheel_js
@@ -11,13 +20,6 @@
 	$slickscroll_js
 	</script>
 	
-	<style>
-	$slickscroll_css
-	</style>
-	
-	<style>
-	$css
-	</style>
 	<script>
 	function like_success(id, liked_string) {
 	    //alert(id, liked_string);
@@ -118,10 +120,14 @@
     }
     
     function show_older_posts(posts, url) {
+        clearInterval(intervalID);
+        //var intervalID = setInterval(function(){\$("#scroller").mCustomScrollbar("update");}, 2000);
         //alert(url);
         //alert(\$('#older-button').attr('onclick'));
         \$('.older').before(posts);
-        scroll1.InValidate();
+        //scroll1.InValidate();
+        \$("#scroller").mCustomScrollbar("update");
+        var intervalID = setInterval(function(){\$("#scroller").mCustomScrollbar("update");}, 2000);
         \$('#older-button').attr('onclick', 'window.location.href="eossocial:GET_OLDER_POSTS?url=' + url + '"');
         //alert(\$('#older-button').attr('onclick'));
     }
@@ -130,21 +136,18 @@
 	
 	<script type="text/javascript">
 
-    var scroll1
-
-    \$(document).ready(function () {
-	    scroll1 = \$('#scroller').slickscroll({ "verticalscrollbar": true });
-	    //\$('#scroller').css('height', \$(document).heightt() - 5);
-        //alert("WIDTH: " + \$(document).width());
-        //alert("HEIGHT: " + \$(document).height());
-    });
+    (function(\$){
+        \$(window).load(function(){
+            \$("#scroller").mCustomScrollbar();
+        });
+    })(jQuery);
 
     </script>
 	
 	</head>
 	<body>
 		<div id="top-container">
-			<div id="scroller" class="slickscroll" style="width:398px;height:640px;overflow:hidden;">
+			<div id="scroller" class="slickscroll" style="width:394px;height:100%;overflow:hidden;">
 			    <br/>
 			    <div class="newer" onclick="window.location.href='eossocial:GET_NEWER_POSTS:?url=$newer'"></div>
 				<!--a href="eossocial:GET_NEWER_POSTS:?url=$newer" style="text-align:center;">Get latest posts</a-->

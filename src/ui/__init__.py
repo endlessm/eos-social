@@ -176,6 +176,11 @@ class PostMessageSendArea(gtk.Alignment):
         self.text_area.get_buffer().set_text(self.DEFAULT_TEXT)
         self.text_area.connect('focus-in-event', self._focus_in)
         self.text_area.connect('focus-out-event', self._focus_out)
+        self.text_area.set_left_margin(5)
+        self.text_area.set_right_margin(5)
+        self.text_area.set_pixels_inside_wrap(3)
+        self.text_area.set_pixels_below_lines(3)
+        self.text_area.set_pixels_above_lines(3)
 
         self.text_area_wraper = gtk.HBox(True)
         self.text_area_wraper.pack_start(self.text_area, True, True, 10)

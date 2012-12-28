@@ -111,7 +111,7 @@ class SocialBarPresenter:
             return result
     
     def fb_login(self, callback=None):
-        proc = subprocess.Popen(['python', 'facebook/fb_auth_window.py'], stdout=subprocess.PIPE)
+        proc = subprocess.Popen(['python', '/usr/share/eos-social/facebook/fb_auth_window.pyc'], stdout=subprocess.PIPE)
         for line in proc.stdout:
             print line
             if line.startswith('ACCESS_TOKEN:'):
@@ -243,7 +243,7 @@ class SocialBarPresenter:
                   {'newer':newer_url}, {'older':older_url},
                   {'like_string':_('like')},
                   {'comment_string':_('comment')}]
-        page = Template(file = 'templates/news-feed-fql.html', searchList = params)
+        page = Template(file = '/usr/share/eos-social/templates/news-feed-fql.html', searchList = params)
         return page
     
     def navigator(self, uri):
@@ -326,7 +326,7 @@ class SocialBarPresenter:
         params = [{'posts':posts},
                   {'like_string':_('like')},
                   {'comment_string':_('comment')}]
-        page = Template(file = 'templates/posts-array-fql.html', searchList = params)
+        page = Template(file = '/usr/share/eos-social/templates/posts-array-fql.html', searchList = params)
         return page
 
     def get_fb_user(self, fb_user_id='me'):

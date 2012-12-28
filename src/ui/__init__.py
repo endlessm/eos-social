@@ -9,7 +9,7 @@ from simple_button import SimpleButton
 from main_window import MainWindow
 from user_profile_menu import UserProfileMenu
 
-gettext.install('endlessm_social_bar', '/usr/share/locale', unicode=True, names=['ngettext'])
+gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 
 class SimplePopUp(gtk.Window):
 
@@ -338,15 +338,15 @@ class PostMessage(gtk.Alignment):
         close.connect('button-press-event', 
           lambda w, e: self._emit_action(w, 'close'))
         close.show_image(
-          '/usr/share/endlessm_social_bar/images/cancel_button_normal.png')
+          '/usr/share/eos-social/images/cancel_button_normal.png')
         close.set_image('click', 
-          '/usr/share/endlessm_social_bar/images/cancel_button_down.png')
+          '/usr/share/eos-social/images/images/cancel_button_down.png')
         close.set_image('release', 
-          '/usr/share/endlessm_social_bar/images/cancel_button_normal.png')
+          '/usr/share/eos-social/images/images/cancel_button_normal.png')
         close.set_image('enter', 
-          '/usr/share/endlessm_social_bar/images/cancel_button_hover.png')
+          '/usr/share/eos-social/images/cancel_button_hover.png')
         close.set_image('leave', 
-          '/usr/share/endlessm_social_bar/images/cancel_button_normal.png')
+          '/usr/share/eos-social/images/cancel_button_normal.png')
 
         self.collapse_text_field()
 

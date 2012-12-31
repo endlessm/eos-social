@@ -18,7 +18,7 @@ install:
 	mkdir -p $(DESTDIR)/usr/share/locale/pt_BR/LC_MESSAGES/
 	msgfmt -v po/pt_BR.po -o $(DESTDIR)/usr/share/locale/pt_BR/LC_MESSAGES/eos-social.mo
 uninstall:
-	rm -f /usr/lib/python2.7/dist-packages/eos-social
+	rm -Rf /usr/lib/python2.7/dist-packages/eos-social
 	rm -Rf $(LIBDIR)
 	rm -f $(BINDIR)/eos-social
 	rm -Rf $(HOME)/.endlessm/social_bar/

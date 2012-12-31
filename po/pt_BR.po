@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dev 0.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-26 11:16+0100\n"
+"POT-Creation-Date: 2012-12-31 10:01+0100\n"
 "PO-Revision-Date: 2012-12-26 11:16+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -17,57 +17,88 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: src/social_bar_presenter.py:153
+#: src/facebook/facebook_post.py:39
+msgid " posted on Facebook."
+msgstr " posted on Facebook."
+
+#: src/ui/__init__.py:438
+msgid "Login"
+msgstr "Login"
+
+#: src/social_bar_presenter.py:150
 msgid ""
 "Network problem detected. Please check your internet connection and try "
 "again."
-msgstr "Problema na rede detectado. Por favor, verifique sua conexão de internet e tente novamente."
+msgstr ""
+"Problema na rede detectado. Por favor, verifique sua conexão de internet e "
+"tente novamente."
 
-#: src/social_bar_presenter.py:147
+#: src/social_bar_presenter.py:144
 msgid "Requested action is not possible at the moment. Please try again later."
-msgstr "A ação requerida não é possível no momento. Por favor, tente novamente mais tarde."
+msgstr ""
+"A ação requerida não é possível no momento. Por favor, tente novamente mais "
+"tarde."
 
-#: src/social_bar_presenter.py:77
-msgid "Something went wrong when authenticating app."
-msgstr "Something went wrong when authenticating app."
+#: src/ui/__init__.py:137
+msgid "Type status here"
+msgstr "O que vc está pensando?"
 
-#: src/social_bar_presenter.py:178 src/social_bar_presenter.py:262
+#: src/ui/__init__.py:434
+msgid "We've brought Facebook to your"
+msgstr "Nós trouxemos o facebook para sua"
+
+#: src/ui/__init__.py:430
+msgid "Welcome!"
+msgstr "Bem-vindo!"
+
+#: src/social_bar_presenter.py:161 src/social_bar_presenter.py:206
 msgid "comment"
 msgstr "comentar"
 
-#: src/facebook/facebook_post.py:80
+#: src/ui/__init__.py:441
+msgid "connect"
+msgstr "conectar"
+
+#: src/facebook/facebook_post.py:98
 msgid "day ago"
 msgstr "há um dia"
 
-#: src/facebook/facebook_post.py:90
+#: src/facebook/facebook_post.py:108
 msgid "days ago"
 msgstr "há alguns dias"
 
-#: src/facebook/facebook_post.py:82
+#: src/ui/__init__.py:437
+msgid "desktop. Please Login below."
+msgstr "página principal. Por favor, registre-se."
+
+#: src/facebook/facebook_post.py:100
 msgid "hour ago"
 msgstr "há uma hora"
 
-#: src/facebook/facebook_post.py:92
+#: src/facebook/facebook_post.py:110
 msgid "hours ago"
 msgstr "há algumas horas"
 
-#: src/facebook/facebook_post.py:65 src/facebook/facebook_post.py:86
-#: src/facebook/facebook_post.py:96
+#: src/facebook/facebook_post.py:77 src/facebook/facebook_post.py:104
+#: src/facebook/facebook_post.py:114
 msgid "less than a minute ago"
 msgstr "less than a minute ago"
 
-#: src/social_bar_presenter.py:177 src/social_bar_presenter.py:261
+#: src/social_bar_presenter.py:160 src/social_bar_presenter.py:205
 msgid "like"
 msgstr "curtir"
 
-#: src/social_bar_presenter.py:206
+#: src/social_bar_presenter.py:179
 msgid "liked"
 msgstr "curtiu"
 
-#: src/facebook/facebook_post.py:84
+#: src/facebook/facebook_post.py:102
 msgid "minute ago"
 msgstr "há um minuto"
 
-#: src/facebook/facebook_post.py:94
+#: src/facebook/facebook_post.py:112
 msgid "minutes ago"
 msgstr "há alguns minutos"
+
+#~ msgid "Something went wrong when authenticating app."
+#~ msgstr "Something went wrong when authenticating app."

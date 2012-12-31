@@ -5,7 +5,6 @@ import pprint
 
 class FacebookPost:
     def __init__(self, data):
-        #pprint.pprint(data)
         self.id = data['post_id']
         self.poster = data['who']['name']
         self.poster_id = data['actor_id']
@@ -21,29 +20,10 @@ class FacebookPost:
         if data.has_key('description'):
             self.subject = data['description']
         
-#        text = ''
-#        
-#        if data['message']:
-#            print 'data has MESSAGE:', data['message']
-#            text = data['message']
-#        else:
-#            if data['attachment'].has_key('caption') and data['attachment']['caption']:
-#                text = data['attachment']['caption']
-#            elif data['attachment'].has_key('description') and data['attachment']['description']:
-#                text = data['attachment']['description']
-#            elif data['attachment'].has_key('name'):
-#                text = data['attachment']['name']
-#        self.text = text
-        
         if not self.text and not self.subject:
             self.text = '\n' + self.poster + _(' posted on Facebook.') + '\n'
         
         self.text = self.text.replace('\n','<br/>')
-        
-#        if data['attachment']:
-#            if data['attachment'].has_key('media'):
-#                if data['attachment']['media']:
-#                    self.image = data['attachment']['media'][0]['src']
         
         self.date_created = data['created_time']
         self.date_updated = data['updated_time']

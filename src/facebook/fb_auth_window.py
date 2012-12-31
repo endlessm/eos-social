@@ -7,7 +7,6 @@ import urlparse
 
 class FBAuthWindow(gtk.Window):
     def __init__(self, presenter=None, url='', width=800, height=600):
-        print 'Initializing TestWindow...'
         super(FBAuthWindow, self).__init__()
         self.set_title('Login')
         self._presenter = presenter
@@ -17,41 +16,28 @@ class FBAuthWindow(gtk.Window):
         self.web_view.connect("navigation-requested", self.on_navigation_requested)
         self.web_view.open('http://graph.facebook.com/oauth/authorize?scope=read_stream%2Cpublish_stream&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F&client_id=393860344022808')
         self.web_view.show()
-#        print 'Done...'
-#        print 'Showing window...'
         self.scroller.add(self.web_view)
         self.scroller.show()
         self.add(self.scroller)
         self.set_size_request(width, height)
-#        self.set_position(gtk.WIN_POS_CENTER)
+        self.set_position(gtk.WIN_POS_CENTER)
         self.show()
         self.connect("delete-event", self.on_destroy)
-#        print 'Done.'
     
     def on_navigation_requested(self, view, frame, request, data=None):
-#        print 'Navigation requested...'
         uri = request.get_uri()
         parsed = urlparse.urlparse(uri)
-#        print 'SCHEME:', parsed.scheme
-#        print 'PATH  :', parsed.path
-#        print 'QUERY :', parsed.query
-#        print 'PARAMS:', parsed.params
         parsed_query = urlparse.parse_qs(parsed.query)
-#        print parsed_query
-        # ukoliko imam code onda idem po access token i cuvam ga
         if parsed_query.has_key('code'):
-            # isto sto i u request handleru
             code = parsed_query['code'][0]
             token = self.get_access_token(code)
             if token:
-#                self._presenter.set_fb_access_token(token)
                 print 'ACCESS_TOKEN:' + token
                 self._authorized = True
             self.emit("delete-event", gtk.gdk.Event(gtk.gdk.DELETE))
         elif parsed_query.has_key('error'):
             print 'ERROR occured.'
             self.emit("delete-event", gtk.gdk.Event(gtk.gdk.DELETE))
-        # ukoliko imam error_reason=user_denied ... sta da radim???
         return False
     
     def get_access_token(self, code):
@@ -61,12 +47,9 @@ class FBAuthWindow(gtk.Window):
                   'client_secret':'eb0dcb05f7512be39f7a3826ce99dfcd',
                   'code':code}
         url = url + '?' + urllib.urlencode(params)
-#        print 'URL  :', url
         try:
             response = urllib2.urlopen(url).read()
-#            print response
             token = urlparse.parse_qs(response)['access_token'][0]
-#            print token
             return token
         except:
             print 'EXCEPTION CAUGHT!!!'
@@ -90,6 +73,5 @@ class FBAuthWindow(gtk.Window):
 
 
 if __name__ == "__main__":
-#    print 'Starting app....'
     t = FBAuthWindow()
     t.main()

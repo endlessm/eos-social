@@ -15,7 +15,6 @@ class FBAuthView():
         if url:
             self.web_view.show()
             self.web_view.open(url)
-#        self.web_view.show()
         self.scroller.add(self.web_view)
         self.window.add(self.scroller)
         print '-- done.'

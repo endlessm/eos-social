@@ -14,11 +14,6 @@ class FacebookPosts:
             self.previous_url = self.posts[0].date_created
             self.next_url = self.posts[len(self.posts)-1].date_created
         
-        print 'PREVIOUS:', self.previous_url, 'NEXT:', self.next_url
+#        print 'PREVIOUS:', self.previous_url, 'NEXT:', self.next_url
         
-#        if data.has_key('paging'):
-#            if data['paging'].has_key('previous'):
-#                self.previous_url = data['paging']['previous']
-#            if data['paging'].has_key('next'):
-#                self.next_url = data['paging']['next']
             

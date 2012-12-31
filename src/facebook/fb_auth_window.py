@@ -9,6 +9,7 @@ class FBAuthWindow(gtk.Window):
     def __init__(self, presenter=None, url='', width=800, height=600):
         print 'Initializing TestWindow...'
         super(FBAuthWindow, self).__init__()
+        self.set_title('Login')
         self._presenter = presenter
         self._authorized = False
         self.scroller = gtk.ScrolledWindow()

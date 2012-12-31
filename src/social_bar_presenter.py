@@ -12,7 +12,7 @@ import simplejson
 import urllib2
 import gettext
 
-gettext.install('endlessm_social_bar', '/usr/share/locale', unicode=True, names=['ngettext'])
+gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 
 class SocialBarPresenter:
     

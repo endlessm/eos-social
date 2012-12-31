@@ -9,7 +9,7 @@ from simple_button import SimpleButton
 from main_window import MainWindow
 from user_profile_menu import UserProfileMenu
 
-gettext.install('endlessm_social_bar', '/usr/share/locale', unicode=True, names=['ngettext'])
+gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 
 class SimplePopUp(gtk.Window):
 
@@ -129,7 +129,7 @@ class PostMessageSendArea(gtk.Alignment):
           ), 
         }
 
-    IMG_PATH = '/usr/share/endlessm_social_bar/images/'
+    IMG_PATH = '/usr/share/eos-social/images/'
     def _img(cls, key):
         images = cls.IMG[key]
         return [cls.IMG_PATH + img for img in images]
@@ -245,7 +245,7 @@ class PostMessage(gtk.Alignment):
     COLLAPSED_HEIGHT = 70 + ANIMATION_STEP
     EXPANDED_HEIGHT = 160 - ANIMATION_STEP
 
-    IMG_PATH = '/usr/share/endlessm_social_bar/images/'
+    IMG_PATH = '/usr/share/eos-social/images/'
 
     LOC = {
         'post': (10, 15), 
@@ -337,30 +337,30 @@ class PostMessage(gtk.Alignment):
         post.connect('button-press-event', 
           lambda w, e: self._emit_action(w, 'post'))
         post.show_image(
-          '/usr/share/endlessm_social_bar/images/publish_button_normal.png')
+          '/usr/share/eos-social/images/publish_button_normal.png')
         post.set_image('click', 
-          '/usr/share/endlessm_social_bar/images/publish_button_down.png')
+          '/usr/share/eos-social/images/publish_button_down.png')
         post.set_image('release', 
-          '/usr/share/endlessm_social_bar/images/publish_button_normal.png')
+          '/usr/share/eos-social/images/publish_button_normal.png')
         post.set_image('enter', 
-          '/usr/share/endlessm_social_bar/images/publish_button_hover.png')
+          '/usr/share/eos-social/images/publish_button_hover.png')
         post.set_image('leave', 
-          '/usr/share/endlessm_social_bar/images/publish_button_normal.png')
+          '/usr/share/eos-social/images/publish_button_normal.png')
 
         close = SimpleButton()
         self.toolbar.put(close, *self.LOC['close'])
         close.connect('button-press-event', 
           lambda w, e: self._emit_action(w, 'close'))
         close.show_image(
-          '/usr/share/endlessm_social_bar/images/cancel_button_normal.png')
+          '/usr/share/eos-social/images/cancel_button_normal.png')
         close.set_image('click', 
-          '/usr/share/endlessm_social_bar/images/cancel_button_down.png')
+          '/usr/share/eos-social/images/images/cancel_button_down.png')
         close.set_image('release', 
-          '/usr/share/endlessm_social_bar/images/cancel_button_normal.png')
+          '/usr/share/eos-social/images/images/cancel_button_normal.png')
         close.set_image('enter', 
-          '/usr/share/endlessm_social_bar/images/cancel_button_hover.png')
+          '/usr/share/eos-social/images/cancel_button_hover.png')
         close.set_image('leave', 
-          '/usr/share/endlessm_social_bar/images/cancel_button_normal.png')
+          '/usr/share/eos-social/images/cancel_button_normal.png')
 
         self.collapse_text_field()
 
@@ -442,11 +442,11 @@ class WelcomePanel(gtk.Alignment):
         #self.fb_button.set_size_request(128, 34)
         self.fb_button.set_size_request(144, 50)
         self.fb_button.set_image('leave', 
-          '/usr/share/endlessm_social_bar/images/login_button_normal.png')
+          '/usr/share/eos-social/images/login_button_normal.png')
         self.fb_button.set_image('enter', 
-          '/usr/share/endlessm_social_bar/images/login_button_hover.png')
+          '/usr/share/eos-social/images/login_button_hover.png')
         self.fb_button.show_image(
-          '/usr/share/endlessm_social_bar/images/login_button_normal.png')
+          '/usr/share/eos-social/images/login_button_normal.png')
         self.fb_button.connect('button-press-event', 
           lambda w, e: self._emit_action(w, 'login'))
 

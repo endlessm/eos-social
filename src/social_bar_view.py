@@ -16,7 +16,7 @@ from ui import UserNameLabel
 import gettext
 import time
 
-gettext.install('endlessm_social_bar', '/usr/share/locale', unicode=True, names=['ngettext'])
+gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 
 
 class SocialBarView(MainWindow):
@@ -28,8 +28,8 @@ class SocialBarView(MainWindow):
         self._presenter = None
 
     def set_presenter(self, presenter):
-        super(SocialBarView, self).set_background_image(
-          '/usr/share/endlessm_social_bar/images/bg-right.png')
+        super(SocialBarView, self).set_background_image('/usr/share/eos-social/images/bg-right.png')
+
         self._presenter = presenter
         self._browser = webkit.WebView()
         self._browser.connect("navigation-requested", self._navigation_handler)

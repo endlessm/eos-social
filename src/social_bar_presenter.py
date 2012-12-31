@@ -63,8 +63,7 @@ class SocialBarPresenter:
             return result
     
     def fb_login(self, callback=None):
-        #TODO: fix path and window title
-        proc = subprocess.Popen(['python', 'facebook/fb_auth_window.py'], stdout=subprocess.PIPE)
+        proc = subprocess.Popen(['python', '/usr/share/eos-social/facebook/fb_auth_window.pyc'], stdout=subprocess.PIPE)
         for line in proc.stdout:
             print line
             if line.startswith('ACCESS_TOKEN:'):
@@ -163,7 +162,7 @@ class SocialBarPresenter:
                   {'like_string':_('like')},
                   {'comment_string':_('comment')}]
         #@TODO: fix path and file name
-        page = Template(file = 'templates/news-feed.html', searchList = params)
+        page = Template(file = '/usr/share/eos-social/templates/news-feed.html', searchList = params)
         return page
     
     def navigator(self, uri):
@@ -208,7 +207,7 @@ class SocialBarPresenter:
                   {'like_string':_('like')},
                   {'comment_string':_('comment')}]
         #@TODO: fix path and file name
-        page = Template(file = 'templates/posts-array.html', searchList = params)
+        page = Template(file = '/usr/share/eos-social/templates/posts-array.html', searchList = params)
         return page
 
 #    def get_fb_user(self, fb_user_id='me'):
@@ -313,8 +312,12 @@ class SocialBarPresenter:
     def get_older_posts(self, parsed):
         url = parsed.path.split('?url=')[1]
         result = self.get_new_fb_posts(None, url)
-        if not result or not result.posts:
+        if not result:
             return
+        
+        if not hasattr(result, 'posts'):
+            return
+        
         html = self.generate_posts_elements(result.posts)
         script = 'show_older_posts(%s, %s);' % (simplejson.dumps(str(html)), simplejson.dumps(result.next_url))
         self._view._browser.execute_script(script)

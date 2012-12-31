@@ -1,7 +1,16 @@
 <html>
 	<head>
 	<!-- script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script -->
+	<style>
+	$slickscroll_css
+	</style>
+	
+	<style>
+	$css
+	</style>
+	
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
 	
 	<script>
 	$mousewheel_js
@@ -11,13 +20,6 @@
 	$slickscroll_js
 	</script>
 	
-	<style>
-	$slickscroll_css
-	</style>
-	
-	<style>
-	$css
-	</style>
 	<script>
 	function like_success(id, liked_string) {
 	    //alert(id, liked_string);
@@ -112,16 +114,20 @@
         document.getElementById("comment-image-"+id).setAttribute("href", "eossocialbar:#");
     }
 
-    function show_post_details(post_id) {
+    function show_post_details(url) {
         //alert("eossocialbar:VIEWPOST?id=" + post_id);
-        window.location.href = "eossocialbar:VIEWPOST?id=" + post_id;
+        window.location.href = "eossocialbar:VIEWPOST?url=" + url;
     }
     
     function show_older_posts(posts, url) {
+        clearInterval(intervalID);
+        //var intervalID = setInterval(function(){\$("#scroller").mCustomScrollbar("update");}, 2000);
         //alert(url);
         //alert(\$('#older-button').attr('onclick'));
         \$('.older').before(posts);
-        scroll1.InValidate();
+        //scroll1.InValidate();
+        \$("#scroller").mCustomScrollbar("update");
+        var intervalID = setInterval(function(){\$("#scroller").mCustomScrollbar("update");}, 2000);
         \$('#older-button').attr('onclick', 'window.location.href="eossocial:GET_OLDER_POSTS?url=' + url + '"');
         //alert(\$('#older-button').attr('onclick'));
     }
@@ -130,21 +136,18 @@
 	
 	<script type="text/javascript">
 
-    var scroll1
-
-    \$(document).ready(function () {
-	    scroll1 = \$('#scroller').slickscroll({ "verticalscrollbar": true });
-	    //\$('#scroller').css('height', \$(document).heightt() - 5);
-        //alert("WIDTH: " + \$(document).width());
-        //alert("HEIGHT: " + \$(document).height());
-    });
+    (function(\$){
+        \$(window).load(function(){
+            \$("#scroller").mCustomScrollbar();
+        });
+    })(jQuery);
 
     </script>
 	
 	</head>
 	<body>
 		<div id="top-container">
-			<div id="scroller" class="slickscroll" style="width:398px;height:640px;overflow:hidden;">
+			<div id="scroller" class="slickscroll" style="width:392px;height:100%;overflow:hidden;">
 			    <br/>
 			    <div class="newer" onclick="window.location.href='eossocial:GET_NEWER_POSTS:?url=$newer'"></div>
 				<!--a href="eossocial:GET_NEWER_POSTS:?url=$newer" style="text-align:center;">Get latest posts</a-->
@@ -170,14 +173,14 @@
 						</span>
 						&nbsp;&nbsp;$post.time_elapsed_string
 						<br/>
-						<span class="clickable" onclick="show_post_details('$post.id');" style="cursor:pointer;">
+						<span class="clickable" onclick="show_post_details('$post.url');" style="cursor:pointer;">
 						<!-- subject (TODO: add check if subject is existant -->
 						#if $post.subject
-							<b>$post.subject</b><br/>
+							<br/><b><span class="wrapable">$post.subject</span></b><br/><br/>
 						#end if
 						<!-- Post text -->
 						#if $post.text
-							$post.text<br/>
+							<span class="wrapable">$post.text</span><br/>
 						#end if
 						<!-- Post image -->
 						#if $post.image
@@ -187,20 +190,12 @@
 						</span>
 						<div class="clearer" style="clear:both;"></div>
 						<br/>
-						#if $post.actions
+						#if $post.likes['can_like'] and $post.comments['can_post']
 						<!-- Like comes first -->
 						    <!-- Like url -->
-						    #for $action in $post.actions
-						        #if $action['name'] == 'Like'
-						            <a href="eossocialbar:LIKE?id=$post.id" id="like-$post.id" style="font-size:12px;">$like_string</a>&nbsp;&nbsp;<b>&#183;</b>
-						        #end if
-						    #end for
+						    <a href="eossocialbar:LIKE?id=$post.id" id="like-$post.id" style="font-size:12px;">$like_string</a>&nbsp;&nbsp;<b>&#183;</b>
 						    <!-- Comment url -->
-						    #for $action in $post.actions
-						        #if $action['name'] == 'Comment'
-						            <a href="eossocialbar:COMMENT?id=$post.id" id="comment-$post.id" style="margin-right:65px; font-size:12px;">$comment_string</a>&nbsp;&nbsp;
-						        #end if
-						    #end for
+						    <a href="eossocialbar:COMMENT?id=$post.id" id="comment-$post.id" style="margin-right:65px; font-size:12px;">$comment_string</a>&nbsp;&nbsp;
 						    <!-- Like icon and count -->
 						    <div class="wrapper">
                               <div class="like">

@@ -3,7 +3,6 @@ import json
 
 class SocialBarModel:
     def __init__(self):
-        print 'In __init__ method.'
         self.LOCAL_FACEBOOK_FILE = os.path.expanduser('~/.fb_access_token')
         self.USER_IMAGES_LOCATION = os.path.expanduser('~/.endlessm/social_bar/images/')
         self.LOCAL_IMAGES_LOCATION = os.path.expanduser('/usr/share/endlessm_social_bar/images/')

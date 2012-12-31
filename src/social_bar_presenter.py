@@ -1,7 +1,6 @@
 from util.util import CSS, SLICKSCROLL_CSS, SLICKSCROLL_JS, MOUSE_WHEEL_JS, posts_query, users_query, older_posts_query
 from facebook.facebook import GraphAPIError, GraphAPI
 from facebook.facebook_posts import FacebookPosts
-from facebook.fb_auth_window import FBAuthWindow
 import subprocess
 from urllib2 import URLError
 from Cheetah.Template import Template
@@ -161,7 +160,7 @@ class SocialBarPresenter:
                   {'like_string':_('like')},
                   {'comment_string':_('comment')}]
         #@TODO: fix path and file name
-        page = Template(file = 'templates/news-feed-fql.html', searchList = params)
+        page = Template(file = 'templates/news-feed.html', searchList = params)
         return page
     
     def navigator(self, uri):
@@ -206,7 +205,7 @@ class SocialBarPresenter:
                   {'like_string':_('like')},
                   {'comment_string':_('comment')}]
         #@TODO: fix path and file name
-        page = Template(file = 'templates/posts-array-fql.html', searchList = params)
+        page = Template(file = 'templates/posts-array.html', searchList = params)
         return page
 
     def get_fb_user(self, fb_user_id='me'):

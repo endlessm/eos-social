@@ -17,7 +17,6 @@ import gettext
 
 gettext.install('endlessm_social_bar', '/usr/share/locale', unicode=True, names=['ngettext'])
 
-#gtk.gdk.threads_init()
 
 class SocialBarView(MainWindow):
 
@@ -32,7 +31,6 @@ class SocialBarView(MainWindow):
           '/usr/share/endlessm_social_bar/images/bg-right.png')
         self._presenter = presenter
         self._browser = webkit.WebView()
-#        self._browser.set_size_request(-1, 600)
         self._browser.connect("navigation-requested", self._navigation_handler)
         self.post_message_area = PostMessageSendArea()
         self.user_avatar_menu = UserProfileMenu(self._presenter)
@@ -44,12 +42,10 @@ class SocialBarView(MainWindow):
         self.logout.connect('logout-label-action', self._on_action)
         self.user_avatar = UserAvatar(self.user_avatar_menu)
         self.user_avatar.set_presenter(self._presenter)
-        #self.user_avatar.connect('user-profile-action', self._on_action)
         self.post_message_area.connect('post-panel-action', self._on_action)
         self.post_message = PostMessage(self.post_message_area, self.user_avatar, self.user_name, self.logout)
         self.post_message.connect('post-panel-action', self._on_action)
 
-        # pack main container
         self.main_container = gtk.VBox()
         self.main_container.pack_start(self.post_message, expand=False, fill=False, padding=0)
         self.main_container.pack_start(self._browser, expand=True, fill=True, padding=0)
@@ -85,10 +81,8 @@ class SocialBarView(MainWindow):
             self.post_message_area.set_default_text()
         elif action == 'close':
             self.iconify()
-            #gtk.main_quit()
         elif action == 'send':
             text = self.post_message_area.get_post_message()
-            #self.post_message_area.set_default_text()
             self.post_message_area.clear_text(True)
             self.post_message.collapse_text_field()
             if text is not None:
@@ -123,7 +117,6 @@ class SocialBarView(MainWindow):
         elif action == 'logout_on_shutdown_inactive':
             self._presenter.set_logout_on_shutdown_active(False)
         elif action == 'logout':
-            print 'logout'
             self.user_avatar.set_is_expanded(False)
             self.logout.hide()
             self.user_name.hide()
@@ -154,20 +147,13 @@ class SocialBarView(MainWindow):
         self._browser.show()
     
     def load_html(self, html):
-#        print '='*80
-#        print html
-#        print '='*80
         result = self._browser.load_string(html, 'text/html', 'utf-8', '')
-#        print 'RESULT:', result
         self.show_browser()
     
     def _navigation_handler(self, view, frame, request, data=None):
-        print 'In navigation handler view function...'
         return self._presenter.navigator(request.get_uri())
     
     def _destroy(self, *args):
-        #if self._presenter.get_logout_on_shutdown_active():
-        #    self._presenter.logout()
         gtk.main_quit()
 
     def main(self):

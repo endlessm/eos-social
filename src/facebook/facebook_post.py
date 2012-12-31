@@ -1,40 +1,55 @@
 import datetime
+import calendar
 from math import floor
+import pprint
 
 class FacebookPost:
     def __init__(self, data):
-        self.id = data['id']
-        self.poster = data['from']['name']
-        self.poster_id = data['from']['id']
-        self.poster_image = 'https://graph.facebook.com/' + data['from']['id'] + '/picture'
-        self.image = ''
+        #pprint.pprint(data)
+        self.id = data['post_id']
+        self.poster = data['who']['name']
+        self.poster_id = data['actor_id']
+        self.poster_image = data['who']['pic_square']
+        self.image = self.get_image(data)
         self.subject = ''
         self.actions = {}
         self.likes = {}
         self.comments = {}
+        self.type = data['type']
+        self.url = self.get_url(data)
+        self.text = self.get_text(data)
+        if data.has_key('description'):
+            self.subject = data['description']
         
-        if data.has_key('message'):
-            text = data['message']
-        elif data.has_key('story'):
-            text = data['story']
-        else:
-            text = 'No text.'     # Can this happen? If so, internationalize or set to empty string!
+#        text = ''
+#        
+#        if data['message']:
+#            print 'data has MESSAGE:', data['message']
+#            text = data['message']
+#        else:
+#            if data['attachment'].has_key('caption') and data['attachment']['caption']:
+#                text = data['attachment']['caption']
+#            elif data['attachment'].has_key('description') and data['attachment']['description']:
+#                text = data['attachment']['description']
+#            elif data['attachment'].has_key('name'):
+#                text = data['attachment']['name']
+#        self.text = text
         
-        self.text = text
+        if not self.text and not self.subject:
+            self.text = '\n' + self.poster + _(' posted on Facebook.') + '\n'
         
-        if data.has_key('name'):
-            self.subject = data['name']
+        self.text = self.text.replace('\n','<br/>')
         
-        if data.has_key('picture'):
-            self.image = data['picture']
+#        if data['attachment']:
+#            if data['attachment'].has_key('media'):
+#                if data['attachment']['media']:
+#                    self.image = data['attachment']['media'][0]['src']
         
-        self.date_created = str(datetime.datetime.strptime(data['created_time'],'%Y-%m-%dT%H:%M:%S+0000'))
-        self.date_updated = str(datetime.datetime.strptime(data['updated_time'],'%Y-%m-%dT%H:%M:%S+0000'))
-        self.time_elapsed = datetime.datetime.utcnow() - datetime.datetime.strptime(data['created_time'],'%Y-%m-%dT%H:%M:%S+0000')
+        self.date_created = data['created_time']
+        self.date_updated = data['updated_time']
+        now = calendar.timegm(datetime.datetime.utcnow().utctimetuple())
+        self.time_elapsed = now - self.date_created
         self.time_elapsed_string = self.get_elapsed_string(self.time_elapsed)
-        
-        if data.has_key('actions'):
-            self.actions = data['actions']
         
         if data.has_key('likes'):
             self.likes = data['likes']
@@ -58,16 +73,19 @@ class FacebookPost:
         return rv
     
     def get_elapsed_string(self, delta):
-        if delta.days:
-            if delta.days > 0:
-                return self.pluralize(delta.days, 'DAY')
-            else:
-                return _('less than a minute ago')
-        if int(floor(delta.seconds/3600)):
-            return self.pluralize(int(floor(delta.seconds/3600)), 'HOUR')
-        if int(floor(delta.seconds/60)):
-            return self.pluralize(int(floor(delta.seconds/60)), 'MINUTE')
-        return self.pluralize(delta.seconds, 'SECOND')
+        if delta < 0:
+            return _('less than a minute ago')
+        days = int(floor(delta/(60*60*24)))
+        hours = int(floor(delta/(60*60)))
+        minutes = int(floor(delta/60))
+        if days > 0:
+            return self.pluralize(days, 'DAY')
+        
+        if hours > 0:
+            return self.pluralize(hours, 'HOUR')
+        
+        if minutes > 0:
+            return self.pluralize(minutes, 'MINUTE')
     
     def pluralize(self, num, period_name):
         if num == 1:
@@ -94,3 +112,35 @@ class FacebookPost:
             return str(num) + ' ' + _('minutes ago')
         if period_name == 'SECOND':
             return _('less than a minute ago')
+    
+    def get_url(self, data):
+        if data['permalink']:
+            return data['permalink']
+        else:
+            if self.type == 361:
+                parts = self.id.split('_')
+                return 'http://www.facebook.com/' + parts[0] + '/posts/' + parts[1]
+            else:
+                return 'http://www.facebook.com/' + str(self.poster_id)
+    
+    def get_text(self, data):
+        text = ''
+        if data['message']:
+            text = data['message']
+        else:
+            if data['attachment'].has_key('caption') and data['attachment']['caption']:
+                text = data['attachment']['caption']
+            elif data['attachment'].has_key('description') and data['attachment']['description']:
+                text = data['attachment']['description']
+            elif data['attachment'].has_key('name'):
+                text = data['attachment']['name']
+        return text
+    
+    def get_image(self, data):
+        image = ''
+        if data['attachment']:
+            if data['attachment'].has_key('media'):
+                if data['attachment']['media']:
+                    image = data['attachment']['media'][0]['src']
+        return image
+        

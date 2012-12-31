@@ -14,6 +14,7 @@ from ui import UserProfileMenu
 from ui import LogoutLabel
 from ui import UserNameLabel
 import gettext
+import time
 
 gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 
@@ -72,6 +73,23 @@ class SocialBarView(MainWindow):
         y = self.user_name.allocation.y
         self.post_message.toolbar.move(self.user_name, x, y)
 
+    def _on_avatar(self):
+        if self.user_avatar.get_is_expanded():
+            self._presenter.show_profil_page()
+            self.user_avatar.set_is_expanded(False)
+            self.logout.hide()
+            self.user_name.hide()
+        else:
+            self.user_avatar.set_is_expanded(True)
+            x = self.user_avatar.allocation.x - self.user_name.allocation.width - 8
+            y = self.user_name.allocation.y
+            self.post_message.toolbar.move(self.user_name, x, y)
+            x = self.user_avatar.allocation.x - self.logout.allocation.width - 8
+            y = self.logout.allocation.y
+            self.post_message.toolbar.move(self.logout, x, y)
+            self.logout.show()
+            self.user_name.show()
+
     def _on_action(self, widget, action):
         if action == 'post':
             self.post_message.toggle_text_field()
@@ -88,21 +106,7 @@ class SocialBarView(MainWindow):
             if text is not None:
                 self._presenter.post_to_fb(text)
         elif action == 'avatar':
-            if self.user_avatar.get_is_expanded():
-                self._presenter.show_profil_page()
-                self.user_avatar.set_is_expanded(False)
-                self.logout.hide()
-                self.user_name.hide()
-            else:
-                self.user_avatar.set_is_expanded(True)
-                x = self.user_avatar.allocation.x - self.user_name.allocation.width - 8
-                y = self.user_name.allocation.y
-                self.post_message.toolbar.move(self.user_name, x, y)
-                x = self.user_avatar.allocation.x - self.logout.allocation.width - 8
-                y = self.logout.allocation.y
-                self.post_message.toolbar.move(self.logout, x, y)
-                self.logout.show()
-                self.user_name.show()
+            self._on_avatar()
         elif action == 'user-name':
             self._presenter.show_profil_page()
             self.user_avatar.set_is_expanded(False)
@@ -134,14 +138,18 @@ class SocialBarView(MainWindow):
             self.user_avatar.set_avatar(file_path)
             self.user_name.set_text(self._presenter.get_profil_display_name())
             self.wraper_main.show_panel('main_container')
+            self.set_focus_out_active(True)
 
+        self.set_focus_out_active(False)
         if self._presenter.is_user_loged_in():
             _callback()
         else:
             self._presenter.fb_login(callback=_callback)
 
     def show_popup_notification(self, notification_text):
+        self.set_focus_out_active(False)
         SimplePopUp(notification_text).show()
+        self.set_focus_out_active(True)
     
     def show_browser(self):
         self._browser.show()

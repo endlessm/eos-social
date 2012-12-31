@@ -27,15 +27,9 @@ class SocialBarView(MainWindow):
         self._presenter = None
 
     def set_presenter(self, presenter):
-        super(SocialBarView, self).set_background_image(
-<<<<<<< HEAD
-          '/usr/share/eos-social/images/bg-right.png')
+        super(SocialBarView, self).set_background_image('/usr/share/eos-social/images/bg-right.png')
 
-        self._presenter = None
-=======
-          '/usr/share/endlessm_social_bar/images/bg-right.png')
         self._presenter = presenter
->>>>>>> localization
         self._browser = webkit.WebView()
         self._browser.connect("navigation-requested", self._navigation_handler)
         self.post_message_area = PostMessageSendArea()

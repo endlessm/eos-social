@@ -159,7 +159,7 @@ class SocialBarPresenter:
                   {'like_string':_('like')},
                   {'comment_string':_('comment')}]
         #@TODO: fix path and file name
-        page = Template(file = 'templates/news-feed.html', searchList = params)
+        page = Template(file = '/usr/share/eos-social/templates/news-feed.html', searchList = params)
         return page
     
     def navigator(self, uri):
@@ -204,7 +204,7 @@ class SocialBarPresenter:
                   {'like_string':_('like')},
                   {'comment_string':_('comment')}]
         #@TODO: fix path and file name
-        page = Template(file = 'templates/posts-array.html', searchList = params)
+        page = Template(file = '/usr/share/eos-social/templates/posts-array.html', searchList = params)
         return page
 
     def get_fb_user(self, fb_user_id='me'):

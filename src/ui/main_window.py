@@ -12,6 +12,7 @@ class MainWindow(gtk.Window):
     def __init__(self, transparent=False, dock=None):
         super(MainWindow, self).__init__(gtk.WINDOW_TOPLEVEL)
         self.image_path = None
+        self.focus_out_active = True
         screen_height = gtk.gdk.screen_height() - 80
         screen_width = gtk.gdk.screen_width()
         self.set_app_paintable(True)
@@ -27,7 +28,9 @@ class MainWindow(gtk.Window):
         self.set_modal(True)
         self.set_skip_pager_hint(True)
         self.move(screen_width-self.DEFAULT_WINDOW_WIDTH, 0)
+        self.connect('notify::is-active', self._set_focus)
         self.connect('expose-event', self._on_draw)
+        self.connect('delete-event', self._on_close)
 
         position = self._get_position_by_dock(dock)
         if position is not None:
@@ -39,6 +42,22 @@ class MainWindow(gtk.Window):
             #self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
             self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
 
+    def _on_close(self, widget, event):
+        return True
+
+    def set_focus_out_active(self, value):
+        if value:
+            self.get_focus()
+            def activate_later():
+                self.focus_out_active = True
+                return False
+            gobject.timeout_add(2000, activate_later)
+        else:
+            self.focus_out_active = False
+
+    def _set_focus(self, window, gparam_boolean):
+        if self.focus_out_active and not window.props.is_active:
+            window.iconify()
 
     def _on_draw(self, widget, event):
         if os.path.isfile(self.image_path):

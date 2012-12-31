@@ -14,6 +14,7 @@ from ui import UserProfileMenu
 from ui import LogoutLabel
 from ui import UserNameLabel
 import gettext
+import time
 
 gettext.install('endlessm_social_bar', '/usr/share/locale', unicode=True, names=['ngettext'])
 
@@ -134,14 +135,18 @@ class SocialBarView(MainWindow):
             self.user_avatar.set_avatar(file_path)
             self.user_name.set_text(self._presenter.get_profil_display_name())
             self.wraper_main.show_panel('main_container')
+            self.set_focus_out_active(True)
 
+        self.set_focus_out_active(False)
         if self._presenter.is_user_loged_in():
             _callback()
         else:
             self._presenter.fb_login(callback=_callback)
 
     def show_popup_notification(self, notification_text):
+        self.set_focus_out_active(False)
         SimplePopUp(notification_text).show()
+        self.set_focus_out_active(True)
     
     def show_browser(self):
         self._browser.show()

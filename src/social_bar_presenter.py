@@ -10,7 +10,9 @@ import pprint
 import webbrowser
 import simplejson
 import urllib2
+import gettext
 
+gettext.install('endlessm_social_bar', '/usr/share/locale', unicode=True, names=['ngettext'])
 
 class SocialBarPresenter:
     
@@ -47,6 +49,8 @@ class SocialBarPresenter:
         except URLError as e:
             self.url_exception_handler()
             return None
+        except:
+            return None        
         
         if result:
             result =  self.parse_posts(result)
@@ -117,18 +121,18 @@ class SocialBarPresenter:
         query = {'posts':older_posts_query % str(stamp),'users':users_query}
         try:
             result = self._graph_api.fql(query)
+            return result
         except GraphAPIError as error:
             self.oauth_exception_handler(error.result)
             return None
         except URLError as e:
             self.url_exception_handler()
             return None
-        
-        if result:
-            return self.parse_posts(result)
+        except:
+            return None
     
-    def show_fb_login(self):
-        self._view.show_fb_auth_popup()
+#    def show_fb_login(self):
+#        self._view.show_fb_auth_popup()
     
     def set_fb_access_token(self, token):
         self._fb_access_token = token
@@ -138,7 +142,6 @@ class SocialBarPresenter:
         server_error_codes = [1,2,4,17]
         oauth_error_codes = [102, 190]
         permissions_error_codes = range(200, 300)
-        pprint.pprint(result)
         code = result['error']['code']
         if code in server_error_codes:
             message = _('Requested action is not possible at the moment. Please try again later.')
@@ -208,8 +211,8 @@ class SocialBarPresenter:
         page = Template(file = 'templates/posts-array.html', searchList = params)
         return page
 
-    def get_fb_user(self, fb_user_id='me'):
-        return
+#    def get_fb_user(self, fb_user_id='me'):
+#        return
 
     def show_profil_page(self):
         if self._graph_api is None:
@@ -229,15 +232,13 @@ class SocialBarPresenter:
     def get_profil_display_name(self):
         if self._graph_api is None:
             return ''
-        profile = self._graph_api.get_object("me")
-        user_data_url = 'https://graph.facebook.com/' + profile['id']
+        
         try:
-            user_data_json = urllib2.urlopen(user_data_url).read()
-            user_data = json.loads(user_data_json)
-            return user_data['name']
+            profile = self._graph_api.get_object("me")
+            if profile:
+                return profile['name']
         except:
-            pass
-        return ''
+            return ''
 
     def get_stored_picture_file_path(self):
         return self._model.get_stored_picture_file_path()

@@ -32,11 +32,13 @@ class MainWindow(gtk.Window):
         self.connect('expose-event', self._on_draw)
         self.connect('delete-event', self._on_close)
 
+        self.set_role("eos-non-max")
+
         position = self._get_position_by_dock(dock)
         if position is not None:
             self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DOCK)
             self.show() # must call show() before property_change()
-            self.window.property_change("_NET_WM_STRUT", "CARDINAL", 32, 
+            self.window.property_change("_NET_WM_STRUT", "CARDINAL", 32,
               gtk.gdk.PROP_MODE_REPLACE, position)
         else:
             #self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)

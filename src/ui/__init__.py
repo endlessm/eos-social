@@ -306,6 +306,7 @@ class PostMessage(gtk.Alignment):
         super(PostMessage, self).__init__()
         self.set_size_request(-1, self.COLLAPSED_HEIGHT)
         self._buttons = {}
+        self.last_click = None
 
         self.toolbar = gtk.Fixed()
         self.toolbar.set_size_request(-1, self.COLLAPSED_HEIGHT-self.ANIMATION_STEP)
@@ -314,6 +315,12 @@ class PostMessage(gtk.Alignment):
         self.user_avatar = user_avatar
         self.user_name = user_name
         self.logout = logout
+
+        self.connect('hierarchy-changed', self._on_parent_change)
+
+        self.user_avatar.connect('button_press_event', self._on_click)
+        self.user_name.connect('button_press_event', self._on_click)
+        self.logout.connect('button_press_event', self._on_click)
 
         self.toolbar.put(self.user_avatar, *self.LOC['avatar'])
         self.toolbar.put(self.user_name, *self.LOC['user_name'])
@@ -363,6 +370,18 @@ class PostMessage(gtk.Alignment):
           '/usr/share/eos-social/images/cancel_button_normal.png')
 
         self.collapse_text_field()
+
+    def _on_parent_change(self, widget, previous_toplevel):
+        root_win = self.get_toplevel()
+        root_win.connect('button_press_event', self._on_click)
+        root_win.set_events(gtk.gdk.BUTTON_PRESS_MASK)
+
+    def _on_click(self, widget, event):
+        if self.last_click is None or self.last_click is widget:
+            self.user_avatar.set_is_expanded(False)
+            self.user_name.hide()
+            self.logout.hide()
+        self.last_click = widget
 
     def show(self):
         self.toolbar.show()

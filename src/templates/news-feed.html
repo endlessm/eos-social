@@ -64,12 +64,12 @@
                 var commenttextdiv = document.createElement("div");
                 commenttextdiv.setAttribute('style', 'font-size: 12px;margin-left: 5px;');
                 var poster = document.createTextNode(comments[i].from.name);
-                var br = document.createElement("br");
+                //var br = document.createElement("br");
                 var hr = document.createElement("hr");
                 var text = document.createTextNode(comments[i].message);
                 posterdiv.appendChild(poster);
                 commentdiv.appendChild(posterdiv);
-                commentdiv.appendChild(br);
+                //commentdiv.appendChild(br);
                 commenttextdiv.appendChild(text);
                 commentdiv.appendChild(commenttextdiv);
                 commentdiv.appendChild(hr);
@@ -83,6 +83,7 @@
         f.setAttribute('action',"eossocialbar:POST_COMMENT?id="+id);
         var i = document.createElement('input');
         i.setAttribute('type',"text");
+        i.setAttribute('class', 'comment-input-box');
         i.setAttribute('name',"comment_text");
         i.setAttribute("id", "comment-text-"+id);
         var h = document.createElement('input');

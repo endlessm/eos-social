@@ -191,6 +191,8 @@ CSS = ''' @charset "utf-8";
       
       .comment-button {
         border: 0px;
+        padding-top: 10px;
+        margin-left: 5px;
       }
       
       .comment-button:hover {
@@ -213,6 +215,17 @@ CSS = ''' @charset "utf-8";
         color: #6d6d6d;
         display: inline;
         font-size: 10px;
+      }
+      
+      .comment-input-box {
+        border:1px solid #CCCCCC;
+        padding: 5px 5px 5px 5px;
+        margin-top: 0px;
+        margin-left: 5px;
+        margin-right: 5px;
+        margin-bottom: 5px;
+        width: 85%;
+        height: 25px;
       }
 '''
     

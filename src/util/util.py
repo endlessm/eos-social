@@ -266,6 +266,10 @@ CSS = ''' @charset "utf-8";
       width: 52px;
     }
     
+    .link-r:hover {
+      background: #f0f0f0;
+    }
+    
     
     .link-r a {
       color: #646464;

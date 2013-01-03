@@ -13,7 +13,7 @@ class MainWindow(gtk.Window):
         super(MainWindow, self).__init__(gtk.WINDOW_TOPLEVEL)
         self.image_path = None
         self.focus_out_active = True
-        screen_height = gtk.gdk.screen_height() - 80
+        screen_height = gtk.gdk.screen_height()
         screen_width = gtk.gdk.screen_width()
         self.set_app_paintable(True)
         if transparent:

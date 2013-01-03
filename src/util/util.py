@@ -227,6 +227,53 @@ CSS = ''' @charset "utf-8";
         width: 85%;
         height: 25px;
       }
+
+    .links {
+      /* background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAAABCAMAAADHLAisAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6RDM2MjQ5RjY0QjVGMTFFMkI2QjJGMzhCRjFEQkU2MjEiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6RDM2MjQ5RjU0QjVGMTFFMkI2QjJGMzhCRjFEQkU2MjEiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmRpZDo0NDk0N0NDQTVCNEJFMjExOTAyMEYxMTRGQTI0RjI1RCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo0NDk0N0NDQTVCNEJFMjExOTAyMEYxMTRGQTI0RjI1RCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pkou0WsAAAAGUExURR4oMRMYHkPpmTYAAAATSURBVHjaYmAYBQMKGNEAQIABAAIZABEIWgAAAAAAAElFTkSuQmCC') no-repeat scroll center bottom;*/
+      display: inline-block;
+      height: 22px;
+      width: 100%;
+      padding-top: 5px;
+    }
+    
+    .left-list {
+      float: left;
+      list-style: none;
+      padding: 6px 0 0 5px;
+      margin: 0;
+    }
+    
+    .link-l {
+      display: inline;
+    }
+    
+    .link-l a {
+      font-size: 12px;
+      font-weight: bold;
+    }
+    
+    .right-list {
+      float: right;
+      list-style: none;
+      padding: 4px 0 0 0;
+      margin: 0;
+      width: 104px;
+      font-size: 10px;
+    }
+    
+    .link-r {
+      float: left;
+      width: 52px;
+    }
+    
+    
+    .link-r a {
+      color: #646464;
+      font-size: 11px;
+      height: 18px;
+      padding: 7px 7px 7px 6px;
+      width: 42px;
+    }
 '''
     
 SLICKSCROLL_CSS = '''

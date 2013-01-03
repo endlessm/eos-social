@@ -46,6 +46,7 @@ class SocialBarView(MainWindow):
         self.post_message_area.connect('post-panel-action', self._on_action)
         self.post_message = PostMessage(self.post_message_area, self.user_avatar, self.user_name, self.logout)
         self.post_message.connect('post-panel-action', self._on_action)
+        self._browser.connect('button_press_event', lambda w, e: self.post_message._on_click(self, e))
 
         self.main_container = gtk.VBox()
         self.main_container.pack_start(self.post_message, expand=False, fill=False, padding=0)

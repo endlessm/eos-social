@@ -133,10 +133,9 @@
 	<body>
 		<div id="top-container">
 			<div id="scroller" class="slickscroll" style="width:392px;height:100%;overflow:hidden;">
-			    <br/>
+			    
 			    <div class="newer" onclick="window.location.href='eossocial:GET_NEWER_POSTS:?url=$newer'"></div>
-				<!--a href="eossocial:GET_NEWER_POSTS:?url=$newer" style="text-align:center;">Get latest posts</a-->
-				<br/>
+				
 				<!-- here comes the list of posts -->
 				#for $post in $posts
 				<div class="post" id="$post.id" style="padding-top:5px;display:block;">
@@ -156,7 +155,7 @@
 						<b>$post.poster</b>
 						</a>
 						</span>
-						&nbsp;&nbsp;$post.time_elapsed_string
+						&nbsp;&nbsp;<div class="datetime">$post.time_elapsed_string</div>
 						<br/>
 						<span class="clickable" onclick="show_post_details('$post.url');" style="cursor:pointer;">
 						<!-- subject (TODO: add check if subject is existant -->
@@ -217,11 +216,8 @@
 				</div>
 				<div class="clearer" style="clear:both;"></div>
 				#end for
-				
-				<!--br/-->
-				<!--a href="eossocial:GET_OLDER_POSTS?url=$older" style="text-allign:center;"-->
+
 				<div class="older" onclick="window.location.href='eossocial:GET_OLDER_POSTS?url=$older'" id="older-button"></div>
-				<!--br/-->
 			</div>
 		</div>
 	</body>

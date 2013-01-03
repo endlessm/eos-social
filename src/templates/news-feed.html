@@ -22,11 +22,8 @@
 	
 	<script>
 	function like_success(id, liked_string) {
-	    //alert(id, liked_string);
         document.getElementById("like-"+id).innerHTML = liked_string;
-        //alert(document.getElementById("like-"+id).href);
         document.getElementById("like-"+id).href = 'eossocialbar:#';
-        //alert(document.getElementById("like-"+id).href);
         number = parseInt(document.getElementById("likes-count-"+id).innerHTML);
         if (number) {
         number = number + 1;
@@ -50,12 +47,9 @@
     }
     
     function show_comments(id, comments) {
-        //alert(id);
-        //alert(comments);
         if (comments != null && comments.length > 0) {
             var container = document.getElementById("comments-"+id);
             container.setAttribute("style","visibility:visible;");
-            //for each comment append child element, up to 4 of them
             var i = 0;
             var limit = 4;
             if (comments.length < limit) {
@@ -65,7 +59,6 @@
             while (i < limit) {
                 var commentdiv = document.createElement("div");
                 commentdiv.setAttribute('class', 'comment-x');
-                //commentdiv.setAttribute("class", "single-comment");
                 var posterdiv = document.createElement("div");
                 posterdiv.setAttribute('style', 'font-size:13px;font-weight:bold;color:#336699;margin-left:5px;');
                 var commenttextdiv = document.createElement("div");
@@ -84,7 +77,7 @@
                 i++;
             }
         }
-        //prikazi edit
+
         var f = document.createElement("form");
         f.setAttribute('method',"get");
         f.setAttribute('action',"eossocialbar:POST_COMMENT?id="+id);
@@ -101,35 +94,27 @@
         s.setAttribute('type',"image");
         s.setAttribute('class', 'comment-button');
         s.setAttribute('src','data:image/png;base64,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');
-        //s.setAttribute('value',"");
         f.appendChild(i);
         f.appendChild(h);
-        //f.appendChild(b);
         f.appendChild(s);
         elem = document.getElementById("comment-post-box-"+id);
         elem.appendChild(f);
         elem.setAttribute("style","visibility:visible;");
-        //osakati comment link
         document.getElementById("comment-"+id).setAttribute("href", "eossocialbar:#");
         document.getElementById("comment-image-"+id).setAttribute("href", "eossocialbar:#");
+        \$("#scroller").mCustomScrollbar("update");
     }
 
     function show_post_details(url) {
-        //alert("eossocialbar:VIEWPOST?id=" + post_id);
         window.location.href = "eossocialbar:VIEWPOST?url=" + url;
     }
     
     function show_older_posts(posts, url) {
         clearInterval(intervalID);
-        //var intervalID = setInterval(function(){\$("#scroller").mCustomScrollbar("update");}, 2000);
-        //alert(url);
-        //alert(\$('#older-button').attr('onclick'));
         \$('.older').before(posts);
-        //scroll1.InValidate();
         \$("#scroller").mCustomScrollbar("update");
         var intervalID = setInterval(function(){\$("#scroller").mCustomScrollbar("update");}, 2000);
         \$('#older-button').attr('onclick', 'window.location.href="eossocial:GET_OLDER_POSTS?url=' + url + '"');
-        //alert(\$('#older-button').attr('onclick'));
     }
 
 	</script>

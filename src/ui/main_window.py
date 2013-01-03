@@ -13,6 +13,7 @@ class MainWindow(gtk.Window):
         super(MainWindow, self).__init__(gtk.WINDOW_TOPLEVEL)
         self.image_path = None
         self.focus_out_active = True
+        self._last_show_state = None
         screen_height = gtk.gdk.screen_height()
         screen_width = gtk.gdk.screen_width()
         self.set_app_paintable(True)
@@ -31,6 +32,8 @@ class MainWindow(gtk.Window):
         self.connect('notify::is-active', self._set_focus)
         self.connect('expose-event', self._on_draw)
         self.connect('delete-event', self._on_close)
+        self.connect('visibility-notify-event', self._on_visible)
+        #self.connect('window-state-event', self._on_state)
 
         self.set_role("eos-non-max")
 
@@ -47,6 +50,15 @@ class MainWindow(gtk.Window):
     def _on_close(self, widget, event):
         return True
 
+    #def _on_state(self, widget, event):
+    #    print '_on_state', self.get_property('visible')
+
+    def _on_visible(self, widget, event):
+        if self._last_show_state is None or self._last_show_state != 'max':
+            self._maximize()
+        else:
+            print 'already max'
+
     def set_focus_out_active(self, value):
         if value:
             self.get_focus()
@@ -59,7 +71,16 @@ class MainWindow(gtk.Window):
 
     def _set_focus(self, window, gparam_boolean):
         if self.focus_out_active and not window.props.is_active:
-            window.iconify()
+            self._minimize(window)
+
+    def _minimize(self, window):
+        print '_minimize'
+        self._last_show_state = 'min'
+        window.iconify()
+
+    def _maximize(self):
+        print '_maximize'
+        self._last_show_state = 'max'
 
     def _on_draw(self, widget, event):
         if os.path.isfile(self.image_path):

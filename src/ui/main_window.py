@@ -121,8 +121,9 @@ class MainWindow(gtk.Window):
         print '_hide_animation'
         start_alloc = gtk.gdk.Rectangle(self.init_alloc.x, self.init_alloc.y, 
           self.init_alloc.width, self.init_alloc.height)
-
-        end_alloc = gtk.gdk.Rectangle(x=0, y=0, width=0, height=0)
+        end_alloc_x = self.init_alloc.x+self.init_alloc.width-50
+        end_alloc = gtk.gdk.Rectangle(x=end_alloc_x, y=self.init_alloc.y, 
+          width=50, height=self.init_alloc.height)
         anim = dummy(self, start_alloc, end_alloc, callback)
         gobject.timeout_add(anim.ANIMATION_TIME, anim)
 
@@ -168,12 +169,17 @@ class dummy:
           start_alloc.width, start_alloc.height)
         s.callback = callback
 
-    def __call__(s):
-        print '__call__'
+    def _calc(s):
         s.curr_alloc.x += s.ANIMATION_STEP
         s.curr_alloc.width -= s.ANIMATION_STEP
-        if s.curr_alloc.width < s.MIN_WIDTH:
+        return s.curr_alloc.width < s.end_alloc.width
+
+    def __call__(s):
+        print '__call__'
+        if s._calc():
             print 'done'
+            s.window.move(s.end_alloc.x, s.end_alloc.y)
+            s.window.set_size_request(s.end_alloc.width, s.end_alloc.height)
             if s.callback is not None:
                 try:
                     s.callback()
@@ -184,4 +190,5 @@ class dummy:
             s.window.move(s.curr_alloc.x, s.curr_alloc.y)
             s.window.set_size_request(s.curr_alloc.width, s.curr_alloc.height)
             return True
+
 

@@ -82,7 +82,7 @@ msgstr "há algumas horas"
 #: src/facebook/facebook_post.py:77 src/facebook/facebook_post.py:104
 #: src/facebook/facebook_post.py:114
 msgid "less than a minute ago"
-msgstr "less than a minute ago"
+msgstr "Há menos de um minuto."
 
 #: src/social_bar_presenter.py:160 src/social_bar_presenter.py:205
 msgid "like"

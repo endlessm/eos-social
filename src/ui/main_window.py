@@ -11,8 +11,8 @@ class MainWindow(gtk.Window):
 
     DEFAULT_WINDOW_WIDTH = 400
     MINIMUM_WINDOW_WIDTH = 10
-    ANIMATION_STEP = 5
-    ANIMATION_TIME = 20
+    ANIMATION_STEP = 20
+    ANIMATION_TIME = 50
     def __init__(self, transparent=False, dock=None):
         super(MainWindow, self).__init__(gtk.WINDOW_TOPLEVEL)
         self.image_path = None
@@ -74,13 +74,12 @@ class MainWindow(gtk.Window):
     #    print '_on_state', self.get_property('visible')
 
     def _on_visible(self, widget, event):
-        print '_on_visible'
         if not self._frezz_on_visible:
-            print '..active'
             if self._last_show_state is None or self._last_show_state != 'max':
                 self._maximize()
             else:
-                print 'already max'
+                #print 'already max'
+                pass
 
     def set_focus_out_active(self, value):
         if value:
@@ -93,9 +92,7 @@ class MainWindow(gtk.Window):
             self.focus_out_active = False
 
     def _set_focus(self, window, gparam_boolean):
-        print '_set_focus'
         if not self._freez_on_set_focus:
-            print 'freez_sense', self._freez_on_set_focus
             if self.focus_out_active and not window.props.is_active:
                 self._minimize()
 
@@ -103,27 +100,22 @@ class MainWindow(gtk.Window):
         self._minimize()
 
     def _minimize(self):
-        print '_minimize'
         self._freez_on_set_focus = True
         self._frezz_on_visible = True
         self._last_show_state = 'min'
         def cb():
-            print 'cb..-mix'
             self.iconify()
             self._frezz_on_visible = False
         self._hide_animation(lambda: cb())
 
     def _maximize(self):
-        print '_maximize'
         self._last_show_state = 'max'
         def cb():
-            print 'cb..-max'
             self._freez_on_set_focus = False
         self._show_animation(lambda: cb())
         #self._freez_on_set_focus = False
 
     def _show_animation(self, callback):
-        print '_show_animation'
         start_alloc = gtk.gdk.Rectangle(
           x=self.alloc_collapsed.x, 
           y=self.alloc_collapsed.y, 
@@ -144,7 +136,6 @@ class MainWindow(gtk.Window):
 
 
     def _hide_animation(self, callback):
-        print '_hide_animation'
         start_alloc = gtk.gdk.Rectangle(
           x=self.alloc_expanded.x, 
           y=self.alloc_expanded.y, 

@@ -32,9 +32,7 @@ class WindowAnimator(object):
         return False
 
     def __call__(self):
-        #print '__call__'
         if self._calc():
-            print 'done'
             self.window.move(self.end_alloc.x, self.end_alloc.y)
             self.window.set_size_request(self.end_alloc.width, 
               self.end_alloc.height)

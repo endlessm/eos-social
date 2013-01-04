@@ -3,6 +3,7 @@ import gobject
 import os
 import pango
 import cairo
+import math
 
 
 class MainWindow(gtk.Window):
@@ -98,7 +99,7 @@ class MainWindow(gtk.Window):
         self._frezz_on_visible = True
         self._last_show_state = 'min'
         def cb():
-            print 'cb..'
+            print 'cb..-mix'
             self.iconify()
             self._frezz_on_visible = False
         self._hide_animation(lambda: cb())
@@ -106,15 +107,25 @@ class MainWindow(gtk.Window):
     def _maximize(self):
         print '_maximize'
         self._last_show_state = 'max'
-        self._show_animation()
-        self._freez_on_set_focus = False
+        def cb():
+            print 'cb..-max'
+            self._freez_on_set_focus = False
+        self._show_animation(lambda: cb())
+        #self._freez_on_set_focus = False
 
-    def _show_animation(self):
+    def _show_animation(self, callback):
         print '_show_animation'
-        print 'init_alloc', self.init_alloc
-        self.move(self.init_alloc.x, self.init_alloc.y)
-        self.set_size_request(self.init_alloc.width, self.init_alloc.height)
+        #print 'init_alloc', self.init_alloc
+        #self.move(self.init_alloc.x, self.init_alloc.y)
+        #self.set_size_request(self.init_alloc.width, self.init_alloc.height)
 
+        start_alloc_x = self.init_alloc.x+self.init_alloc.width-50
+        start_alloc = gtk.gdk.Rectangle(x=start_alloc_x, y=self.init_alloc.y, 
+          width=50, height=self.init_alloc.height)
+        end_alloc = gtk.gdk.Rectangle(self.init_alloc.x, self.init_alloc.y, 
+          self.init_alloc.width, self.init_alloc.height)
+        anim = dummy(self, start_alloc, end_alloc, callback)
+        gobject.timeout_add(anim.ANIMATION_TIME, anim)
 
 
     def _hide_animation(self, callback):
@@ -170,9 +181,16 @@ class dummy:
         s.callback = callback
 
     def _calc(s):
-        s.curr_alloc.x += s.ANIMATION_STEP
-        s.curr_alloc.width -= s.ANIMATION_STEP
-        return s.curr_alloc.width < s.end_alloc.width
+        delta_width = s.curr_alloc.width - s.end_alloc.width
+        if math.fabs(delta_width) < s.ANIMATION_STEP:
+            return True
+        if delta_width < 0:
+            s.curr_alloc.width += s.ANIMATION_STEP
+            s.curr_alloc.x -= s.ANIMATION_STEP
+        else:
+            s.curr_alloc.width -= s.ANIMATION_STEP
+            s.curr_alloc.x += s.ANIMATION_STEP
+        return False
 
     def __call__(s):
         print '__call__'

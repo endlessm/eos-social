@@ -33,6 +33,7 @@ class MainWindow(gtk.Window):
         self.connect('delete-event', self._on_close)
 
         self.set_role("eos-non-max")
+        self.set_skip_taskbar_hint(True)
 
         position = self._get_position_by_dock(dock)
         if position is not None:

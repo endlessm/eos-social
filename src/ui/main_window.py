@@ -3,14 +3,16 @@ import gobject
 import os
 import pango
 import cairo
-import math
+from animations import WindowAnimator
 
 
 class MainWindow(gtk.Window):
 
 
     DEFAULT_WINDOW_WIDTH = 400
-    MINIMUM_WINDOW_WIDTH = 50
+    MINIMUM_WINDOW_WIDTH = 10
+    ANIMATION_STEP = 5
+    ANIMATION_TIME = 20
     def __init__(self, transparent=False, dock=None):
         super(MainWindow, self).__init__(gtk.WINDOW_TOPLEVEL)
         self.image_path = None
@@ -134,8 +136,11 @@ class MainWindow(gtk.Window):
           self.alloc_expanded.width, 
           self.alloc_expanded.height
           )
-        anim = dummy(self, start_alloc, end_alloc, callback)
-        gobject.timeout_add(anim.ANIMATION_TIME, anim)
+        anim = WindowAnimator(self, start_alloc, end_alloc, callback, 
+          animation_step=self.ANIMATION_STEP, 
+          animation_time=self.ANIMATION_TIME
+          )
+        gobject.timeout_add(anim.get_animation_time(), anim)
 
 
     def _hide_animation(self, callback):
@@ -152,8 +157,11 @@ class MainWindow(gtk.Window):
           self.alloc_collapsed.width, 
           self.alloc_collapsed.height
           )
-        anim = dummy(self, start_alloc, end_alloc, callback)
-        gobject.timeout_add(anim.ANIMATION_TIME, anim)
+        anim = WindowAnimator(self, start_alloc, end_alloc, callback, 
+          animation_step=self.ANIMATION_STEP, 
+          animation_time=self.ANIMATION_TIME
+          )
+        gobject.timeout_add(anim.get_animation_time(), anim)
 
     def _on_draw(self, widget, event):
         if os.path.isfile(self.image_path):
@@ -182,48 +190,4 @@ class MainWindow(gtk.Window):
 
     def set_background_image(self, image_path):
         self.image_path = image_path
-
-
-
-class dummy:
-    ANIMATION_STEP = 10
-    ANIMATION_TIME = 200
-    MIN_WIDTH = 50
-    def __init__(s, window, start_alloc, end_alloc, callback=None):
-        s.window = window
-        s.start_alloc = start_alloc
-        s.end_alloc = end_alloc
-        s.curr_alloc = gtk.gdk.Rectangle(start_alloc.x, start_alloc.y, 
-          start_alloc.width, start_alloc.height)
-        s.callback = callback
-
-    def _calc(s):
-        delta_width = s.curr_alloc.width - s.end_alloc.width
-        if math.fabs(delta_width) < s.ANIMATION_STEP:
-            return True
-        if delta_width < 0:
-            s.curr_alloc.width += s.ANIMATION_STEP
-            s.curr_alloc.x -= s.ANIMATION_STEP
-        else:
-            s.curr_alloc.width -= s.ANIMATION_STEP
-            s.curr_alloc.x += s.ANIMATION_STEP
-        return False
-
-    def __call__(s):
-        print '__call__'
-        if s._calc():
-            print 'done'
-            s.window.move(s.end_alloc.x, s.end_alloc.y)
-            s.window.set_size_request(s.end_alloc.width, s.end_alloc.height)
-            if s.callback is not None:
-                try:
-                    s.callback()
-                except:
-                    pass
-            return False
-        else:
-            s.window.move(s.curr_alloc.x, s.curr_alloc.y)
-            s.window.set_size_request(s.curr_alloc.width, s.curr_alloc.height)
-            return True
-
 

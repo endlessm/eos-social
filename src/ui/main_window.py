@@ -56,6 +56,7 @@ class MainWindow(gtk.Window):
         #self.connect('window-state-event', self._on_state)
 
         self.set_role("eos-non-max")
+        self.set_skip_taskbar_hint(True)
 
         position = self._get_position_by_dock(dock)
         if position is not None:

@@ -312,6 +312,7 @@ class SocialBarPresenter:
     def get_older_posts(self, parsed):
         url = parsed.path.split('?url=')[1]
         result = self.get_new_fb_posts(None, url)
+        result = self.parse_posts(result)
         if not result:
             return
         

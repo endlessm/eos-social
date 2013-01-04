@@ -10,6 +10,7 @@ class MainWindow(gtk.Window):
 
 
     DEFAULT_WINDOW_WIDTH = 400
+    MINIMUM_WINDOW_WIDTH = 50
     def __init__(self, transparent=False, dock=None):
         super(MainWindow, self).__init__(gtk.WINDOW_TOPLEVEL)
         self.image_path = None
@@ -25,18 +26,24 @@ class MainWindow(gtk.Window):
 
         self.set_resizable(False)
         self.set_default_size(self.DEFAULT_WINDOW_WIDTH, screen_height)
-        self.set_size_request(self.DEFAULT_WINDOW_WIDTH, screen_height)
+        self.set_size_request(self.MINIMUM_WINDOW_WIDTH, screen_height)
         self.stick() # this sticks on all desktops
         #self.set_keep_above(True)
         self.set_decorated(False)
         self.set_modal(True)
         self.set_skip_pager_hint(True)
-        self.move(screen_width-self.DEFAULT_WINDOW_WIDTH, 0)
+        self.move(screen_width-self.MINIMUM_WINDOW_WIDTH, 0)
 
-        self.init_alloc = gtk.gdk.Rectangle(
+        self.alloc_expanded = gtk.gdk.Rectangle(
           x=screen_width-self.DEFAULT_WINDOW_WIDTH, 
           y=0, 
           width=self.DEFAULT_WINDOW_WIDTH, 
+          height=screen_height
+          )
+        self.alloc_collapsed = gtk.gdk.Rectangle(
+          x=screen_width-self.MINIMUM_WINDOW_WIDTH, 
+          y=0, 
+          width=self.MINIMUM_WINDOW_WIDTH, 
           height=screen_height
           )
 
@@ -115,26 +122,36 @@ class MainWindow(gtk.Window):
 
     def _show_animation(self, callback):
         print '_show_animation'
-        #print 'init_alloc', self.init_alloc
-        #self.move(self.init_alloc.x, self.init_alloc.y)
-        #self.set_size_request(self.init_alloc.width, self.init_alloc.height)
-
-        start_alloc_x = self.init_alloc.x+self.init_alloc.width-50
-        start_alloc = gtk.gdk.Rectangle(x=start_alloc_x, y=self.init_alloc.y, 
-          width=50, height=self.init_alloc.height)
-        end_alloc = gtk.gdk.Rectangle(self.init_alloc.x, self.init_alloc.y, 
-          self.init_alloc.width, self.init_alloc.height)
+        start_alloc = gtk.gdk.Rectangle(
+          x=self.alloc_collapsed.x, 
+          y=self.alloc_collapsed.y, 
+          width=self.alloc_collapsed.width, 
+          height=self.alloc_collapsed.height
+          )
+        end_alloc = gtk.gdk.Rectangle(
+          self.alloc_expanded.x, 
+          self.alloc_expanded.y, 
+          self.alloc_expanded.width, 
+          self.alloc_expanded.height
+          )
         anim = dummy(self, start_alloc, end_alloc, callback)
         gobject.timeout_add(anim.ANIMATION_TIME, anim)
 
 
     def _hide_animation(self, callback):
         print '_hide_animation'
-        start_alloc = gtk.gdk.Rectangle(self.init_alloc.x, self.init_alloc.y, 
-          self.init_alloc.width, self.init_alloc.height)
-        end_alloc_x = self.init_alloc.x+self.init_alloc.width-50
-        end_alloc = gtk.gdk.Rectangle(x=end_alloc_x, y=self.init_alloc.y, 
-          width=50, height=self.init_alloc.height)
+        start_alloc = gtk.gdk.Rectangle(
+          x=self.alloc_expanded.x, 
+          y=self.alloc_expanded.y, 
+          width=self.alloc_expanded.width, 
+          height=self.alloc_expanded.height
+          )
+        end_alloc = gtk.gdk.Rectangle(
+          self.alloc_collapsed.x, 
+          self.alloc_collapsed.y, 
+          self.alloc_collapsed.width, 
+          self.alloc_collapsed.height
+          )
         anim = dummy(self, start_alloc, end_alloc, callback)
         gobject.timeout_add(anim.ANIMATION_TIME, anim)
 

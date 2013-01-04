@@ -14,6 +14,8 @@ class MainWindow(gtk.Window):
         self.image_path = None
         self.focus_out_active = True
         self._last_show_state = None
+        self._freez_on_set_focus = False
+        self._frezz_on_visible = False
         screen_height = gtk.gdk.screen_height()
         screen_width = gtk.gdk.screen_width()
         self.set_app_paintable(True)
@@ -29,6 +31,14 @@ class MainWindow(gtk.Window):
         self.set_modal(True)
         self.set_skip_pager_hint(True)
         self.move(screen_width-self.DEFAULT_WINDOW_WIDTH, 0)
+
+        self.init_alloc = gtk.gdk.Rectangle(
+          x=screen_width-self.DEFAULT_WINDOW_WIDTH, 
+          y=0, 
+          width=self.DEFAULT_WINDOW_WIDTH, 
+          height=screen_height
+          )
+
         self.connect('notify::is-active', self._set_focus)
         self.connect('expose-event', self._on_draw)
         self.connect('delete-event', self._on_close)
@@ -54,10 +64,13 @@ class MainWindow(gtk.Window):
     #    print '_on_state', self.get_property('visible')
 
     def _on_visible(self, widget, event):
-        if self._last_show_state is None or self._last_show_state != 'max':
-            self._maximize()
-        else:
-            print 'already max'
+        print '_on_visible'
+        if not self._frezz_on_visible:
+            print '..active'
+            if self._last_show_state is None or self._last_show_state != 'max':
+                self._maximize()
+            else:
+                print 'already max'
 
     def set_focus_out_active(self, value):
         if value:
@@ -70,17 +83,48 @@ class MainWindow(gtk.Window):
             self.focus_out_active = False
 
     def _set_focus(self, window, gparam_boolean):
-        if self.focus_out_active and not window.props.is_active:
-            self._minimize(window)
+        print '_set_focus'
+        if not self._freez_on_set_focus:
+            print 'freez_sense', self._freez_on_set_focus
+            if self.focus_out_active and not window.props.is_active:
+                self._minimize()
 
-    def _minimize(self, window):
+    def collapse(self):
+        self._minimize()
+
+    def _minimize(self):
         print '_minimize'
+        self._freez_on_set_focus = True
+        self._frezz_on_visible = True
         self._last_show_state = 'min'
-        window.iconify()
+        def cb():
+            print 'cb..'
+            self.iconify()
+            self._frezz_on_visible = False
+        self._hide_animation(lambda: cb())
 
     def _maximize(self):
         print '_maximize'
         self._last_show_state = 'max'
+        self._show_animation()
+        self._freez_on_set_focus = False
+
+    def _show_animation(self):
+        print '_show_animation'
+        print 'init_alloc', self.init_alloc
+        self.move(self.init_alloc.x, self.init_alloc.y)
+        self.set_size_request(self.init_alloc.width, self.init_alloc.height)
+
+
+
+    def _hide_animation(self, callback):
+        print '_hide_animation'
+        start_alloc = gtk.gdk.Rectangle(self.init_alloc.x, self.init_alloc.y, 
+          self.init_alloc.width, self.init_alloc.height)
+
+        end_alloc = gtk.gdk.Rectangle(x=0, y=0, width=0, height=0)
+        anim = dummy(self, start_alloc, end_alloc, callback)
+        gobject.timeout_add(anim.ANIMATION_TIME, anim)
 
     def _on_draw(self, widget, event):
         if os.path.isfile(self.image_path):
@@ -109,4 +153,35 @@ class MainWindow(gtk.Window):
 
     def set_background_image(self, image_path):
         self.image_path = image_path
+
+
+
+class dummy:
+    ANIMATION_STEP = 10
+    ANIMATION_TIME = 200
+    MIN_WIDTH = 50
+    def __init__(s, window, start_alloc, end_alloc, callback=None):
+        s.window = window
+        s.start_alloc = start_alloc
+        s.end_alloc = end_alloc
+        s.curr_alloc = gtk.gdk.Rectangle(start_alloc.x, start_alloc.y, 
+          start_alloc.width, start_alloc.height)
+        s.callback = callback
+
+    def __call__(s):
+        print '__call__'
+        s.curr_alloc.x += s.ANIMATION_STEP
+        s.curr_alloc.width -= s.ANIMATION_STEP
+        if s.curr_alloc.width < s.MIN_WIDTH:
+            print 'done'
+            if s.callback is not None:
+                try:
+                    s.callback()
+                except:
+                    pass
+            return False
+        else:
+            s.window.move(s.curr_alloc.x, s.curr_alloc.y)
+            s.window.set_size_request(s.curr_alloc.width, s.curr_alloc.height)
+            return True
 

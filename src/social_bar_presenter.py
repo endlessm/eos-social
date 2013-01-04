@@ -246,17 +246,17 @@ class SocialBarPresenter:
         return self._model.get_no_picture_file_path()
 
     def get_image_dwn(self, image_url):
-        url_response = urllib2.urlopen(image_url)
-        image_final_url = url_response.geturl()
-        if image_final_url[-3:] in ('jpg', 'png', 'gif'):
-            image_data = url_response.read()
-            try:
+        try:
+            url_response = urllib2.urlopen(image_url)
+            image_final_url = url_response.geturl()
+            if image_final_url[-3:] in ('jpg', 'png', 'gif'):
+                image_data = url_response.read()
                 with open(self.get_stored_picture_file_path(), 'w') as f:
                     f.write(image_data)
                     f.close()
                 return
-            except:
-                pass
+        except:
+            pass
         print 'error:', 'no image', image_final_url
         return
 

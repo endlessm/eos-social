@@ -1,0 +1,20 @@
+#!/bin/sh
+set -e
+case "$1" in
+    configure)
+    ln -s -f /usr/share/eos-social /usr/lib/python2.7/dist-packages/
+    mkdir -p ~/.endlessm/social_bar/images/
+    chmod -R 777 ~/.endlessm/social_bar/images/
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+    rm -f /usr/lib/python2.7/dist-packages/eos-social
+    rm -f ~/.endlessm/social_bar/images
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+exit 0

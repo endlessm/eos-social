@@ -30,6 +30,7 @@ class SocialBarView(MainWindow):
     def set_presenter(self, presenter):
         super(SocialBarView, self).set_background_image('/usr/share/eos-social/images/bg-right.png')
 
+        self.set_title('Endless Social Bar')
         self._presenter = presenter
         self._browser = webkit.WebView()
         self._browser.connect("navigation-requested", self._navigation_handler)

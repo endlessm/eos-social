@@ -1,4 +1,4 @@
 Endless Social Bar
 ==================
 
-Read me here...
+Endless Mobile Social Application

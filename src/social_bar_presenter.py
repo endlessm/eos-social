@@ -68,8 +68,11 @@ class SocialBarPresenter:
             print line
             if line.startswith('ACCESS_TOKEN:'):
                 token = line.split(':')[1]
-                self.set_fb_access_token(token)
-                self._graph_api = GraphAPI(access_token=self._fb_access_token)
+                if self.is_token_valid(token):
+                    self.set_fb_access_token(token)
+                    self._graph_api = GraphAPI(access_token=self._fb_access_token)
+                else:
+                    return
             elif line.startswith('FAILURE'):
                 return
 
@@ -141,11 +144,15 @@ class SocialBarPresenter:
         server_error_codes = [1,2,4,17]
         oauth_error_codes = [102, 190]
         permissions_error_codes = range(200, 300)
-        code = result['error']['code']
+        if 'error' in result:
+            if 'code' in result['error']:
+                code = result['error']['code']
+        elif 'error_code' in result:
+            code = result['error_code']
         if code in server_error_codes:
             message = _('Requested action is not possible at the moment. Please try again later.')
             self._view.show_popup_notification(message)
-        if code in oauth_error_codes or code in permissions_error_codes:
+        if code in oauth_error_codes or code in permissions_error_codes or code == 606:
             self.fb_login()
     
     def url_exception_handler(self):
@@ -261,9 +268,10 @@ class SocialBarPresenter:
         return
 
     def is_user_loged_in(self):
-        if self._fb_access_token is None:
+        if self._fb_access_token is None or not self.is_token_valid():
             return False
-        return True
+        else:
+            return True
     
 #    def get_html(self):
 #        #@TODO: FOR DEBUGGING, NOT NEEDED IN PRODUCTION
@@ -322,5 +330,14 @@ class SocialBarPresenter:
         html = self.generate_posts_elements(result.posts)
         script = 'show_older_posts(%s, %s);' % (simplejson.dumps(str(html)), simplejson.dumps(result.next_url))
         self._view._browser.execute_script(script)
-
+    
+    def is_token_valid(self, token=''):
+        if not token:
+            token = self._fb_access_token
+        try:
+            temp_api = GraphAPI(access_token=token)
+            resp = temp_api.request('me/home')
+            return True
+        except:
+            return False
 

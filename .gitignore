@@ -1,19 +1,40 @@
-/.pydevproject
-/.project
-.metadata
-*.pyc
+*.py[cod]
+
+# C extensions
+*.so
+# Packages
+*.egg
+*.egg-info
 dist
 build
-debian/endless-os-desktop-widget/
-warnendless_os_desktop_widget.txt
-*.log
-*.deb
-*.changes
-*~
-debian/endless-os-desktop-widget.substvars
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+
+# Translations
+*.mo
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
 debian/files
 *.pyc
 .*.swp
 .settings/
 po/*.pot
-

@@ -13,6 +13,7 @@ class MainWindow(gtk.Window):
         super(MainWindow, self).__init__(gtk.WINDOW_TOPLEVEL)
         self.image_path = None
         self.focus_out_active = True
+        self.is_minimized = False
         screen_height = gtk.gdk.screen_height()
         screen_width = gtk.gdk.screen_width()
         self.set_app_paintable(True)
@@ -28,6 +29,7 @@ class MainWindow(gtk.Window):
         self.set_modal(True)
         self.set_skip_pager_hint(True)
         self.move(screen_width-self.DEFAULT_WINDOW_WIDTH, 0)
+        self.connect("window-state-event", self.on_window_state_event)
         self.connect('notify::is-active', self._set_focus)
         self.connect('expose-event', self._on_draw)
         self.connect('delete-event', self._on_close)
@@ -58,7 +60,7 @@ class MainWindow(gtk.Window):
             self.focus_out_active = False
 
     def _set_focus(self, window, gparam_boolean):
-        if self.focus_out_active and not window.props.is_active:
+        if self.focus_out_active and not window.props.is_active and not self.is_minimized:
             window.iconify()
 
     def _on_draw(self, widget, event):
@@ -88,4 +90,11 @@ class MainWindow(gtk.Window):
 
     def set_background_image(self, image_path):
         self.image_path = image_path
+    
+    def on_window_state_event(self, widget, event, data=None):
+        if event.changed_mask & gtk.gdk.WINDOW_STATE_ICONIFIED:
+            if event.new_window_state & gtk.gdk.WINDOW_STATE_ICONIFIED:
+                self.is_minimized = True
+            else:
+                self.is_minimized = False
 

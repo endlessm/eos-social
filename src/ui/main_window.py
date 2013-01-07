@@ -22,6 +22,7 @@ class MainWindow(gtk.Window):
         self._frezz_on_visible = False
         screen_height = gtk.gdk.screen_height()
         screen_width = gtk.gdk.screen_width()
+        self.is_minimized = False
         self.set_app_paintable(True)
         if transparent:
             self.set_colormap(self.get_screen().get_rgba_colormap())
@@ -48,7 +49,7 @@ class MainWindow(gtk.Window):
           width=self.MINIMUM_WINDOW_WIDTH, 
           height=screen_height
           )
-
+        self.connect("window-state-event", self.on_window_state_event)
         self.connect('notify::is-active', self._set_focus)
         self.connect('expose-event', self._on_draw)
         self.connect('delete-event', self._on_close)
@@ -182,4 +183,11 @@ class MainWindow(gtk.Window):
 
     def set_background_image(self, image_path):
         self.image_path = image_path
+    
+    def on_window_state_event(self, widget, event, data=None):
+        if event.changed_mask & gtk.gdk.WINDOW_STATE_ICONIFIED:
+            if event.new_window_state & gtk.gdk.WINDOW_STATE_ICONIFIED:
+                self.is_minimized = True
+            else:
+                self.is_minimized = False
 

@@ -27,27 +27,29 @@ class MainWindow(gtk.Window):
         if transparent:
             self.set_colormap(self.get_screen().get_rgba_colormap())
 
+        self.y_loc = 45
+        self.height_loc = screen_height - self.y_loc - 40
         self.set_resizable(False)
-        self.set_default_size(self.DEFAULT_WINDOW_WIDTH, screen_height)
-        self.set_size_request(self.MINIMUM_WINDOW_WIDTH, screen_height)
+        self.set_size_request(self.MINIMUM_WINDOW_WIDTH, self.height_loc)
+        self.set_size_request(self.DEFAULT_WINDOW_WIDTH, self.height_loc)
         self.stick() # this sticks on all desktops
         #self.set_keep_above(True)
         self.set_decorated(False)
         self.set_modal(True)
         self.set_skip_pager_hint(True)
-        self.move(screen_width-self.MINIMUM_WINDOW_WIDTH, 0)
+        self.move(screen_width-self.MINIMUM_WINDOW_WIDTH, self.y_loc)
 
         self.alloc_expanded = gtk.gdk.Rectangle(
           x=screen_width-self.DEFAULT_WINDOW_WIDTH, 
-          y=0, 
+          y=self.y_loc, 
           width=self.DEFAULT_WINDOW_WIDTH, 
-          height=screen_height
+          height=self.height_loc
           )
         self.alloc_collapsed = gtk.gdk.Rectangle(
           x=screen_width-self.MINIMUM_WINDOW_WIDTH, 
-          y=0, 
+          y=self.y_loc, 
           width=self.MINIMUM_WINDOW_WIDTH, 
-          height=screen_height
+          height=self.height_loc
           )
         self.connect("window-state-event", self.on_window_state_event)
         self.connect('notify::is-active', self._set_focus)

@@ -34,8 +34,8 @@ class WindowAnimator(object):
     def __call__(self):
         if self._calc():
             self.window.move(self.end_alloc.x, self.end_alloc.y)
-            self.window.set_size_request(self.end_alloc.width, 
-              self.end_alloc.height)
+            #self.window.set_size_request(self.end_alloc.width, 
+            #  self.end_alloc.height)
             if self.callback is not None:
                 try:
                     self.callback()
@@ -44,7 +44,7 @@ class WindowAnimator(object):
             return False
         else:
             self.window.move(self.curr_alloc.x, self.curr_alloc.y)
-            self.window.set_size_request(self.curr_alloc.width, 
-              self.curr_alloc.height)
+            #self.window.set_size_request(self.curr_alloc.width, 
+            #  self.curr_alloc.height)
             return True
 

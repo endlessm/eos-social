@@ -44,6 +44,7 @@ class WindowAnimator(object):
             return False
         else:
             self.window.move(self.curr_alloc.x, self.curr_alloc.y)
+            self.window.queue_draw()
             #self.window.set_size_request(self.curr_alloc.width, 
             #  self.curr_alloc.height)
             return True

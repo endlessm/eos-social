@@ -20,11 +20,11 @@ class SocialBarPresenter:
         self._view = view
         self._model = model
         # -- DEV --
-        self._app_id = '393860344022808'
-        self._app_secret = 'eb0dcb05f7512be39f7a3826ce99dfcd'
+        #self._app_id = '393860344022808'
+        #self._app_secret = 'eb0dcb05f7512be39f7a3826ce99dfcd'
         # -- PRODUCTION --
-#        self._app_id = ''
-#        self._app_secret = ''
+        self._app_id = '407909575958642'
+        self._app_secret = '496f85b88366ae40b42d16579719815c'
         self._fb_graph_url = 'graph.facebook.com'
         self._webserver_url = 'http://localhost:8080/'
         self._fb_access_token = self._model.get_stored_fb_access_token()

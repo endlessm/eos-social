@@ -14,7 +14,7 @@ class FBAuthWindow(gtk.Window):
         self.scroller = gtk.ScrolledWindow()
         self.web_view = webkit.WebView()
         self.web_view.connect("navigation-requested", self.on_navigation_requested)
-        self.web_view.open('http://graph.facebook.com/oauth/authorize?scope=read_stream%2Cpublish_stream&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F&client_id=393860344022808')
+        self.web_view.open('http://graph.facebook.com/oauth/authorize?scope=read_stream%2Cpublish_stream&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F&client_id=407909575958642')
         self.web_view.show()
         self.scroller.add(self.web_view)
         self.scroller.show()
@@ -42,9 +42,9 @@ class FBAuthWindow(gtk.Window):
     
     def get_access_token(self, code):
         url = 'https://graph.facebook.com/oauth/access_token'
-        params = {'client_id':'393860344022808',
+        params = {'client_id':'407909575958642',
                   'redirect_uri':'http://localhost:8080/',
-                  'client_secret':'eb0dcb05f7512be39f7a3826ce99dfcd',
+                  'client_secret':'496f85b88366ae40b42d16579719815c',
                   'code':code}
         url = url + '?' + urllib.urlencode(params)
         try:

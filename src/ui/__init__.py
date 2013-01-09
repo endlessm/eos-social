@@ -57,6 +57,8 @@ class UserAvatar(gtk.EventBox):
         self.menu = menu
         self.menu.connect('user-profile-action', 
           lambda w, a: self.emit('user-profile-action', a))
+        self.connect("enter-notify-event", self._on_enter)
+        self.connect("leave-notify-event", self._on_leave)
         ##self.connect('button-press-event', self._on_click)
 
     def show(self):
@@ -100,7 +102,12 @@ class UserAvatar(gtk.EventBox):
         self.menu.set_logout_on_shutdown_active(state)
         self.menu.show(pos_x, pos_y)
         self.menu.run()
+    
+    def _on_enter(self, widget, event):
+        widget.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.HAND2))
 
+    def _on_leave(self, widget, event):
+        widget.window.set_cursor(None)
 
 class PostMessageSendArea(gtk.Alignment):
 
@@ -193,9 +200,13 @@ class PostMessageSendArea(gtk.Alignment):
         self.text_area_wraper.pack_start(self.text_area, True, True, 10)
 
         send = self._make_button('send', SimpleButton())
+        send.connect("enter-notify-event", self._on_enter)
+        send.connect("leave-notify-event", self._on_leave)
         self._skin_it('send', send)
 
         cancel = self._make_button('cancel', SimpleButton())
+        cancel.connect("enter-notify-event", self._on_enter)
+        cancel.connect("leave-notify-event", self._on_leave)
         self._skin_it('cancel', cancel)
 
         self.post_toolbar = gtk.HBox()
@@ -237,6 +248,12 @@ class PostMessageSendArea(gtk.Alignment):
     def hide(self):
         self.post_toolbar.hide()
         super(PostMessageSendArea, self).hide()
+    
+    def _on_enter(self, widget, event):
+        widget.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.HAND2))
+        
+    def _on_leave(self, widget, event):
+        widget.window.set_cursor(None)
 
 
 class PostMessage(gtk.Alignment):
@@ -343,6 +360,8 @@ class PostMessage(gtk.Alignment):
         self.toolbar.put(post, *self.LOC['post'])
         post.connect('button-press-event', 
           lambda w, e: self._emit_action(w, 'post'))
+        post.connect("enter-notify-event", self._on_enter)
+        post.connect("leave-notify-event", self._on_leave)
         post.show_image(
           '/usr/share/eos-social/images/publish_button_normal.png')
         post.set_image('click', 
@@ -358,6 +377,8 @@ class PostMessage(gtk.Alignment):
         self.toolbar.put(close, *self.LOC['close'])
         close.connect('button-press-event', 
           lambda w, e: self._emit_action(w, 'close'))
+        close.connect("enter-notify-event", self._on_enter)
+        close.connect("leave-notify-event", self._on_leave)
         close.show_image(
           '/usr/share/eos-social/images/cancel_button_normal.png')
         close.set_image('click', 
@@ -424,7 +445,13 @@ class PostMessage(gtk.Alignment):
             self.expand_text_field()
         else:
             self.collapse_text_field()
-
+    
+    def _on_enter(self, widget, event):
+        widget.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.HAND2))
+        
+    def _on_leave(self, widget, event):
+        widget.window.set_cursor(None)
+    
 
 class WelcomePanel(gtk.Alignment):
 

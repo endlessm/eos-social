@@ -84,8 +84,11 @@ class MainWindow(gtk.Window):
     def _on_visible(self, widget, event):
         print '_on_visible'
         if not self._frezz_on_visible:
-            #if self._last_show_state != 'max' and self.is_minimized:
-            if self.is_minimized:
+            print 'first_run', repr(self.first_run)
+            print 'last_state', repr(self._last_show_state)
+            print 'is minimized', repr(self.is_minimized)
+            if self._last_show_state is not None and self._last_show_state != 'max':
+            #if self.is_minimized:
                 #self._last_show_state is None or
                 print '--'
                 self._maximize()

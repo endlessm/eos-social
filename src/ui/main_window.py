@@ -29,7 +29,7 @@ class MainWindow(gtk.Window):
             self.set_colormap(self.get_screen().get_rgba_colormap())
 
         self.y_loc = 45
-        self.height_loc = screen_height - self.y_loc - 40
+        self.height_loc = screen_height - self.y_loc - 38
         self.set_resizable(False)
         #self.set_size_request(self.MINIMUM_WINDOW_WIDTH, self.height_loc)
         self.set_size_request(self.DEFAULT_WINDOW_WIDTH, self.height_loc)

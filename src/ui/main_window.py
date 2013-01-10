@@ -4,7 +4,6 @@ import os
 import pango
 import cairo
 from animations import WindowAnimator
-import traceback
 
 
 class MainWindow(gtk.Window):
@@ -73,8 +72,6 @@ class MainWindow(gtk.Window):
             #self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
             self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
 
-        #self.show_delayed()
-
     def _on_close(self, widget, event):
         return True
 
@@ -82,15 +79,8 @@ class MainWindow(gtk.Window):
     #    print '_on_state', self.get_property('visible')
 
     def _on_visible(self, widget, event):
-        print '_on_visible'
         if not self._frezz_on_visible:
-            print 'first_run', repr(self.first_run)
-            print 'last_state', repr(self._last_show_state)
-            print 'is minimized', repr(self.is_minimized)
             if self._last_show_state is not None and self._last_show_state != 'max':
-            #if self.is_minimized:
-                #self._last_show_state is None or
-                print '--'
                 self._maximize()
             else:
                 #print 'already max'
@@ -124,8 +114,6 @@ class MainWindow(gtk.Window):
         self._hide_animation(lambda: cb())
 
     def _maximize(self):
-        print '_maximize'
-        #traceback.print_stack()
         self._last_show_state = 'max'
         def cb():
             self._freez_on_set_focus = False
@@ -133,8 +121,6 @@ class MainWindow(gtk.Window):
         #self._freez_on_set_focus = False
 
     def _show_animation(self, callback):
-        print '_show_animation'
-        traceback.print_stack()
         start_alloc = gtk.gdk.Rectangle(
           x=self.alloc_collapsed.x, 
           y=self.alloc_collapsed.y, 
@@ -174,7 +160,6 @@ class MainWindow(gtk.Window):
         gobject.timeout_add(anim.get_animation_time(), anim)
 
     def show_delayed(self):
-        print 'show_delayed'
         if not self.first_run:
             return
         self.first_run = False

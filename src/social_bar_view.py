@@ -67,6 +67,7 @@ class SocialBarView(MainWindow):
             self._perform_login()
         else:
             self.wraper_main.show_panel('welcome_panel')
+            self.show_delayed()
         self.logout.hide()
         self.user_name.hide()
 
@@ -141,6 +142,7 @@ class SocialBarView(MainWindow):
             self.user_name.set_text(self._presenter.get_profil_display_name())
             self.wraper_main.show_panel('main_container')
             self.set_focus_out_active(True)
+            self.show_delayed()
 
         self.set_focus_out_active(False)
         if self._presenter.is_user_loged_in():

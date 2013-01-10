@@ -4,6 +4,7 @@ import os
 import pango
 import cairo
 from animations import WindowAnimator
+import traceback
 
 
 class MainWindow(gtk.Window):
@@ -15,6 +16,7 @@ class MainWindow(gtk.Window):
     ANIMATION_TIME = 50
     def __init__(self, transparent=False, dock=None):
         super(MainWindow, self).__init__(gtk.WINDOW_TOPLEVEL)
+        self.first_run = True
         self.image_path = None
         self.focus_out_active = True
         self._last_show_state = None
@@ -30,14 +32,14 @@ class MainWindow(gtk.Window):
         self.y_loc = 45
         self.height_loc = screen_height - self.y_loc - 40
         self.set_resizable(False)
-        self.set_size_request(self.MINIMUM_WINDOW_WIDTH, self.height_loc)
+        #self.set_size_request(self.MINIMUM_WINDOW_WIDTH, self.height_loc)
         self.set_size_request(self.DEFAULT_WINDOW_WIDTH, self.height_loc)
         self.stick() # this sticks on all desktops
         #self.set_keep_above(True)
         self.set_decorated(False)
         self.set_modal(True)
         self.set_skip_pager_hint(True)
-        self.move(screen_width-self.MINIMUM_WINDOW_WIDTH, self.y_loc)
+        self.move(screen_width, self.y_loc)
 
         self.alloc_expanded = gtk.gdk.Rectangle(
           x=screen_width-self.DEFAULT_WINDOW_WIDTH, 
@@ -71,6 +73,8 @@ class MainWindow(gtk.Window):
             #self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
             self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
 
+        #self.show_delayed()
+
     def _on_close(self, widget, event):
         return True
 
@@ -78,8 +82,12 @@ class MainWindow(gtk.Window):
     #    print '_on_state', self.get_property('visible')
 
     def _on_visible(self, widget, event):
+        print '_on_visible'
         if not self._frezz_on_visible:
-            if self._last_show_state is None or self._last_show_state != 'max':
+            #if self._last_show_state != 'max' and self.is_minimized:
+            if self.is_minimized:
+                #self._last_show_state is None or
+                print '--'
                 self._maximize()
             else:
                 #print 'already max'
@@ -113,6 +121,8 @@ class MainWindow(gtk.Window):
         self._hide_animation(lambda: cb())
 
     def _maximize(self):
+        print '_maximize'
+        #traceback.print_stack()
         self._last_show_state = 'max'
         def cb():
             self._freez_on_set_focus = False
@@ -120,6 +130,8 @@ class MainWindow(gtk.Window):
         #self._freez_on_set_focus = False
 
     def _show_animation(self, callback):
+        print '_show_animation'
+        traceback.print_stack()
         start_alloc = gtk.gdk.Rectangle(
           x=self.alloc_collapsed.x, 
           y=self.alloc_collapsed.y, 
@@ -157,6 +169,16 @@ class MainWindow(gtk.Window):
           animation_time=self.ANIMATION_TIME
           )
         gobject.timeout_add(anim.get_animation_time(), anim)
+
+    def show_delayed(self):
+        print 'show_delayed'
+        if not self.first_run:
+            return
+        self.first_run = False
+        def _callback():
+            self._maximize()
+            return False
+        gobject.timeout_add(2000, _callback)
 
     def _on_draw(self, widget, event):
         if os.path.isfile(self.image_path):

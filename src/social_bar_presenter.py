@@ -15,16 +15,20 @@ import gettext
 gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 
 class SocialBarPresenter:
-    
+
+
+    # -- DEV --
+    #FB_APP_ID = '393860344022808'
+    #FB_APP_SECRET = 'eb0dcb05f7512be39f7a3826ce99dfcd'
+    # -- PRODUCTION --
+    FB_APP_ID = '407909575958642'
+    FB_APP_SECRET = '496f85b88366ae40b42d16579719815c'
+
     def __init__(self, view=None, model=None):
         self._view = view
         self._model = model
-        # -- DEV --
-        self._app_id = '393860344022808'
-        self._app_secret = 'eb0dcb05f7512be39f7a3826ce99dfcd'
-        # -- PRODUCTION --
-#        self._app_id = ''
-#        self._app_secret = ''
+        self._app_id = self.FB_APP_ID
+        self._app_secret = self.FB_APP_SECRET
         self._fb_graph_url = 'graph.facebook.com'
         self._webserver_url = 'http://localhost:8080/'
         self._fb_access_token = self._model.get_stored_fb_access_token()
@@ -253,17 +257,17 @@ class SocialBarPresenter:
         return self._model.get_no_picture_file_path()
 
     def get_image_dwn(self, image_url):
-        url_response = urllib2.urlopen(image_url)
-        image_final_url = url_response.geturl()
-        if image_final_url[-3:] in ('jpg', 'png', 'gif'):
-            image_data = url_response.read()
-            try:
+        try:
+            url_response = urllib2.urlopen(image_url)
+            image_final_url = url_response.geturl()
+            if image_final_url[-3:] in ('jpg', 'png', 'gif'):
+                image_data = url_response.read()
                 with open(self.get_stored_picture_file_path(), 'w') as f:
                     f.write(image_data)
                     f.close()
                 return
-            except:
-                pass
+        except:
+            pass
         print 'error:', 'no image', image_final_url
         return
 

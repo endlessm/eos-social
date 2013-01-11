@@ -30,6 +30,7 @@ class SocialBarView(MainWindow):
     def set_presenter(self, presenter):
         super(SocialBarView, self).set_background_image('/usr/share/eos-social/images/bg-right.png')
 
+        self.set_title('Endless Social Bar')
         self._presenter = presenter
         self._browser = webkit.WebView()
         self._browser.connect("navigation-requested", self._navigation_handler)
@@ -66,6 +67,7 @@ class SocialBarView(MainWindow):
             self._perform_login()
         else:
             self.wraper_main.show_panel('welcome_panel')
+            self.show_delayed()
         self.logout.hide()
         self.user_name.hide()
 
@@ -99,7 +101,7 @@ class SocialBarView(MainWindow):
             self.post_message.collapse_text_field()
             self.post_message_area.set_default_text()
         elif action == 'close':
-            self.iconify()
+            self.collapse()
         elif action == 'send':
             text = self.post_message_area.get_post_message()
             self.post_message_area.clear_text(True)
@@ -140,6 +142,7 @@ class SocialBarView(MainWindow):
             self.user_name.set_text(self._presenter.get_profil_display_name())
             self.wraper_main.show_panel('main_container')
             self.set_focus_out_active(True)
+            self.show_delayed()
 
         self.set_focus_out_active(False)
         if self._presenter.is_user_loged_in():

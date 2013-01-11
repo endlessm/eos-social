@@ -6,6 +6,15 @@ import urllib2
 import urlparse
 
 class FBAuthWindow(gtk.Window):
+
+
+    # -- DEV --
+    #FB_APP_ID = '393860344022808'
+    #FB_APP_SECRET = 'eb0dcb05f7512be39f7a3826ce99dfcd'
+    # -- PRODUCTION --
+    FB_APP_ID = '407909575958642'
+    FB_APP_SECRET = '496f85b88366ae40b42d16579719815c'
+
     def __init__(self, presenter=None, url='', width=800, height=600):
         super(FBAuthWindow, self).__init__()
         self.set_title('Login')
@@ -14,7 +23,7 @@ class FBAuthWindow(gtk.Window):
         self.scroller = gtk.ScrolledWindow()
         self.web_view = webkit.WebView()
         self.web_view.connect("navigation-requested", self.on_navigation_requested)
-        self.web_view.open('http://graph.facebook.com/oauth/authorize?scope=read_stream%2Cpublish_stream&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F&client_id=393860344022808')
+        self.web_view.open('http://graph.facebook.com/oauth/authorize?scope=read_stream%2Cpublish_stream&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F&client_id=' + self.FB_APP_ID)
         self.web_view.show()
         self.scroller.add(self.web_view)
         self.scroller.show()
@@ -42,9 +51,9 @@ class FBAuthWindow(gtk.Window):
     
     def get_access_token(self, code):
         url = 'https://graph.facebook.com/oauth/access_token'
-        params = {'client_id':'393860344022808',
+        params = {'client_id': self.FB_APP_ID,
                   'redirect_uri':'http://localhost:8080/',
-                  'client_secret':'eb0dcb05f7512be39f7a3826ce99dfcd',
+                  'client_secret': self.FB_APP_SECRET,
                   'code':code}
         url = url + '?' + urllib.urlencode(params)
         try:

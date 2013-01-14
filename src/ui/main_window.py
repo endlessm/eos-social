@@ -88,7 +88,8 @@ class MainWindow(gtk.Window):
 
     def set_focus_out_active(self, value):
         if value:
-            self.get_focus()
+            #self.get_focus()
+            self.present()
             def activate_later():
                 self.focus_out_active = True
                 return False

@@ -26,12 +26,14 @@ class SocialBarView(MainWindow):
         super(SocialBarView, self).__init__()
         self.connect('destroy', self._destroy)
         self._presenter = None
+        self.set_title('Endless Social Bar')
 
     def set_presenter(self, presenter):
         super(SocialBarView, self).set_background_image('/usr/share/eos-social/images/bg-right.png')
-
-        self.set_title('Endless Social Bar')
         self._presenter = presenter
+        self._create()
+
+    def _create(self):
         self._browser = webkit.WebView()
         self._browser.connect("navigation-requested", self._navigation_handler)
         self.post_message_area = PostMessageSendArea()
@@ -48,14 +50,11 @@ class SocialBarView(MainWindow):
         self.post_message = PostMessage(self.post_message_area, self.user_avatar, self.user_name, self.logout)
         self.post_message.connect('post-panel-action', self._on_action)
         self._browser.connect('button_press_event', lambda w, e: self.post_message._on_click(self, e))
-
         self.main_container = gtk.VBox()
         self.main_container.pack_start(self.post_message, expand=False, fill=False, padding=0)
         self.main_container.pack_start(self._browser, expand=True, fill=True, padding=0)
-
         self.welcome_panel = WelcomePanel()
         self.welcome_panel.connect('welcome-panel-action', self._on_action)
-
         self.wraper_main = MultiPanel()
         self.wraper_main.add_panel(self.main_container, 'main_container')
         self.wraper_main.add_panel(self.welcome_panel, 'welcome_panel')
@@ -76,7 +75,7 @@ class SocialBarView(MainWindow):
         y = self.user_name.allocation.y
         self.post_message.toolbar.move(self.user_name, x, y)
 
-    def _on_avatar(self):
+    def _on_avatar_action(self):
         if self.user_avatar.get_is_expanded():
             self._presenter.show_profil_page()
             self.user_avatar.set_is_expanded(False)
@@ -93,42 +92,72 @@ class SocialBarView(MainWindow):
             self.logout.show()
             self.user_name.show()
 
+    def _on_post_action(self):
+        self.post_message.toggle_text_field()
+        self.post_message_area.set_default_text()
+
+    def _on_cancel_action(self):
+        self.post_message.collapse_text_field()
+        self.post_message_area.set_default_text()
+
+    def _on_close_action(self):
+        self.collapse()
+
+    def _on_send_action(self):
+        text = self.post_message_area.get_post_message()
+        self.post_message_area.clear_text(True)
+        self.post_message.collapse_text_field()
+        if text is not None:
+            self._presenter.post_to_fb(text)
+
+    def _on_user_name_action(self):
+        self._presenter.show_profil_page()
+        self.user_avatar.set_is_expanded(False)
+        self.logout.hide()
+        self.user_name.hide()
+
+    def _on_user_profile_action(self):
+        self._presenter.show_profil_page()
+
+    def _on_login_action(self):
+        self._perform_login()
+
+    def _on_logout_on_shutdown_active_action(self):
+        self._presenter.set_logout_on_shutdown_active(True)
+
+    def _on_logout_on_shutdown_inactive_active(self):
+        self._presenter.set_logout_on_shutdown_active(False)
+
+    def _on_logout_action(self):
+        self.user_avatar.set_is_expanded(False)
+        self.logout.hide()
+        self.user_name.hide()
+        self.wraper_main.show_panel('welcome_panel')
+        self._presenter.logout()
+
     def _on_action(self, widget, action):
         if action == 'post':
-            self.post_message.toggle_text_field()
-            self.post_message_area.set_default_text()
+            self._on_post_action()
         elif action == 'cancel':
-            self.post_message.collapse_text_field()
-            self.post_message_area.set_default_text()
+            self._on_cancel_action()
         elif action == 'close':
-            self.collapse()
+            self._on_close_action()
         elif action == 'send':
-            text = self.post_message_area.get_post_message()
-            self.post_message_area.clear_text(True)
-            self.post_message.collapse_text_field()
-            if text is not None:
-                self._presenter.post_to_fb(text)
+            self._on_send_action()
         elif action == 'avatar':
-            self._on_avatar()
+            self._on_avatar_action()
         elif action == 'user-name':
-            self._presenter.show_profil_page()
-            self.user_avatar.set_is_expanded(False)
-            self.logout.hide()
-            self.user_name.hide()
+            self._on_user_name_action()
         elif action == 'user_profile':
-            self._presenter.show_profil_page()
+            self._on_user_profile_action()
         elif action == 'login':
-            self._perform_login()
+            self._on_login_action()
         elif action == 'logout_on_shutdown_active':
-            self._presenter.set_logout_on_shutdown_active(True)
+            self._on_logout_on_shutdown_active_action()
         elif action == 'logout_on_shutdown_inactive':
-            self._presenter.set_logout_on_shutdown_active(False)
+            self._on_logout_on_shutdown_inactive_active()
         elif action == 'logout':
-            self.user_avatar.set_is_expanded(False)
-            self.logout.hide()
-            self.user_name.hide()
-            self.wraper_main.show_panel('welcome_panel')
-            self._presenter.logout()
+            self._on_logout_action()
         else:
             print 'no action ->', action
 
@@ -141,14 +170,14 @@ class SocialBarView(MainWindow):
             self.user_avatar.set_avatar(file_path)
             self.user_name.set_text(self._presenter.get_profil_display_name())
             self.wraper_main.show_panel('main_container')
-            self.set_focus_out_active(True)
-            self.show_delayed()
 
         self.set_focus_out_active(False)
         if self._presenter.is_user_loged_in():
             _callback()
         else:
             self._presenter.fb_login(callback=_callback)
+        self.set_focus_out_active(True)
+        self.show_delayed()
 
     def show_popup_notification(self, notification_text):
         self.set_focus_out_active(False)

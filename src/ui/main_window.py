@@ -18,17 +18,12 @@ class MainWindow(gtk.Window):
         super(MainWindow, self).__init__(gtk.WINDOW_TOPLEVEL)
         self.first_run = True
         self.image_path = None
-        self.focus_out_active = True
         self._last_show_state = None
-        self._freez_on_set_focus = False
-        self._frezz_on_visible = False
         screen_height = gtk.gdk.screen_height()
         screen_width = gtk.gdk.screen_width()
-        self.is_minimized = False
         self.set_app_paintable(True)
         if transparent:
             self.set_colormap(self.get_screen().get_rgba_colormap())
-
         self.y_loc = 45
         self.height_loc = screen_height - self.y_loc - 38
         self.set_resizable(False)
@@ -53,39 +48,22 @@ class MainWindow(gtk.Window):
           width=self.MINIMUM_WINDOW_WIDTH, 
           height=self.height_loc
           )
-        self.connect("window-state-event", self.on_window_state_event)
-        #self.connect('notify::is-active', self._set_focus)
         self.connect('expose-event', self._on_draw)
         self.connect('delete-event', self._on_close)
-        self.connect('visibility-notify-event', self._on_visible)
-        #self.connect('window-state-event', self._on_state)
-
         self.set_role("eos-non-max")
         self.set_skip_taskbar_hint(True)
-
-        position = self._get_position_by_dock(dock)
-        if position is not None:
-            self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DOCK)
-            self.show() # must call show() before property_change()
-            self.window.property_change("_NET_WM_STRUT", "CARDINAL", 32,
-              gtk.gdk.PROP_MODE_REPLACE, position)
-        else:
-            #self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
-            self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
         self.set_active_window_checker()
 
     def set_active_window_checker(self):
         def check_active():
             active = self._get_active_window_name()
-            print 'active', repr(active)
             if active == 'Endless Social Bar':
-                print 'Me'
                 self._last_show_state = 'max'
                 self._maximize()
             elif active == 'Endless OS Browser':
-                print 'Browser'
+                self._last_show_state = 'max'
+                self._maximize()
             else:
-                print 'other'
                 if self._last_show_state is not None:
                     self._minimize()
                     self._last_show_state = None
@@ -98,43 +76,12 @@ class MainWindow(gtk.Window):
         if len(window_list) == 0:
             return None
         for win in window_list:
-            print 'win', repr(win)
             if win.is_active():
                 return win.get_name()
         return None
 
     def _on_close(self, widget, event):
         return True
-
-    #def _on_state(self, widget, event):
-    #    print '_on_state', self.get_property('visible')
-
-    def _on_visible(self, widget, event):
-        if not self._frezz_on_visible:
-            if self._last_show_state is not None and self._last_show_state != 'max':
-                self._maximize()
-            else:
-                #print 'already max'
-                pass
-
-    def set_focus_out_active(self, value):
-        if value:
-            #self.get_focus()
-            self.present()
-            def activate_later():
-                self.focus_out_active = True
-                return False
-            gobject.timeout_add(2000, activate_later)
-        else:
-            self.focus_out_active = False
-
-    def _set_focus(self, window, gparam_boolean):
-        if not self._freez_on_set_focus:
-            if self.focus_out_active and not window.props.is_active:
-                self._minimize()
-
-    def collapse(self):
-        self._minimize()
 
     def _minimize(self):
         self._freez_on_set_focus = True
@@ -153,9 +100,7 @@ class MainWindow(gtk.Window):
         top_level_x, top_level_y = top_level.get_window().get_origin()
         pos_x = top_level_x + self.allocation.x
         if pos_x != self.alloc_expanded.x:
-            print '-->', self.allocation.x, self.alloc_expanded.x
             self._show_animation(lambda: cb())
-        #self._freez_on_set_focus = False
 
     def _show_animation(self, callback):
         start_alloc = gtk.gdk.Rectangle(
@@ -175,7 +120,6 @@ class MainWindow(gtk.Window):
           animation_time=self.ANIMATION_TIME
           )
         gobject.timeout_add(anim.get_animation_time(), anim)
-
 
     def _hide_animation(self, callback):
         start_alloc = gtk.gdk.Rectangle(
@@ -219,24 +163,5 @@ class MainWindow(gtk.Window):
             except:
                 pass
 
-    def _get_position_by_dock(self, dock):
-        position = None
-        if dock == 'right':
-            position = [0, self.DEFAULT_WINDOW_WIDTH, 0, 0]
-        elif dock == 'left':
-            #TODO: make it dockable to left side
-            pass
-        else:
-            pass
-        return position
-
     def set_background_image(self, image_path):
         self.image_path = image_path
-    
-    def on_window_state_event(self, widget, event, data=None):
-        if event.changed_mask & gtk.gdk.WINDOW_STATE_ICONIFIED:
-            if event.new_window_state & gtk.gdk.WINDOW_STATE_ICONIFIED:
-                self.is_minimized = True
-            else:
-                self.is_minimized = False
-

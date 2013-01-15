@@ -21,7 +21,10 @@ class WindowAnimator(object):
 
     def _calc(self):
         delta_width = self.curr_alloc.width - self.end_alloc.width
+        print 'delta_width', repr(delta_width)
         if math.fabs(delta_width) < self.animation_step:
+            self.curr_alloc.width = self.end_alloc.width
+            print 'done'
             return True
         if delta_width < 0:
             self.curr_alloc.width += self.animation_step

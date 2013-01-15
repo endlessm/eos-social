@@ -4,6 +4,7 @@ import os
 import pango
 import cairo
 from animations import WindowAnimator
+import wnck
 
 
 class MainWindow(gtk.Window):
@@ -53,7 +54,7 @@ class MainWindow(gtk.Window):
           height=self.height_loc
           )
         self.connect("window-state-event", self.on_window_state_event)
-        self.connect('notify::is-active', self._set_focus)
+        #self.connect('notify::is-active', self._set_focus)
         self.connect('expose-event', self._on_draw)
         self.connect('delete-event', self._on_close)
         self.connect('visibility-notify-event', self._on_visible)
@@ -71,6 +72,36 @@ class MainWindow(gtk.Window):
         else:
             #self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
             self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
+        self.set_active_window_checker()
+
+    def set_active_window_checker(self):
+        def check_active():
+            active = self._get_active_window_name()
+            print 'active', repr(active)
+            if active == 'Endless Social Bar':
+                print 'Me'
+                self._last_show_state = 'max'
+                self._maximize()
+            elif active == 'Endless OS Browser':
+                print 'Browser'
+            else:
+                print 'other'
+                if self._last_show_state is not None:
+                    self._minimize()
+                    self._last_show_state = None
+            return True
+        gobject.timeout_add(2000, check_active)
+
+    def _get_active_window_name(self):
+        default = wnck.screen_get_default()
+        window_list = default.get_windows()
+        if len(window_list) == 0:
+            return None
+        for win in window_list:
+            print 'win', repr(win)
+            if win.is_active():
+                return win.get_name()
+        return None
 
     def _on_close(self, widget, event):
         return True
@@ -118,7 +149,12 @@ class MainWindow(gtk.Window):
         self._last_show_state = 'max'
         def cb():
             self._freez_on_set_focus = False
-        self._show_animation(lambda: cb())
+        top_level = self.get_toplevel()
+        top_level_x, top_level_y = top_level.get_window().get_origin()
+        pos_x = top_level_x + self.allocation.x
+        if pos_x != self.alloc_expanded.x:
+            print '-->', self.allocation.x, self.alloc_expanded.x
+            self._show_animation(lambda: cb())
         #self._freez_on_set_focus = False
 
     def _show_animation(self, callback):

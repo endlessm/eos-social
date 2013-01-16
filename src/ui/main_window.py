@@ -41,7 +41,7 @@ class MainWindow(SkinableWindow, WM_Inspect_MixIn):
           height=self.height_loc
           )
         self.alloc_collapsed = gtk.gdk.Rectangle(
-          x=screen_width-self.MINIMUM_WINDOW_WIDTH, 
+          x=screen_width, 
           y=self.y_loc, 
           width=self.MINIMUM_WINDOW_WIDTH, 
           height=self.height_loc

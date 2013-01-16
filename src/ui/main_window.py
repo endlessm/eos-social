@@ -4,26 +4,24 @@ import os
 import pango
 import cairo
 from animations import WindowAnimator
-import wnck
+from skinable_window import SkinableWindow
+from wm_inspect import WM_Inspect_MixIn
 
 
-class MainWindow(gtk.Window):
+class MainWindow(SkinableWindow, WM_Inspect_MixIn):
 
 
     DEFAULT_WINDOW_WIDTH = 400
     MINIMUM_WINDOW_WIDTH = 10
     ANIMATION_STEP = 20
     ANIMATION_TIME = 50
-    def __init__(self, transparent=False, dock=None):
-        super(MainWindow, self).__init__(gtk.WINDOW_TOPLEVEL)
+    def __init__(self):
+        SkinableWindow.__init__(self, gtk.WINDOW_TOPLEVEL)
+        WM_Inspect_MixIn.__init__(self)
         self.first_run = True
-        self.image_path = None
         self._last_show_state = None
         screen_height = gtk.gdk.screen_height()
         screen_width = gtk.gdk.screen_width()
-        self.set_app_paintable(True)
-        if transparent:
-            self.set_colormap(self.get_screen().get_rgba_colormap())
         self.y_loc = 45
         self.height_loc = screen_height - self.y_loc - 38
         self.set_resizable(False)
@@ -48,40 +46,21 @@ class MainWindow(gtk.Window):
           width=self.MINIMUM_WINDOW_WIDTH, 
           height=self.height_loc
           )
-        self.connect('expose-event', self._on_draw)
-        self.connect('delete-event', self._on_close)
+        self.connect('delete-event', lambda w, e: True)
         self.set_role("eos-non-max")
         self.set_skip_taskbar_hint(True)
-        self.set_active_window_checker()
 
-    def set_active_window_checker(self):
-        def check_active():
-            active = self._get_active_window_name()
-            if active == 'Endless Social Bar':
-                self._last_show_state = 'max'
-                self._maximize()
-            elif active == 'Endless OS Browser':
-                self._last_show_state = 'max'
-                self._maximize()
-            else:
-                if self._last_show_state is not None:
-                    self._minimize()
-                    self._last_show_state = None
-            return True
-        gobject.timeout_add(2000, check_active)
-
-    def _get_active_window_name(self):
-        default = wnck.screen_get_default()
-        window_list = default.get_windows()
-        if len(window_list) == 0:
-            return None
-        for win in window_list:
-            if win.is_active():
-                return win.get_name()
-        return None
-
-    def _on_close(self, widget, event):
-        return True
+    def _active_win_callback(self, active_name):
+        if active_name == 'Endless Social Bar':
+            self._last_show_state = 'max'
+            self._maximize()
+        elif active_name == 'Endless OS Browser':
+            self._last_show_state = 'max'
+            self._maximize()
+        else:
+            if self._last_show_state is not None:
+                self._minimize()
+                self._last_show_state = None
 
     def _minimize(self):
         self._freez_on_set_focus = True
@@ -149,19 +128,5 @@ class MainWindow(gtk.Window):
             return False
         gobject.timeout_add(2000, _callback)
 
-    def _on_draw(self, widget, event):
-        if os.path.isfile(self.image_path):
-            try:
-                cr = widget.window.cairo_create()
-                pixbuf = gtk.gdk.pixbuf_new_from_file(self.image_path)
-                pixbuf_scaled = pixbuf.scale_simple(event.area.width, event.area.height, gtk.gdk.INTERP_BILINEAR)
-                #widget.window.draw_pixbuf(widget.style.bg_gc[gtk.STATE_NORMAL], pixbuf_scaled, 0, 0, 0,0)
-                cr.set_source_pixbuf(pixbuf, 0, 0)
-                del pixbuf_scaled
-                del pixbuf
-                cr.paint()
-            except:
-                pass
 
-    def set_background_image(self, image_path):
-        self.image_path = image_path
+

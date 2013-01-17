@@ -101,7 +101,7 @@ class SocialBarView(MainWindow):
         self.post_message_area.set_default_text()
 
     def _on_close_action(self):
-        self._minimize()
+        self.hide()
 
     def _on_send_action(self):
         text = self.post_message_area.get_post_message()
@@ -175,7 +175,7 @@ class SocialBarView(MainWindow):
             _callback()
         else:
             self._presenter.fb_login(callback=_callback)
-        self.show_delayed()
+        #self.show_delayed()
 
     def show_popup_notification(self, notification_text):
         SimplePopUp(notification_text).show()

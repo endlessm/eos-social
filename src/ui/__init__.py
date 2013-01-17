@@ -162,6 +162,17 @@ class PostMessageSendArea(gtk.Alignment):
         self._buttons[button_name] = button
         return button
 
+    def _get_button(self, name):
+        return self._buttons.get(name, None)
+
+    def enable_posting(self):
+        button = self._get_button('send')
+        button.set_sensitive(True)
+
+    def disable_posting(self):
+        button = self._get_button('send')
+        button.set_sensitive(False)
+
     def _skin_it(self, button_name, button):
         images = self._img(button_name)
         button.show_image(images[0])
@@ -187,7 +198,9 @@ class PostMessageSendArea(gtk.Alignment):
         self.text_area.set_size_request(400, 100)
         ##self.text_area.set_size_request(380, self.COLLAPSED_HEIGHT) #390
         self.text_area.set_wrap_mode(gtk.WRAP_WORD_CHAR)
-        self.text_area.get_buffer().set_text(self.DEFAULT_TEXT)
+        self.text_buffer = self.text_area.get_buffer()
+        self.text_buffer.set_text(self.DEFAULT_TEXT)
+        self.text_buffer.connect('changed', self._text_changed)
         self.text_area.connect('focus-in-event', self._focus_in)
         self.text_area.connect('focus-out-event', self._focus_out)
         self.text_area.set_left_margin(5)
@@ -224,6 +237,9 @@ class PostMessageSendArea(gtk.Alignment):
         if text == '' or text == self.DEFAULT_TEXT:
             return None
         return text
+
+    def _text_changed(self, textbuffer):
+        self._emit_action(self, 'post_msg_changed')
 
     def _get_text(self):
         text_buffer = self.text_area.get_buffer()

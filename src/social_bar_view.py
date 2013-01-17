@@ -135,6 +135,13 @@ class SocialBarView(MainWindow):
         self.wraper_main.show_panel('welcome_panel')
         self._presenter.logout()
 
+    def _on_post_msg_changed(self):
+        text = self.post_message_area.get_post_message()
+        if text is not None:
+            self.post_message_area.enable_posting()
+        else:
+            self.post_message_area.disable_posting()
+
     def _on_action(self, widget, action):
         if action == 'post':
             self._on_post_action()
@@ -158,6 +165,8 @@ class SocialBarView(MainWindow):
             self._on_logout_on_shutdown_inactive_active()
         elif action == 'logout':
             self._on_logout_action()
+        elif action == 'post_msg_changed':
+            self._on_post_msg_changed()
         else:
             print 'no action ->', action
 

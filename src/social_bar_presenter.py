@@ -11,6 +11,7 @@ import webbrowser
 import simplejson
 import urllib2
 import gettext
+from settings import Settings
 
 gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 
@@ -21,8 +22,8 @@ class SocialBarPresenter:
     #FB_APP_ID = '393860344022808'
     #FB_APP_SECRET = 'eb0dcb05f7512be39f7a3826ce99dfcd'
     # -- PRODUCTION --
-    FB_APP_ID = '407909575958642'
-    FB_APP_SECRET = '496f85b88366ae40b42d16579719815c'
+    FB_APP_ID = Settings.FB_APP_ID
+    FB_APP_SECRET = Settings.FB_APP_SECRET
 
     def __init__(self, view=None, model=None):
         self._view = view

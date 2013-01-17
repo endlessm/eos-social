@@ -4,7 +4,6 @@ import webkit
 import urllib
 import urllib2
 import urlparse
-from ../settings import Settings
 
 
 class FBAuthWindow(gtk.Window):
@@ -14,12 +13,12 @@ class FBAuthWindow(gtk.Window):
     #FB_APP_ID = '393860344022808'
     #FB_APP_SECRET = 'eb0dcb05f7512be39f7a3826ce99dfcd'
     # -- PRODUCTION --
-    FB_APP_ID = Settings.FB_APP_ID
-    FB_APP_SECRET = Settings.FB_APP_SECRET
+    FB_APP_ID = '407909575958642'
+    FB_APP_SECRET = '496f85b88366ae40b42d16579719815c'
 
     def __init__(self, presenter=None, url='', width=800, height=600):
         super(FBAuthWindow, self).__init__()
-        self.set_title('Login*')
+        self.set_title('Login')
         self._presenter = presenter
         self._authorized = False
         self.scroller = gtk.ScrolledWindow()

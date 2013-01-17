@@ -66,7 +66,7 @@ class SocialBarView(MainWindow):
             self._perform_login()
         else:
             self.wraper_main.show_panel('welcome_panel')
-            self.show_delayed()
+            #self.show_delayed()
         self.logout.hide()
         self.user_name.hide()
 

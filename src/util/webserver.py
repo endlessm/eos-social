@@ -9,6 +9,7 @@ import urlparse
 import gettext
 import pprint
 from Cheetah.Template import Template
+from settings import Settings
 
 gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 
@@ -87,7 +88,8 @@ class MyHandler(BaseHTTPRequestHandler):
     def generate_posts_elements(self, posts):
         params = [{'posts':posts},
                   {'like_string':_('like')},
-                  {'comment_string':_('comment')}]
+                  {'comment_string':_('comment')},
+                  {'auto_refresh_interval':Settings.FB_AUTO_REFRESH_INTERVAL}]
         page = Template(file = '/usr/share/eos-social/templates/posts-array.html', searchList = params)
         return page
         

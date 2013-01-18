@@ -168,7 +168,8 @@ class SocialBarPresenter:
                   {'slickscroll_css':SLICKSCROLL_CSS},
                   {'newer':newer_url}, {'older':older_url},
                   {'like_string':_('like')},
-                  {'comment_string':_('comment')}]
+                  {'comment_string':_('comment')},
+                  {'auto_refresh_interval':Settings.FB_AUTO_REFRESH_INTERVAL}]
         #@TODO: fix path and file name
         page = Template(file = '/usr/share/eos-social/templates/news-feed.html', searchList = params)
         return page
@@ -213,7 +214,8 @@ class SocialBarPresenter:
     def generate_posts_elements(self, posts):
         params = [{'posts':posts},
                   {'like_string':_('like')},
-                  {'comment_string':_('comment')}]
+                  {'comment_string':_('comment')},
+                  {'auto_refresh_interval':Settings.FB_AUTO_REFRESH_INTERVAL}]
         #@TODO: fix path and file name
         page = Template(file = '/usr/share/eos-social/templates/posts-array.html', searchList = params)
         return page

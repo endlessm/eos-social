@@ -37,20 +37,20 @@ class FacebookPost:
         if data.has_key('comments'):
             self.comments = data['comments']
     
-    def __str__(self):
-        rv =  'id      : ' + self.id + '\n'
-        rv += 'from    : ' + self.poster + '\n'
-        rv += 'avatar  : ' + self.poster_image + '\n'
-        rv += 'subject : ' + self.subject + '\n'
-        rv += 'text    : ' + self.text + '\n'
-        rv += 'image   : ' + self.image + '\n'
-        rv += 'created : ' + self.date_created + '\n'
-        rv += 'updated : ' + self.date_updated + '\n'
-        rv += 'likes   : ' + unicode(self.likes) + '\n'
-        rv += 'comments: ' + unicode(self.comments) + '\n'
-        rv += 'actions : ' + unicode(self.actions) + '\n'
-        rv += '-'*80
-        return rv
+    #def __str__(self):
+    #    rv =  'id      : ' + self.id + '\n'
+    #    rv += 'from    : ' + self.poster + '\n'
+    #    rv += 'avatar  : ' + self.poster_image + '\n'
+    #    rv += 'subject : ' + self.subject + '\n'
+    #    rv += 'text    : ' + self.text + '\n'
+    #    rv += 'image   : ' + self.image + '\n'
+    #    rv += 'created : ' + self.date_created + '\n'
+    #    rv += 'updated : ' + self.date_updated + '\n'
+    #    rv += 'likes   : ' + unicode(self.likes) + '\n'
+    #    rv += 'comments: ' + unicode(self.comments) + '\n'
+    #    rv += 'actions : ' + unicode(self.actions) + '\n'
+    #    rv += '-'*80
+    #    return rv
     
     def get_elapsed_string(self, delta):
         if delta < 0:

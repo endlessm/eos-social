@@ -15,5 +15,12 @@ class FacebookPosts:
             self.next_url = self.posts[len(self.posts)-1].date_created
         
 #        print 'PREVIOUS:', self.previous_url, 'NEXT:', self.next_url
-        
+    def to_dict(self):
+        d = {}
+        d['posts'] = []
+        d['previous_url'] = self.previous_url
+        d['next_url'] = self.next_url
+        for post in self.posts:
+            d['posts'].append(post.__dict__)
+        return d
             

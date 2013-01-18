@@ -11,18 +11,15 @@ import webbrowser
 import simplejson
 import urllib2
 import gettext
+from settings import Settings
 
 gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 
 class SocialBarPresenter:
 
 
-    # -- DEV --
-    #FB_APP_ID = '393860344022808'
-    #FB_APP_SECRET = 'eb0dcb05f7512be39f7a3826ce99dfcd'
-    # -- PRODUCTION --
-    FB_APP_ID = '407909575958642'
-    FB_APP_SECRET = '496f85b88366ae40b42d16579719815c'
+    FB_APP_ID = Settings.FB_APP_ID
+    FB_APP_SECRET = Settings.FB_APP_SECRET
 
     def __init__(self, view=None, model=None):
         self._view = view
@@ -67,7 +64,7 @@ class SocialBarPresenter:
             return result
     
     def fb_login(self, callback=None):
-        proc = subprocess.Popen(['python', '/usr/share/eos-social/facebook/fb_auth_window.pyc'], stdout=subprocess.PIPE)
+        proc = subprocess.Popen(['python', Settings.FB_LOGIN_MODULE_PATH], stdout=subprocess.PIPE)
         for line in proc.stdout:
             print line
             if line.startswith('ACCESS_TOKEN:'):

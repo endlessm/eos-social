@@ -15,6 +15,7 @@ from ui import LogoutLabel
 from ui import UserNameLabel
 import gettext
 import time
+from settings import Settings
 
 gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 
@@ -26,7 +27,8 @@ class SocialBarView(MainWindow):
         super(SocialBarView, self).__init__()
         self.connect('destroy', self._destroy)
         self._presenter = None
-        self.set_title('Endless Social Bar')
+        self.set_title(Settings.MAIN_WINDOW_TITLE)
+        #self.set_title('Endless Social Bar')
 
     def set_presenter(self, presenter):
         super(SocialBarView, self).set_background_image('/usr/share/eos-social/images/bg-right.png')

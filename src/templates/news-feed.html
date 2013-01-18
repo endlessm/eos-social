@@ -23,6 +23,13 @@
 	<script>
 	first_post_timestamp = $newer;
     last_post_timestamp = $older;
+    on_top = false;
+    
+    function auto_update() {
+        if (on_top) {
+            get_newer_posts(first_post_timestamp);
+        }
+    }
 	
 	function like_success(id, liked_string) {
         document.getElementById("like-"+id).innerHTML = liked_string;
@@ -133,6 +140,7 @@
     
     function get_newer_posts(timestamp) {
         show_posts_loader('top');
+        on_top = true;
         var req = \$.ajax({
             url: 'http://localhost:8088/GET_NEWER_POSTS?timestamp=' + timestamp,
             crossDomain: true,
@@ -344,7 +352,8 @@
     (function(\$){
         \$(window).load(function(){
             \$("#scroller").mCustomScrollbar({callbacks:{onTotalScroll:function(){get_older_posts(last_post_timestamp);},
-                                                         onTotalScrollBack:function(){get_newer_posts(first_post_timestamp);}
+                                                         onTotalScrollBack:function(){get_newer_posts(first_post_timestamp);},
+                                                         onScrollStart:function(){on_top = false;}
                                                         }
                                               });
         });
@@ -458,5 +467,8 @@
 				<div id="debug-console"></div>
 			</div>
 		</div>
+		<script>
+		setInterval(function() { auto_update();}, 60000);
+		</script>
 	</body>
 </html>

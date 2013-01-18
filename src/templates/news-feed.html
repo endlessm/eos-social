@@ -21,6 +21,9 @@
 	</script>
 	
 	<script>
+	first_post_timestamp = $newer;
+    last_post_timestamp = $older;
+	
 	function like_success(id, liked_string) {
         document.getElementById("like-"+id).innerHTML = liked_string;
         document.getElementById("like-"+id).href = 'eossocialbar:#';
@@ -110,12 +113,228 @@
         window.location.href = "eossocialbar:VIEWPOST?url=" + url;
     }
     
+    //var loader_image_uri = 'data:image/gif;base64,R0lGODlhEAALAPQAAP///wAAANra2tDQ0Orq6gYGBgAAAC4uLoKCgmBgYLq6uiIiIkpKSoqKimRkZL6+viYmJgQEBE5OTubm5tjY2PT09Dg4ONzc3PLy8ra2tqCgoMrKyu7u7gAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCwAAACwAAAAAEAALAAAFLSAgjmRpnqSgCuLKAq5AEIM4zDVw03ve27ifDgfkEYe04kDIDC5zrtYKRa2WQgAh+QQJCwAAACwAAAAAEAALAAAFJGBhGAVgnqhpHIeRvsDawqns0qeN5+y967tYLyicBYE7EYkYAgAh+QQJCwAAACwAAAAAEAALAAAFNiAgjothLOOIJAkiGgxjpGKiKMkbz7SN6zIawJcDwIK9W/HISxGBzdHTuBNOmcJVCyoUlk7CEAAh+QQJCwAAACwAAAAAEAALAAAFNSAgjqQIRRFUAo3jNGIkSdHqPI8Tz3V55zuaDacDyIQ+YrBH+hWPzJFzOQQaeavWi7oqnVIhACH5BAkLAAAALAAAAAAQAAsAAAUyICCOZGme1rJY5kRRk7hI0mJSVUXJtF3iOl7tltsBZsNfUegjAY3I5sgFY55KqdX1GgIAIfkECQsAAAAsAAAAABAACwAABTcgII5kaZ4kcV2EqLJipmnZhWGXaOOitm2aXQ4g7P2Ct2ER4AMul00kj5g0Al8tADY2y6C+4FIIACH5BAkLAAAALAAAAAAQAAsAAAUvICCOZGme5ERRk6iy7qpyHCVStA3gNa/7txxwlwv2isSacYUc+l4tADQGQ1mvpBAAIfkECQsAAAAsAAAAABAACwAABS8gII5kaZ7kRFGTqLLuqnIcJVK0DeA1r/u3HHCXC/aKxJpxhRz6Xi0ANAZDWa+kEAA7AAAAAAAAAAAA';
+    
+    function show_posts_loader(where) {
+        if (where == 'top') {
+            \$('#top-loader').attr("style", "visibility:visible;");
+        } else {
+            \$('#bottom-loader').attr("style", "visibility:visible");
+        }
+    }
+    
+    function hide_posts_loader(where) {
+        if (where == 'top') {
+            \$('#top-loader').attr("style", "visibility:hidden;");
+        } else {
+            \$('#bottom-loader').attr("style", "visibility:hidden;");
+        }
+    }
+    
+    function get_newer_posts(timestamp) {
+        show_posts_loader('top');
+        var req = \$.ajax({
+            url: 'http://localhost:8088/GET_NEWER_POSTS?timestamp=' + timestamp,
+            crossDomain: true,
+            dataType: 'jsonp',
+            jsonp: 'onJSONPLoad',
+            //success: function(response) {
+            //    \$("#debugger").html(response);
+            //},
+            //error: function(request, error) {
+            //    \$("#debugger").html('Error:' + request.responseText);
+            //}
+        });
+        
+        req.done(function(data) {
+            hide_posts_loader('top');
+            //if there are posts, change the timestamp and display posts
+            if (data.previous_url > 0) {
+                first_post_timestamp = data.previous_url
+            
+                clearInterval(intervalID);
+                \$('.newer').after(data.html);
+                \$("#scroller").mCustomScrollbar("update");
+                var intervalID = setInterval(function(){\$("#scroller").mCustomScrollbar("update");}, 2000);
+            }
+            
+            //\$("#scroller").mCustomScrollbar("update");
+            //else do nothing
+            //\$("#debugger").html( "Message: " + JSON.stringify(msg) );
+        });
+ 
+        req.fail(function(jqXHR, textStatus) {
+            hide_posts_loader('top');
+            //\$("#debugger").html( "Request failed: " + JSON.stringify(req) );
+        });
+        
+        req.always(function() {
+            \$("#scroller").mCustomScrollbar("update");
+            //var intID = setInterval(function(){\$("#scroller").mCustomScrollbar("update");}, 2000);
+        });
+    }
+    
+    function get_older_posts(timestamp) {
+        show_posts_loader('bottom');
+        
+        var req = \$.ajax({
+            url: 'http://localhost:8088/GET_OLDER_POSTS?timestamp=' + timestamp,
+            crossDomain: true,
+            dataType: 'jsonp',
+            jsonp: 'onJSONPLoad',
+        });
+        
+        req.done(function(data) {
+            //\$('#debug-console').append(JSON.stringify(data) + '<br>');
+            //\$("#scroller").mCustomScrollbar("update");
+            //return
+            hide_posts_loader('bottom');
+            if (data.next_url > 0) {
+                last_post_timestamp = data.next_url
+            
+                clearInterval(intervalID);
+                \$('.older').before(data.html);
+                \$("#scroller").mCustomScrollbar("update");
+                var intervalID = setInterval(function(){\$("#scroller").mCustomScrollbar("update");}, 2000);
+            }
+        });
+        
+        req.fail(function(jqXHR, textStatus) {
+            hide_posts_loader('bottom');
+            //\$("#debugger").html( "Request failed: " + JSON.stringify(req) );
+        });
+        
+        req.always(function() {
+            //\$("#scroller").mCustomScrollbar("update");
+            //var intID = setInterval(function(){\$("#scroller").mCustomScrollbar("update");}, 2000);
+        });
+    }
+    
+    function display_retrieved_posts(data, where) {
+        if (where == 'bottom') {
+            for (i=0;i<data.posts.length;i++) {
+                display_post(data.posts[i], where);
+            }
+        } else {
+            for (i=data.posts.length-1;i>=0;i--) {
+                display_post(data.posts[i], where);
+            }
+        }
+        
+        //\$("#scroller").mCustomScrollbar("update");
+    }
+    
+    function display_post(post, where) {
+        //\$('#debug-console').append(JSON.stringify(post) + '<br>');
+        //\$("#scroller").mCustomScrollbar("update");
+        //post div
+        var postdiv = document.createElement("div");
+        postdiv.setAttribute("class", "post");
+        postdiv.setAttribute("id", post.id);
+        postdiv.setAttribute("style", "padding-top:5px;display:block;");
+        //user image div
+        var user_image_div = document.createElement("div");
+        user_image_div.setAttribute("class", "user");
+        user_image_div.setAttribute("style", "width:70px;float:left;");
+        //link to image
+        var a = document.createElement("a");
+        a.setAttribute("href", "eossocialbar:VIEW_POSTER?poster_id=" + post.poster_id);
+        a.setAttribute("style", "text-decoration:none;");
+        var u_image = document.createElement("img");
+        u_image.setAttribute("src", post.poster_image);
+        a.appendChild(u_image);
+        var brk = document.createElement("br");
+        user_image_div.appendChild(a);
+        user_image_div.appendChild(brk);
+        //done with user, go to post itself
+        //post content div
+        var post_content_div = document.createElement("div")
+        post_content_div.setAttribute("class", "post-content");
+        //username
+        var span1 = document.createElement("span");
+        var a2 = document.createElement("a");
+        a2.setAttribute("href", "eossocialbar:VIEW_POSTER?poster_id=" + post.poster_id);
+        a2.setAttribute("style", "font-size:13px; margin-left:-2px;");
+        var bold1 = document.createElement("b");
+        bold1.innerText = post.poster + '  ';
+        a2.appendChild(bold1);
+        span1.appendChild(a2);
+        post_content_div.appendChild(span1);
+        var elapsed_div = document.createElement("div");
+        elapsed_div.setAttribute("class", "datetime");
+        elapsed_div.innerText = post.time_elapsed_string;
+        post_content_div.appendChild(elapsed_div);
+        var brk1 = document.createElement("br");
+        post_content_div.appendChild(brk1);
+        postdiv.appendChild(user_image_div);
+        postdiv.appendChild(post_content_div);
+        var span2 = document.createElement("span");
+        span2.setAttribute("class", "clickable");
+        span2.setAttribute("onclick", "show_post_details('" + post.url + "');");
+        span2.setAttribute("style", "cursor:pointer;");
+        //subject if exists
+        if (post.subject != null) {
+            var break1 = document.createElement("br");
+            var break2 = document.createElement("br");
+            var break3 = document.createElement("br");
+            var bold2 = document.createElement("b");
+            var span3 = document.createElement("span");
+            span3.setAttribute("class", "wrapable");
+            span3.innerText = post.subject;
+            span2.appendChild(break1);
+            bold2.appendChild(span3);
+            span2.appendChild(bold2);
+            span2.appendChild(break2);
+            span2.appendChild(break3);
+        }
+        //text if exists
+        if (post.text != null && post.text != '') {
+            var span4 = document.createElement("span");
+            span4.setAttribute("class", "wrapable")
+            span4.innerHtml = post.text;
+            var break4 = document.createElement("br");
+            span2.appendChild(span4);
+            span2.appendChild(break4);
+        }
+        //image if exists
+        if (post.image != null && post.image != '') {
+            var pi_div = document.createElement("div");
+            pi_div.setAttribute("class", "imagecls");
+            pi_div.setAttribute("style", "text-align:center;");
+            var pi = document.createElement("img");
+            pi.setAttribute("src", post.image);
+            pi_div.appendChild(pi);
+            span2.appendChild(pi_div);
+        }
+        
+        post_content_div.appendChild(span2);
+        var clearer = document.createElement("div");
+        clearer.setAttribute("class", "clearer");
+        clearer.setAttribute("style", "clear:both;");
+        post_content_div.appendChild(clearer);
+        var break5 = document.createElement("br");
+        post_content_div.appendChild(break5);
+        //like and comment buttons and counts
+        
+        //add it to dom
+        if (where == 'top') {
+            //\$("#debugger").html( "should add it on top<br>" );
+            \$(".newer").after(postdiv);
+        } else {
+            //\$("#debugger").html( "should add it at the bottom<br>" );
+            \$(".older").before(postdiv);
+        }
+        //\$('#'+post.id).show();
+        //\$("#scroller").mCustomScrollbar("update");
+    }
+    
     function show_older_posts(posts, url) {
         clearInterval(intervalID);
         \$('.older').before(posts);
         \$("#scroller").mCustomScrollbar("update");
         var intervalID = setInterval(function(){\$("#scroller").mCustomScrollbar("update");}, 2000);
         \$('#older-button').attr('onclick', 'window.location.href="eossocial:GET_OLDER_POSTS?url=' + url + '"');
+        last_post_timestamp = url;
     }
 
 	</script>
@@ -124,7 +343,10 @@
 
     (function(\$){
         \$(window).load(function(){
-            \$("#scroller").mCustomScrollbar();
+            \$("#scroller").mCustomScrollbar({callbacks:{onTotalScroll:function(){get_older_posts(last_post_timestamp);},
+                                                         onTotalScrollBack:function(){get_newer_posts(first_post_timestamp);}
+                                                        }
+                                              });
         });
     })(jQuery);
 
@@ -133,9 +355,12 @@
 	</head>
 	<body>
 		<div id="top-container">
+		    
 			<div id="scroller" class="slickscroll" style="width:392px;height:100%;overflow:hidden;">
 			    
-			    <div class="newer" onclick="window.location.href='eossocial:GET_NEWER_POSTS:?url=$newer'"></div>
+			    <div class="newer" onclick="window.location.href='eossocial:GET_NEWER_POSTS:?url=$newer'">
+			    <img id="top-loader" src="data:image/gif;base64,R0lGODlhEAALAPQAAP///wAAANra2tDQ0Orq6gYGBgAAAC4uLoKCgmBgYLq6uiIiIkpKSoqKimRkZL6+viYmJgQEBE5OTubm5tjY2PT09Dg4ONzc3PLy8ra2tqCgoMrKyu7u7gAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCwAAACwAAAAAEAALAAAFLSAgjmRpnqSgCuLKAq5AEIM4zDVw03ve27ifDgfkEYe04kDIDC5zrtYKRa2WQgAh+QQJCwAAACwAAAAAEAALAAAFJGBhGAVgnqhpHIeRvsDawqns0qeN5+y967tYLyicBYE7EYkYAgAh+QQJCwAAACwAAAAAEAALAAAFNiAgjothLOOIJAkiGgxjpGKiKMkbz7SN6zIawJcDwIK9W/HISxGBzdHTuBNOmcJVCyoUlk7CEAAh+QQJCwAAACwAAAAAEAALAAAFNSAgjqQIRRFUAo3jNGIkSdHqPI8Tz3V55zuaDacDyIQ+YrBH+hWPzJFzOQQaeavWi7oqnVIhACH5BAkLAAAALAAAAAAQAAsAAAUyICCOZGme1rJY5kRRk7hI0mJSVUXJtF3iOl7tltsBZsNfUegjAY3I5sgFY55KqdX1GgIAIfkECQsAAAAsAAAAABAACwAABTcgII5kaZ4kcV2EqLJipmnZhWGXaOOitm2aXQ4g7P2Ct2ER4AMul00kj5g0Al8tADY2y6C+4FIIACH5BAkLAAAALAAAAAAQAAsAAAUvICCOZGme5ERRk6iy7qpyHCVStA3gNa/7txxwlwv2isSacYUc+l4tADQGQ1mvpBAAIfkECQsAAAAsAAAAABAACwAABS8gII5kaZ7kRFGTqLLuqnIcJVK0DeA1r/u3HHCXC/aKxJpxhRz6Xi0ANAZDWa+kEAA7AAAAAAAAAAAA" style="visibility:hidden;"/>
+			    </div>
 				
 				<!-- here comes the list of posts -->
 				#for $post in $posts
@@ -161,7 +386,7 @@
 						<span class="clickable" onclick="show_post_details('$post.url');" style="cursor:pointer;">
 						<!-- subject (TODO: add check if subject is existant -->
 						#if $post.subject
-							<br/><b><span class="wrapable">$post.subject</span></b><br/><br/>
+							<br/><b><span class="wrapable">$post.subject</span></b><br/></br>
 						#end if
 						<!-- Post text -->
 						#if $post.text
@@ -169,7 +394,7 @@
 						#end if
 						<!-- Post image -->
 						#if $post.image
-							<div class="imagecls" style="text-align:center;"><img src="$post.image"/></div><br/>
+							<div class="imagecls" style="text-align:center;"><img src="$post.image"/></div>
 						#end if
 						<!-- Like and Comment links/buttons and respective counts -->
 						</span>
@@ -227,7 +452,10 @@
 				<div class="clearer" style="clear:both;"></div>
 				#end for
 
-				<div class="older" onclick="window.location.href='eossocial:GET_OLDER_POSTS?url=$older'" id="older-button"></div>
+				<div class="older" onclick="window.location.href='eossocial:GET_OLDER_POSTS?url=$older'" id="older-button">
+				<img id="bottom-loader" src="data:image/gif;base64,R0lGODlhEAALAPQAAP///wAAANra2tDQ0Orq6gYGBgAAAC4uLoKCgmBgYLq6uiIiIkpKSoqKimRkZL6+viYmJgQEBE5OTubm5tjY2PT09Dg4ONzc3PLy8ra2tqCgoMrKyu7u7gAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCwAAACwAAAAAEAALAAAFLSAgjmRpnqSgCuLKAq5AEIM4zDVw03ve27ifDgfkEYe04kDIDC5zrtYKRa2WQgAh+QQJCwAAACwAAAAAEAALAAAFJGBhGAVgnqhpHIeRvsDawqns0qeN5+y967tYLyicBYE7EYkYAgAh+QQJCwAAACwAAAAAEAALAAAFNiAgjothLOOIJAkiGgxjpGKiKMkbz7SN6zIawJcDwIK9W/HISxGBzdHTuBNOmcJVCyoUlk7CEAAh+QQJCwAAACwAAAAAEAALAAAFNSAgjqQIRRFUAo3jNGIkSdHqPI8Tz3V55zuaDacDyIQ+YrBH+hWPzJFzOQQaeavWi7oqnVIhACH5BAkLAAAALAAAAAAQAAsAAAUyICCOZGme1rJY5kRRk7hI0mJSVUXJtF3iOl7tltsBZsNfUegjAY3I5sgFY55KqdX1GgIAIfkECQsAAAAsAAAAABAACwAABTcgII5kaZ4kcV2EqLJipmnZhWGXaOOitm2aXQ4g7P2Ct2ER4AMul00kj5g0Al8tADY2y6C+4FIIACH5BAkLAAAALAAAAAAQAAsAAAUvICCOZGme5ERRk6iy7qpyHCVStA3gNa/7txxwlwv2isSacYUc+l4tADQGQ1mvpBAAIfkECQsAAAAsAAAAABAACwAABS8gII5kaZ7kRFGTqLLuqnIcJVK0DeA1r/u3HHCXC/aKxJpxhRz6Xi0ANAZDWa+kEAA7AAAAAAAAAAAA" style="visibility:hidden;"/>
+				</div>
+				<div id="debug-console"></div>
 			</div>
 		</div>
 	</body>

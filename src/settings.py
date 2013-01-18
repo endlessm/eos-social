@@ -5,7 +5,7 @@ from defaults import Defaults
 class MetaSettings(type):
 
 
-    INI_FILE_PATH = '/usr/share/eos-social/social_bar.ini'
+    INI_FILE_PATH = '/etc/eos-social/social_bar.ini'
     config = None
 
     @classmethod

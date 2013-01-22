@@ -1543,3 +1543,17 @@ WHERE filter_key IN
 ORDER BY created_time DESC
 LIMIT 25
 '''
+
+comments_query = '''
+SELECT id, fromid, text, can_remove, user_likes, time, likes
+FROM comment
+WHERE object_id = 483083671730084
+ORDER BY time DESC
+LIMIT 10
+'''
+
+comments_users_query = '''
+SELECT uid, first_name, last_name, name
+FROM user
+WHERE uid IN (SELECT fromid FROM #comments)
+'''

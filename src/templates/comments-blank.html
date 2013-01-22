@@ -1,7 +1,7 @@
 #for $comment in $comments
 <div class="comment-x" >
 
-    <div style="font-size:13px;font-weight:bold;color:#336699;margin-left:5px;">
+    <div style="font-size:11px;font-weight:bold;color:#336699;margin-left:5px;">
     $comment['from']['name']
     </div>
     
@@ -14,4 +14,5 @@
     
 </div>
 #end for
+<script>\$('#comment-post-box-$post_id .comment-x:lt(6)').hide();\$('#comment-post-box-$post_id .comment-x').first().before(\$('<a />').attr('href','#').text('Show more').click(function(){var a = this;\$('#comment-post-box-$post_id .comment-x:not(:visible)').fadeIn(function(){if (\$('#comment-post-box-$post_id .comment-x:not(:visible)').length == 0) {\$(a).remove();}}); return false;}));</script>
 

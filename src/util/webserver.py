@@ -33,7 +33,7 @@ class MyHandler(BaseHTTPRequestHandler):
             fb_response = self.get_new_fb_posts(timestamp, True)
         elif 'comment' in parsed_path.path.lower():
             postid = parsed_qry['id'][0]
-            fb_response = self.get_comments(postid)
+            fb_response = self.get_comments(postid, int(parsed_qry['time'][0]))
         else:
             fb_response = None
         
@@ -55,7 +55,8 @@ class MyHandler(BaseHTTPRequestHandler):
             data['previous_url'] = posts.previous_url
         elif 'comment' in parsed_path.path.lower():
 #            data = fb_response
-            data['html'] = str(self.generate_comments(fb_response, parsed_qry['id'][0]))
+            data['html'] = str(self.generate_comments(fb_response, parsed_qry['id'][0], int(parsed_qry['time'][0])))
+            data['html'] = data['html'].replace('\n','')
             print '+'*80
             print data['html']
             print '+'*80
@@ -114,7 +115,12 @@ class MyHandler(BaseHTTPRequestHandler):
         return page
     
     def get_comments(self, post_id, until=0):
-        query = {'comments':comments_query,'users':comments_users_query}
+        if until:
+            cqry = comments_query % ('483083671730084 AND time < ' + str(until), '10')
+        else:
+            cqry = comments_query % ('483083671730084', '10')
+        
+        query = {'comments':cqry,'users':comments_users_query}
         try:
             _model = SocialBarModel()
             _token = _model.get_stored_fb_access_token()
@@ -125,6 +131,11 @@ class MyHandler(BaseHTTPRequestHandler):
 #            pprint.pprint(result)
 #            print '-'*80
             comments = self.parse_comments(result)
+            print 'In get_comments...'
+            print cqry
+            print '-'*80
+            pprint.pprint(comments)
+            print '-'*80
         except GraphAPIError as error:
             print 'GRAPH API ERROR CAUGHT!'
             print '-'*80
@@ -159,12 +170,33 @@ class MyHandler(BaseHTTPRequestHandler):
 #        print '-'*80
 #        pprint.pprint(comments)
 #        print '-'*80
-        
+        comments.reverse()
         return comments
     
-    def generate_comments(self, comments, post_id):
+    def generate_comments(self, comments, post_id, time):
+        pprint.pprint(comments)
+        print '*'*80
+        print post_id
+        print '*'*80
+        print time
+        print '*'*80
         params = [{"comments":comments},
-                  {"post_id":post_id}]
+                  {"post_id":post_id},
+                  {"comments_page_size":10},
+                  {"initial_comments_number":4}]
+        if time == 0:
+            params.append({'first_batch':True})
+        else:
+            params.append({'first_batch':False})\
+        
+        if len(comments) < 10:
+            params.append({'has_more_comments':False})
+            params.append({'last_comment_time':0})
+        else:
+            params.append({'has_more_comments':True})
+            params.append({'last_comment_time':comments[0]['time']})
+        pprint.pprint(params)
+        print '*'*80
         page = Template(file = '/usr/share/eos-social/templates/comments-blank.html', searchList = params)
         return page
     

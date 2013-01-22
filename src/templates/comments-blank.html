@@ -14,5 +14,58 @@
     
 </div>
 #end for
-<script>\$('#comment-post-box-$post_id .comment-x:lt(6)').hide();\$('#comment-post-box-$post_id .comment-x').first().before(\$('<a />').attr('href','#').text('see more').click(function(){var a = this;\$('#comment-post-box-$post_id .comment-x:not(:visible)').fadeIn(function(){if (\$('#comment-post-box-$post_id .comment-x:not(:visible)').length == 0) {\$(a).remove();}}); return false;}));</script>
+
+#if $first_batch
+    <script>
+    var a_more = \$('<a class="show-more"/>').attr('href','#').text('see more');
+    a_more.click(function() {
+            comment_post('$post_id', $last_comment_time);
+        }
+    );
+    var how_many = $comments_page_size-$initial_comments_number;
+    \$('#comment-post-box-$post_id .comment-x:lt('+how_many+')').hide();
+    var see_more_div = \$('<div class="first-batch-$post_id"/>');
+    see_more_div.attr('style','margin-left:10px;margin-bottom:25px;font-size:11px;');
+    
+    see_more_div.append(a_more);
+    a_more.hide();
+    var a_hidden = \$('<a class="show-hidden"/>').attr('href','#').text('see more');
+    a_hidden.click(function(){
+            var a = this;
+            \$('#comment-post-box-$post_id .comment-x:not(:visible)').fadeIn(function(){
+             if (\$('#comment-post-box-$post_id .comment-x:not(:visible)').length == 0) {
+                \$('.first-batch-$post_id a.show-hidden').hide();
+                #if $has_more_comments
+                    \$('.first-batch-$post_id a.show-more').show();
+                #end if
+             }
+            });
+            return false;
+        });
+    see_more_div.append(a_hidden);
+
+    if (\$('#comment-post-box-$post_id .comment-x:not(:visible)').length != 0) {
+        \$('#comment-post-box-$post_id .comment-x').first().before(see_more_div);
+    }
+    </script>
+#else
+    <script>
+    \$('#comment-post-box-$post_id script.first_batch').remove();
+    \$('div.first-batch-$post_id').remove();
+    \$('div.next-batch-$post_id').remove();
+    #if $has_more_comments
+    
+    var see_more_div = \$('<div class="next-batch-$post_id"/>');
+    see_more_div.attr('style','margin-left:10px;margin-bottom:25px;font-size:11px;');
+    see_more_div.append(\$('<a />').attr('href','#').text('see more').click(function(){
+        comment_post('$post_id', $last_comment_time);
+    }));
+    \$('#comment-post-box-$post_id .comment-x').first().before(see_more_div);
+    #end if
+    </script>
+#end if
+
+
+
+
 

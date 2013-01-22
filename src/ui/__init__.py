@@ -116,6 +116,8 @@ class PostMessageSendArea(gtk.Alignment):
         'fb': (32, 32), 
         'send': (20, 21), 
         'cancel': (20, 21), 
+        'image_upload': (20, 21), 
+        'video_upload': (20, 21), 
         }
 
     IMG = {
@@ -222,9 +224,14 @@ class PostMessageSendArea(gtk.Alignment):
         cancel.connect("leave-notify-event", self._on_leave)
         self._skin_it('cancel', cancel)
 
+        image_upload = self._make_button('image_upload', gtk.Button('image_upload'))
+        video_upload = self._make_button('video_upload', gtk.Button('video_upload'))
+
         self.post_toolbar = gtk.HBox()
         self.post_toolbar.pack_end(send, False, False, 5)
         self.post_toolbar.pack_end(cancel, False, False, 5)
+        self.post_toolbar.pack_start(image_upload, False, False, 5)
+        self.post_toolbar.pack_start(video_upload, False, False, 5)
 
         self.post_wraper = gtk.VBox()
         self.post_wraper.pack_start(self.text_area_wraper, True, True)

@@ -16,6 +16,7 @@ from ui import UserNameLabel
 import gettext
 import time
 from settings import Settings
+from ui import SelectVideoDialog
 
 gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 
@@ -148,7 +149,13 @@ class SocialBarView(MainWindow):
         print '_on_image_upload'
 
     def _on_video_upload(self):
-        print '_on_video_upload'
+        select_dialog = SelectVideoDialog()
+        response = select_dialog.run()
+        if response == gtk.RESPONSE_OK:
+            file = select_dialog.get_filename()
+            if file is not None:
+                print 'upload video', repr(file)
+        select_dialog.destroy()
 
     def _on_action(self, widget, action):
         if action == 'post':

@@ -117,8 +117,8 @@ class PostMessageSendArea(gtk.Alignment):
         'fb': (32, 32), 
         'send': (20, 21), 
         'cancel': (20, 21), 
-        'image_upload': (20, 21), 
-        'video_upload': (20, 21), 
+        'image_upload': (23, 16), 
+        'video_upload': (23, 16), 
         }
 
     IMG = {
@@ -136,6 +136,20 @@ class PostMessageSendArea(gtk.Alignment):
           'cancel_button_normal.png', 
           'cancel_button_hover.png', 
           'cancel_button_normal.png', 
+          ), 
+        'image_upload': (
+          'picture_button_normal.png', 
+          'picture_button_down.png', 
+          'picture_button_normal.png',
+          'picture_button_down.png',
+          'picture_button_normal.png',
+          ), 
+        'video_upload': (
+          'play_button_normal.png', 
+          'play_button_down.png',
+          'play_button_normal.png',
+          'play_button_down.png',
+          'play_button_normal.png',
           ), 
         }
 
@@ -225,8 +239,10 @@ class PostMessageSendArea(gtk.Alignment):
         cancel.connect("leave-notify-event", self._on_leave)
         self._skin_it('cancel', cancel)
 
-        image_upload = self._make_button('image_upload', gtk.Button('image_upload'))
-        video_upload = self._make_button('video_upload', gtk.Button('video_upload'))
+        image_upload = self._make_button('image_upload', SimpleButton())
+        self._skin_it('image_upload', image_upload)
+        video_upload = self._make_button('video_upload', SimpleButton())
+        self._skin_it('video_upload', video_upload)
 
         self.post_toolbar = gtk.HBox()
         self.post_toolbar.pack_end(send, False, False, 5)

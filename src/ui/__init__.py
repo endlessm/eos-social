@@ -8,7 +8,7 @@ import gettext
 from simple_button import SimpleButton
 from main_window import MainWindow
 from user_profile_menu import UserProfileMenu
-from dialogs import SelectVideoDialog, SelectImageDialog
+from dialogs import SelectDialog
 
 gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 

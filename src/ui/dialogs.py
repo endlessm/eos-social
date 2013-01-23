@@ -38,16 +38,10 @@ class SelectDialog(gtk.FileChooserDialog):
         else:
             self._try_run_cancel_callback()
 
-
-class SelectVideoDialog(SelectDialog):
-
-
-    def __init__(self, *args, **kwargs):
-        super(SelectVideoDialog, self).__init__(*args, **kwargs)
-
-class SelectImageDialog(SelectDialog):
-
-
-    def __init__(self, *args, **kwargs):
-        super(SelectImageDialog, self).__init__(*args, **kwargs)
+    def filter(self, name, file_types):
+        filter = gtk.FileFilter()
+        filter.set_name(name)
+        for ft in file_types:
+            filter.add_pattern(ft)
+        super(SelectDialog, self).add_filter(filter)
 

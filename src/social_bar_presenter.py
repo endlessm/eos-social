@@ -256,6 +256,7 @@ class SocialBarPresenter:
         return self._model.get_no_picture_file_path()
 
     def get_image_dwn(self, image_url):
+        image_final_url = None
         try:
             url_response = urllib2.urlopen(image_url)
             image_final_url = url_response.geturl()

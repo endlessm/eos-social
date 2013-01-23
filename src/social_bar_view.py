@@ -16,7 +16,7 @@ from ui import UserNameLabel
 import gettext
 import time
 from settings import Settings
-from ui import SelectVideoDialog, SelectImageDialog
+from ui import SelectDialog
 
 gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 
@@ -150,8 +150,12 @@ class SocialBarView(MainWindow):
         def _callback(file_path):
             text = self.post_message_area.get_post_message()
             self._presenter.upload_image(file_path, text)
-        select_dialog = SelectImageDialog(success_callback=_callback)
+        select_dialog = SelectDialog(success_callback=_callback)
         select_dialog.set_title(Settings.SELECT_DIALOG_TITLE)
+        select_dialog.filter(
+          Settings.SELECT_IMAGE_DIALOG_FILTER_NAME, 
+          Settings.SELECT_IMAGE_DIALOG_FILTER
+          )
         select_dialog.run()
         select_dialog.destroy()
 
@@ -159,8 +163,12 @@ class SocialBarView(MainWindow):
         def _callback(file_path):
             text = self.post_message_area.get_post_message()
             self._presenter.upload_video(file_path, text)
-        select_dialog = SelectVideoDialog(success_callback=_callback)
+        select_dialog = SelectDialog(success_callback=_callback)
         select_dialog.set_title(Settings.SELECT_DIALOG_TITLE)
+        select_dialog.filter(
+          Settings.SELECT_VIDEO_DIALOG_FILTER_NAME,
+          Settings.SELECT_VIDEO_DIALOG_FILTER
+          )
         select_dialog.run()
         select_dialog.destroy()
 

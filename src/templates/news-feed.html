@@ -252,14 +252,19 @@
         \$('#comment-icon-'+post_id).attr("onclick", "colapse_comments('" + post_id + "');");
         \$("#scroller").mCustomScrollbar("update");
         //if there are no comments, dont go to server
-        //if (\$('#comment-count-'+post_id).text() == '') {
-        //    \$('#comment-loader-'+post_id).hide();
-        //    return;
-        //}
+        if (\$('#comments-count-'+post_id).text().trim() == '') {
+            \$('#comment-loader-'+post_id).hide();
+            return;
+        }
         
         \$('#comment-loader-'+post_id).show();
+        //get the number of visigle comments
+        
+        //get total number of comments
+        var total_comments = \$('#comments-count-'+post_id).text().trim();
+        if (total_comments == '') { total_comments = '0'; }
         var req = \$.ajax({
-            url: 'http://localhost:8088/COMMENT?id=' + post_id + '&time=' + time,
+            url: 'http://localhost:8088/COMMENT?id=' + post_id + '&time=' + time + '&total_comments=' + total_comments + '&visible_comments=' + \$('#comment-post-box-'+post_id+' .comment-x:visible').length,
             crossDomain: true,
             dataType: 'jsonp',
             jsonp: 'onJSONPLoad',
@@ -416,7 +421,7 @@
                         <div class="comments-container" id="comments-$post.id"></div>
                         
                         <div class="comment-loader" id="comment-loader-$post.id" style="text-align:center;">
-                        <img src="data:image/gif;base64,R0lGODlhEAALAPQAAP8AAAAAANoAANAAAOoAAAYAAAAAAC4AAIIAAGAAALoAACIAAEoAAIoAAGQAAL4AACYAAAQAAE4AAOYAANgAAPQAADgAANwAAPIAALYAAKAAAMoAAO4AAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCwAAACwAAAAAEAALAAAFLSAgjmRpnqSgCuLKAq5AEIM4zDVw03ve27ifDgfkEYe04kDIDC5zrtYKRa2WQgAh+QQJCwAAACwAAAAAEAALAAAFJGBhGAVgnqhpHIeRvsDawqns0qeN5+y967tYLyicBYE7EYkYAgAh+QQJCwAAACwAAAAAEAALAAAFNiAgjothLOOIJAkiGgxjpGKiKMkbz7SN6zIawJcDwIK9W/HISxGBzdHTuBNOmcJVCyoUlk7CEAAh+QQJCwAAACwAAAAAEAALAAAFNSAgjqQIRRFUAo3jNGIkSdHqPI8Tz3V55zuaDacDyIQ+YrBH+hWPzJFzOQQaeavWi7oqnVIhACH5BAkLAAAALAAAAAAQAAsAAAUyICCOZGme1rJY5kRRk7hI0mJSVUXJtF3iOl7tltsBZsNfUegjAY3I5sgFY55KqdX1GgIAIfkECQsAAAAsAAAAABAACwAABTcgII5kaZ4kcV2EqLJipmnZhWGXaOOitm2aXQ4g7P2Ct2ER4AMul00kj5g0Al8tADY2y6C+4FIIACH5BAkLAAAALAAAAAAQAAsAAAUvICCOZGme5ERRk6iy7qpyHCVStA3gNa/7txxwlwv2isSacYUc+l4tADQGQ1mvpBAAIfkECQsAAAAsAAAAABAACwAABS8gII5kaZ7kRFGTqLLuqnIcJVK0DeA1r/u3HHCXC/aKxJpxhRz6Xi0ANAZDWa+kEAA7AAAAAAAAAAAA"/>
+                        <img src="data:image/gif;base64,R0lGODlhEAALAPQAAP///wAAANra2tDQ0Orq6gYGBgAAAC4uLoKCgmBgYLq6uiIiIkpKSoqKimRkZL6+viYmJgQEBE5OTubm5tjY2PT09Dg4ONzc3PLy8ra2tqCgoMrKyu7u7gAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCwAAACwAAAAAEAALAAAFLSAgjmRpnqSgCuLKAq5AEIM4zDVw03ve27ifDgfkEYe04kDIDC5zrtYKRa2WQgAh+QQJCwAAACwAAAAAEAALAAAFJGBhGAVgnqhpHIeRvsDawqns0qeN5+y967tYLyicBYE7EYkYAgAh+QQJCwAAACwAAAAAEAALAAAFNiAgjothLOOIJAkiGgxjpGKiKMkbz7SN6zIawJcDwIK9W/HISxGBzdHTuBNOmcJVCyoUlk7CEAAh+QQJCwAAACwAAAAAEAALAAAFNSAgjqQIRRFUAo3jNGIkSdHqPI8Tz3V55zuaDacDyIQ+YrBH+hWPzJFzOQQaeavWi7oqnVIhACH5BAkLAAAALAAAAAAQAAsAAAUyICCOZGme1rJY5kRRk7hI0mJSVUXJtF3iOl7tltsBZsNfUegjAY3I5sgFY55KqdX1GgIAIfkECQsAAAAsAAAAABAACwAABTcgII5kaZ4kcV2EqLJipmnZhWGXaOOitm2aXQ4g7P2Ct2ER4AMul00kj5g0Al8tADY2y6C+4FIIACH5BAkLAAAALAAAAAAQAAsAAAUvICCOZGme5ERRk6iy7qpyHCVStA3gNa/7txxwlwv2isSacYUc+l4tADQGQ1mvpBAAIfkECQsAAAAsAAAAABAACwAABS8gII5kaZ7kRFGTqLLuqnIcJVK0DeA1r/u3HHCXC/aKxJpxhRz6Xi0ANAZDWa+kEAA7AAAAAAAAAAAA"/>
                         </div>
 						    <form method="get" action="eossocialbar:POST_COMMENT?id=$post.id">
 						        <input type="text" class="comment-input-box" name="comment-text" id="comment-text-$post.id">

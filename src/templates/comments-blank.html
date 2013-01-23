@@ -22,10 +22,19 @@
             comment_post('$post_id', $last_comment_time);
         }
     );
-    var how_many = $comments_page_size-$initial_comments_number;
-    \$('#comment-post-box-$post_id .comment-x:lt('+how_many+')').hide();
+    
     var see_more_div = \$('<div class="first-batch-$post_id"/>');
     see_more_div.attr('style','margin-left:10px;margin-bottom:25px;font-size:11px;');
+    
+    if (\$('#comment-post-box-$post_id .comment-x').length > $initial_comments_number) {
+        var how_many = 0;
+        if (\$('#comment-post-box-$post_id .comment-x').length < $comments_page_size) {
+            how_many = \$('#comment-post-box-$post_id .comment-x').length - $initial_comments_number;
+        } else {
+            how_many = $comments_page_size-$initial_comments_number;
+        }
+        \$('#comment-post-box-$post_id .comment-x:lt('+how_many+')').hide();
+    }
     
     see_more_div.append(a_more);
     a_more.hide();
@@ -54,13 +63,21 @@
     \$('div.first-batch-$post_id').remove();
     \$('div.next-batch-$post_id').remove();
     #if $has_more_comments
-    
-    var see_more_div = \$('<div class="next-batch-$post_id"/>');
-    see_more_div.attr('style','margin-left:10px;margin-bottom:25px;font-size:11px;');
-    see_more_div.append(\$('<a />').attr('href','#').text('see more').click(function(){
-        comment_post('$post_id', $last_comment_time);
-    }));
-    \$('#comment-post-box-$post_id .comment-x').first().before(see_more_div);
+        var see_more_div = \$('<div class="next-batch-$post_id"/>');
+        see_more_div.attr('style','margin-left:10px;margin-bottom:25px;font-size:11px;');
+        see_more_div.append(\$('<a />').attr('href','#').text('see more').click(function(){
+            comment_post('$post_id', $last_comment_time);
+        }));
+        \$('#comment-post-box-$post_id .comment-x').first().before(see_more_div);
+    #else
+        #if $more_on_facebook
+            var see_more_div = \$('<div class="next-batch-$post_id"/>');
+            see_more_div.attr('style','margin-left:10px;margin-bottom:25px;font-size:11px;');
+            see_more_div.append(\$('<a />').attr('href','#').text('see remaining comments on facebook').click(function(){
+                \$('#$post_id .clickable').click();
+            }));
+            \$('#comment-post-box-$post_id .comment-x').first().before(see_more_div);
+        #end if
     #end if
     </script>
 #end if

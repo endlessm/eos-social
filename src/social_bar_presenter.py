@@ -344,3 +344,8 @@ class SocialBarPresenter:
         except:
             return False
 
+    def upload_image(self, file_path, message=None):
+        print 'upload_image', repr(file_path), repr(message)
+
+    def upload_video(self, file_path, message=None):
+        print 'upload_video', repr(file_path), repr(message)

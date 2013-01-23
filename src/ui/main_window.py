@@ -27,6 +27,7 @@ class MainWindow(SkinableWindow, WM_Inspect_MixIn):
     def __init__(self, width=400, top_offset=45, bottom_offset=38):
         SkinableWindow.__init__(self, gtk.WINDOW_TOPLEVEL)
         WM_Inspect_MixIn.__init__(self)
+        self._ignore_win_names = ()
 
         height = gtk.gdk.screen_height() - top_offset - bottom_offset
         self.show_state = WindowStateData(gtk.gdk.screen_width()-width, 
@@ -40,6 +41,9 @@ class MainWindow(SkinableWindow, WM_Inspect_MixIn):
         self.connect('delete-event', lambda w, e: True)
         self._set_options()
         self.set_state(self.hide_state)
+
+    def set_ignore_win_names(self, names):
+        self._ignore_win_names = names
 
     def _get_current_state(self):
         try:
@@ -69,10 +73,7 @@ class MainWindow(SkinableWindow, WM_Inspect_MixIn):
         self.set_skip_pager_hint(True)
 
     def _active_win_callback(self, active_name):
-        if active_name == self.get_title():
-            self._last_show_state = 'max'
-            self.show()
-        elif active_name == 'Endless OS Browser':
+        if active_name in self._ignore_win_names:
             self._last_show_state = 'max'
             self.show()
         else:

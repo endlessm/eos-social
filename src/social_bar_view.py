@@ -16,7 +16,7 @@ from ui import UserNameLabel
 import gettext
 import time
 from settings import Settings
-from ui import SelectVideoDialog
+from ui import SelectVideoDialog, SelectImageDialog
 
 gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 
@@ -29,6 +29,7 @@ class SocialBarView(MainWindow):
         self.connect('destroy', self._destroy)
         self._presenter = None
         self.set_title(Settings.MAIN_WINDOW_TITLE)
+        super(SocialBarView, self).set_ignore_win_names(Settings.IGNORE_WIN_NAMES)
         #self.set_title('Endless Social Bar')
 
     def set_presenter(self, presenter):
@@ -146,15 +147,21 @@ class SocialBarView(MainWindow):
             self.post_message_area.disable_posting()
 
     def _on_image_upload(self):
-        print '_on_image_upload'
+        def _callback(file_path):
+            text = self.post_message_area.get_post_message()
+            self._presenter.upload_image(file_path, text)
+        select_dialog = SelectImageDialog(success_callback=_callback)
+        select_dialog.set_title(Settings.SELECT_DIALOG_TITLE)
+        select_dialog.run()
+        select_dialog.destroy()
 
     def _on_video_upload(self):
-        select_dialog = SelectVideoDialog()
-        response = select_dialog.run()
-        if response == gtk.RESPONSE_OK:
-            file = select_dialog.get_filename()
-            if file is not None:
-                print 'upload video', repr(file)
+        def _callback(file_path):
+            text = self.post_message_area.get_post_message()
+            self._presenter.upload_video(file_path, text)
+        select_dialog = SelectVideoDialog(success_callback=_callback)
+        select_dialog.set_title(Settings.SELECT_DIALOG_TITLE)
+        select_dialog.run()
         select_dialog.destroy()
 
     def _on_action(self, widget, action):

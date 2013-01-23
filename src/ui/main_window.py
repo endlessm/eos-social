@@ -61,12 +61,12 @@ class MainWindow(SkinableWindow, WM_Inspect_MixIn):
     def _set_options(self):
         self.set_resizable(False)
         self.set_role("eos-non-max")
-        #self.set_skip_taskbar_hint(True)
+        self.set_skip_taskbar_hint(True)
         self.stick() # this sticks on all desktops
         #self.set_keep_above(True)
         self.set_decorated(False)
         self.set_modal(True)
-        #self.set_skip_pager_hint(True)
+        self.set_skip_pager_hint(True)
 
     def _active_win_callback(self, active_name):
         if active_name == self.get_title():
@@ -84,7 +84,6 @@ class MainWindow(SkinableWindow, WM_Inspect_MixIn):
         self.set_state(self.show_state)
 
     def hide(self):
-        return
         self.set_state(self.hide_state)
         self.iconify()
 

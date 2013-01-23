@@ -1,6 +1,6 @@
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from facebook.facebook import GraphAPIError, GraphAPI
-from util import posts_query, users_query, older_posts_query, newer_posts_query
+from util import posts_query, users_query, older_posts_query, newer_posts_query, comments_query, comments_users_query
 from facebook.facebook_posts import FacebookPosts
 from social_bar_model import SocialBarModel
 import json
@@ -17,31 +17,52 @@ class MyHandler(BaseHTTPRequestHandler):
     
     def do_GET(self):
         parsed_path = urlparse.urlparse(self.path)
-
         parsed_qry = urlparse.parse_qs(parsed_path.query)
         jsonp_string = parsed_qry['onJSONPLoad'][0]
-        timestamp = parsed_qry['timestamp'][0]
         
+        print '-'*80
+        print 'PARSED PATH :', parsed_path
+        print 'PARSED QUERY:', parsed_qry
+        print 'JSONP STRING:', jsonp_string
+        print '-'*80
         if 'newer' in parsed_path.path.lower():
+            timestamp = parsed_qry['timestamp'][0]
             fb_response = self.get_new_fb_posts(timestamp, False)
         elif 'older' in parsed_path.path.lower():
+            timestamp = parsed_qry['timestamp'][0]
             fb_response = self.get_new_fb_posts(timestamp, True)
+        elif 'comment' in parsed_path.path.lower():
+            postid = parsed_qry['id'][0]
+            fb_response = self.get_comments(postid, int(parsed_qry['time'][0]))
         else:
             fb_response = None
         
         if not fb_response:
             posts = {}
         else:
-            posts = self.parse_posts(fb_response)
+            if 'comment' not in parsed_path.path.lower():
+                posts = self.parse_posts(fb_response)
         
-        html = self.generate_posts_elements(posts.posts)
         data = {}
-        data['html'] = str(html)
+        
         if 'older' in parsed_path.path.lower():
+            html = self.generate_posts_elements(posts.posts)
+            data['html'] = str(html)
             data['next_url'] = posts.next_url
-        else:
+        elif 'newer' in parsed_path.path.lower():
+            html = self.generate_posts_elements(posts.posts)
+            data['html'] = str(html)
             data['previous_url'] = posts.previous_url
-            
+        elif 'comment' in parsed_path.path.lower():
+#            data = fb_response
+            data['html'] = str(self.generate_comments(fb_response, parsed_qry['id'][0], int(parsed_qry['time'][0]), int(parsed_qry['total_comments'][0]), int(parsed_qry['visible_comments'][0])))
+            data['html'] = data['html'].replace('\n','')
+#            print '+'*80
+#            print data['html']
+#            print '+'*80
+#            print '+'*80
+#            print simplejson.dumps(data['html'])
+#            print '+'*80
         to_write = jsonp_string + '(' + simplejson.dumps(data) + ')'
         
         self.send_response(200)
@@ -92,6 +113,106 @@ class MyHandler(BaseHTTPRequestHandler):
                   {'auto_refresh_interval':Settings.FB_AUTO_REFRESH_INTERVAL}]
         page = Template(file = '/usr/share/eos-social/templates/posts-array.html', searchList = params)
         return page
+    
+    def get_comments(self, post_id, until=0):
+        #469229153112182 --13
+        #483083671730084 -- MLOGO
+        #293579017411402 -- pedesetak
+        #543063322379620 -- 4
+        if '_' in post_id:
+            ids = post_id.split('_')
+            post_id = ids[len(ids)-1]
+        if until:
+            cqry = comments_query % (str(post_id) + ' AND time < ' + str(until), str(Settings.FB_COMMENTS_PER_PAGE))
+        else:
+            cqry = comments_query % (str(post_id), str(Settings.FB_COMMENTS_PER_PAGE))
+        
+        query = {'comments':cqry,'users':comments_users_query}
+        try:
+            _model = SocialBarModel()
+            _token = _model.get_stored_fb_access_token()
+            _graph_api = GraphAPI(access_token=_token)
+            result = _graph_api.fql(query)
+#            print 'In get_comments...'
+#            print '-'*80
+#            pprint.pprint(result)
+#            print '-'*80
+            comments = self.parse_comments(result)
+#            print 'In get_comments...'
+#            print cqry
+#            print '-'*80
+#            pprint.pprint(comments)
+#            print '-'*80
+        except GraphAPIError as error:
+            print 'GRAPH API ERROR CAUGHT!'
+            print '-'*80
+            pprint.pprint(error)
+            print '-'*80
+            #self.oauth_exception_handler(error.result)
+            return None
+        except URLError as e:
+            #self.url_exception_handler()
+            return None
+        except:
+            return None
+            
+        return comments
+    
+    def parse_comments(self, data):
+        comments = []
+        users = []
+        
+        for _set in data:
+            if _set['name'] == 'comments':
+                comments = _set['fql_result_set']
+            else:
+                users = _set['fql_result_set']
+        
+        for comment in comments:
+            for user in users:
+                if comment['fromid'] == user['uid']:
+                    comment['from'] = user
+                    break
+#        print 'In parse_comments...'
+#        print '-'*80
+#        pprint.pprint(comments)
+#        print '-'*80
+        comments.reverse()
+        return comments
+    
+    def generate_comments(self, comments, post_id, time, total, visible):
+#        pprint.pprint(comments)
+#        print '*'*80
+#        print post_id
+#        print '*'*80
+#        print time
+#        print '*'*80
+        params = [{"comments":comments},
+                  {"post_id":post_id},
+                  {"comments_page_size":str(Settings.FB_COMMENTS_PER_PAGE)},
+                  {"initial_comments_number":str(Settings.FB_INITIAL_COMMENTS_NUMBER)}]
+        if time == 0:
+            params.append({'first_batch':True})
+        else:
+            params.append({'first_batch':False})
+        
+        if len(comments) + visible >= total or not len(comments):
+            if not len(comments):
+                params.append({"more_on_facebook":True})
+            else:
+                params.append({"more_on_facebook":False})
+            params.append({'has_more_comments':False})
+            params.append({'last_comment_time':0})
+        else:
+            params.append({"more_on_facebook":False})
+            params.append({'has_more_comments':True})
+            params.append({'last_comment_time':comments[0]['time']})
+#        pprint.pprint(params)
+#        print '*'*80
+        page = Template(file = '/usr/share/eos-social/templates/comments-blank.html', searchList = params)
+        return page
+    
+    
         
 def main():
     try:

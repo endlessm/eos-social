@@ -1,4 +1,4 @@
-from util.util import CSS, SLICKSCROLL_CSS, SLICKSCROLL_JS, MOUSE_WHEEL_JS, posts_query, users_query, older_posts_query
+from util.util import CSS, SLICKSCROLL_CSS, SLICKSCROLL_JS, MOUSE_WHEEL_JS, posts_query, users_query, older_posts_query, comments_query, comments_users_query
 from facebook.facebook import GraphAPIError, GraphAPI
 from facebook.facebook_posts import FacebookPosts
 import subprocess
@@ -44,6 +44,7 @@ class SocialBarPresenter:
         query = {'posts':posts_query,'users':users_query}
         try:
             result = self._graph_api.fql(query)
+            #pprint.pprint(result)
         except GraphAPIError as error:
             self.oauth_exception_handler(error.result)
             return None
@@ -207,7 +208,29 @@ class SocialBarPresenter:
             self.get_fb_news_feed()
         return 1
         
-    def get_commments(self, post_id):
+    def get_commments(self, post_id, until=0):
+        query = {'comments':comments_query,'users':comments_users_query}
+        try:
+            result = self._graph_api.fql(query)
+#            print 'In get_comments...'
+#            print '-'*80
+#            pprint.pprint(result)
+#            print '-'*80
+            comments = self.parse_comments(result)
+            return comments
+        except GraphAPIError as error:
+#            print 'GRAPH API ERROR CAUGHT!'
+#            print '-'*80
+#            pprint.pprint(error)
+#            print '-'*80
+            self.oauth_exception_handler(error.result)
+            return None
+        except URLError as e:
+            self.url_exception_handler()
+            return None
+        except:
+            return None
+            
         raw_comments = self._graph_api.request(post_id+'/comments')
         return raw_comments
     
@@ -311,6 +334,13 @@ class SocialBarPresenter:
     
     def display_comments(self, parsed_query):
         comments = self.get_commments(parsed_query['id'][0])
+#        print 'In display_comments...'
+#        print '-'*80
+#        pprint.pprint(comments)
+#        print '-'*80
+        return
+        
+        
         comments['data'].reverse()
         if len(comments['data']) > 4:
             to_show = comments['data'][:4]
@@ -343,4 +373,25 @@ class SocialBarPresenter:
             return True
         except:
             return False
-
+    
+    def parse_comments(self, data):
+#        print 'In parse_comments...'
+#        print '-'*80
+#        pprint.pprint(data)
+#        print '-'*80
+        comments = []
+        users = []
+        
+        for _set in data:
+            if _set['name'] == 'comments':
+                comments = _set['fql_result_set']
+            else:
+                users = _set['fql_result_set']
+        
+        for comment in comments:
+            for user in users:
+                if comment['fromid'] == user['uid']:
+                    comment['from'] = user
+                    break
+        
+        return comments

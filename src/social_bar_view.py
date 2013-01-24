@@ -17,6 +17,7 @@ import gettext
 import time
 from settings import Settings
 from ui import SelectDialog
+import os
 
 gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 
@@ -30,7 +31,6 @@ class SocialBarView(MainWindow):
         self._presenter = None
         self.set_title(Settings.MAIN_WINDOW_TITLE)
         super(SocialBarView, self).set_ignore_win_names(Settings.IGNORE_WIN_NAMES)
-        #self.set_title('Endless Social Bar')
 
     def set_presenter(self, presenter):
         super(SocialBarView, self).set_background_image('/usr/share/eos-social/images/bg-right.png')
@@ -99,20 +99,30 @@ class SocialBarView(MainWindow):
     def _on_post_action(self):
         self.post_message.toggle_text_field()
         self.post_message_area.set_default_text()
+        self.post_message_area.set_selected_file_path(None)
 
     def _on_cancel_action(self):
         self.post_message.collapse_text_field()
         self.post_message_area.set_default_text()
+        self.post_message_area.set_selected_file_path(None)
 
     def _on_close_action(self):
         self.hide()
 
     def _on_send_action(self):
         text = self.post_message_area.get_post_message()
+        selected_file = self.post_message_area.get_selected_file_path()
+        selected_file_type = self.post_message_area.get_selected_file_type()
+        if selected_file_type == 'image':
+            self._presenter.upload_image(selected_file, text)
+        elif selected_file_type == 'video':
+            self._presenter.upload_video(selected_file, text)
+        else:
+            if text is not None:
+                self._presenter.post_to_fb(text)
         self.post_message_area.clear_text(True)
+        self.post_message_area.set_selected_file_path(None)
         self.post_message.collapse_text_field()
-        if text is not None:
-            self._presenter.post_to_fb(text)
 
     def _on_user_name_action(self):
         self._presenter.show_profil_page()
@@ -141,7 +151,8 @@ class SocialBarView(MainWindow):
 
     def _on_post_msg_changed(self):
         text = self.post_message_area.get_post_message()
-        if text is not None:
+        selected_file = self.post_message_area.get_selected_file_path()
+        if (text is not None) or (selected_file is not None):
             self.post_message_area.enable_posting()
         else:
             self.post_message_area.disable_posting()
@@ -149,7 +160,8 @@ class SocialBarView(MainWindow):
     def _on_image_upload(self):
         def _callback(file_path):
             text = self.post_message_area.get_post_message()
-            self._presenter.upload_image(file_path, text)
+            self.post_message_area.set_selected_file_path(file_path, type='image')
+            self._on_post_msg_changed()
         select_dialog = SelectDialog(success_callback=_callback)
         select_dialog.set_title(Settings.SELECT_DIALOG_TITLE)
         select_dialog.filter(
@@ -162,7 +174,8 @@ class SocialBarView(MainWindow):
     def _on_video_upload(self):
         def _callback(file_path):
             text = self.post_message_area.get_post_message()
-            self._presenter.upload_video(file_path, text)
+            self.post_message_area.set_selected_file_path(file_path, type='video')
+            self._on_post_msg_changed()
         select_dialog = SelectDialog(success_callback=_callback)
         select_dialog.set_title(Settings.SELECT_DIALOG_TITLE)
         select_dialog.filter(

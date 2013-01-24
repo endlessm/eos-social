@@ -208,6 +208,8 @@ class PostMessageSendArea(gtk.Alignment):
     def __init__(self):
         super(PostMessageSendArea, self).__init__()
         self._buttons = {}
+        self.file_path = None
+        self.file_type = None
         self.set_size_request(400, 100)
         self.text_area = gtk.TextView()
         self.text_area.set_editable(True)
@@ -243,18 +245,38 @@ class PostMessageSendArea(gtk.Alignment):
         self._skin_it('image_upload', image_upload)
         video_upload = self._make_button('video_upload', SimpleButton())
         self._skin_it('video_upload', video_upload)
-
+        self.uploaded_file_label = gtk.Label()
+        self.uploaded_file_label.set_alignment(0, 0.5)
         self.post_toolbar = gtk.HBox()
         self.post_toolbar.pack_end(send, False, False, 5)
         self.post_toolbar.pack_end(cancel, False, False, 5)
         self.post_toolbar.pack_start(image_upload, False, False, 5)
         self.post_toolbar.pack_start(video_upload, False, False, 5)
+        self.post_toolbar.pack_start(self.uploaded_file_label, True, True, 5)
 
         self.post_wraper = gtk.VBox()
         self.post_wraper.pack_start(self.text_area_wraper, True, True)
         self.post_wraper.pack_end(self.post_toolbar, False, False, 3)
 
         self.add(self.post_wraper)
+
+    def set_selected_file_path(self, file_path, type=None):
+        if file_path and os.path.exists(file_path) and (type in ('video', 'image')):
+            self.file_path = file_path
+            self.file_type = type
+            file_name = os.path.basename(file_path)
+        else:
+            self.file_path = None
+            self.file_type = None
+            file_name = ''
+        self.uploaded_file_label.set_markup(
+          '<span foreground="white">' + file_name + '</span>')
+
+    def get_selected_file_path(self):
+        return self.file_path
+
+    def get_selected_file_type(self):
+        return self.file_type
 
     def get_post_message(self):
         text = self._get_text()

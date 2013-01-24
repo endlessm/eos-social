@@ -47,7 +47,11 @@
 						    <!-- Like url -->
 						        <ul class="left-list">
 						            <li class="link-l">
-						                <a href="eossocialbar:LIKE?id=$post.id" id="like-$post.id" style="font-size:12px;">$like_string</a>
+						                #if $post.likes['user_likes']
+						                    <a href="eossocialbar:UNLIKE?id=$post.id" id="like-$post.id" style="font-size:12px;">$unlike_string</a>
+						                #else
+						                    <a href="eossocialbar:LIKE?id=$post.id" id="like-$post.id" style="font-size:12px;">$like_string</a>
+						                #end if
 						            </li>						    
 						            <b>&#183;</b>
 						    <!-- Comment url -->

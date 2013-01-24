@@ -110,7 +110,8 @@ class MyHandler(BaseHTTPRequestHandler):
         params = [{'posts':posts},
                   {'like_string':_('like')},
                   {'comment_string':_('comment')},
-                  {'auto_refresh_interval':Settings.FB_AUTO_REFRESH_INTERVAL}]
+                  {'auto_refresh_interval':Settings.FB_AUTO_REFRESH_INTERVAL},
+                  {'unlike_string':_('unlike')}]
         page = Template(file = '/usr/share/eos-social/templates/posts-array.html', searchList = params)
         return page
     

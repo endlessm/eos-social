@@ -43,7 +43,7 @@
 	
 	function like_success(id, liked_string) {
         document.getElementById("like-"+id).innerHTML = liked_string;
-        document.getElementById("like-"+id).href = 'eossocialbar:#';
+        document.getElementById("like-"+id).href = 'eossocialbar:UNLIKE?id='+id;
         number = parseInt(document.getElementById("likes-count-"+id).innerHTML);
         if (number) {
         number = number + 1;
@@ -53,17 +53,17 @@
         document.getElementById("likes-count-"+id).innerHTML = number
     }
     
-    function unlike_success(id) {
-        alert('Under construction.\nComing soon.');
-        //document.getElementById("like-"+id).innerHTML = 'Like';
-        //alert(document.getElementById("like-"+id).href);
-        //document.getElementById("like-"+id).href = 'eossocilabar:LIKE?id='+id;
-        //alert(document.getElementById("like-"+id).href);
-        //number = parseInt(document.getElementById("likes-count-"+id).innerHTML);
-        //if (number) {
-        //number = number - 1;
-        //}
-        //document.getElementById("likes-count-"+id).innerHTML = number
+    function unlike_success(id, like_string) {
+        
+        document.getElementById("like-"+id).innerHTML = like_string;
+        document.getElementById("like-"+id).href = 'eossocilabar:LIKE?id='+id;
+        number = parseInt(document.getElementById("likes-count-"+id).innerHTML);
+        
+        if (number) {
+            number = number - 1;
+            document.getElementById("likes-count-"+id).innerHTML = number;
+        }
+        
     }
     
     
@@ -303,7 +303,11 @@
 						    <!-- Like url -->
 						        <ul class="left-list">
 						            <li class="link-l">
-						                <a href="eossocialbar:LIKE?id=$post.id" id="like-$post.id" style="font-size:12px;">$like_string</a>
+						                #if $post.likes['user_likes']
+						                    <a href="eossocialbar:UNLIKE?id=$post.id" id="like-$post.id" style="font-size:12px;">$unlike_string</a>
+						                #else
+						                    <a href="eossocialbar:LIKE?id=$post.id" id="like-$post.id" style="font-size:12px;">$like_string</a>
+						                #end if
 						            </li>						    
 						            <b>&#183;</b>
 						    <!-- Comment url -->

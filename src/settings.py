@@ -22,13 +22,13 @@ class MetaSettings(type):
         try:
             value = cls.config.get('MAIN', name)
         except:
-            print 'no value::%r in MAIN section' % name
+            print 'no value::', repr(name), ' in MAIN section'
             print 'fallback to default value ..'
             if hasattr(Defaults, name):
                 value = getattr(Defaults, name)
-                print 'found default value, using %r' % value
+                print 'found default value, using', repr(value)
             else:
-                print 'no default value for %r, using None' % name
+                print 'no default value, using None'
         return value
 
     @classmethod

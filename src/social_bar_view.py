@@ -18,6 +18,8 @@ import time
 from settings import Settings
 from ui import SelectDialog
 import os
+from ui import ErrorDialog
+import json
 
 gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 
@@ -79,6 +81,16 @@ class SocialBarView(MainWindow):
         y = self.user_name.allocation.y
         self.post_message.toolbar.move(self.user_name, x, y)
 
+    def show_error_dlg(self):
+        self.freeze()
+        err_dlg = ErrorDialog()
+        err_dlg.set_title(Settings.ERROR_DIALOG_TITLE)
+        state = self.get_current_state()
+        if state is not None:
+            err_dlg.run(state.x, state.y, state.width, Settings.ERROR_DIALOG_HEIGHT)
+            err_dlg.destroy()
+        self.unfreeze()
+
     def _on_avatar_action(self):
         if self.user_avatar.get_is_expanded():
             self._presenter.show_profil_page()
@@ -109,14 +121,29 @@ class SocialBarView(MainWindow):
     def _on_close_action(self):
         self.hide()
 
+    def _is_success(self, ret):
+        try:
+            status = json.loads(ret)
+            code = status.get('code', 1)
+            if code == 0:
+                return True
+        except:
+            from traceback import format_exc
+            print format_exc()
+        return False
+
     def _on_send_action(self):
         text = self.post_message_area.get_post_message()
         selected_file = self.post_message_area.get_selected_file_path()
         selected_file_type = self.post_message_area.get_selected_file_type()
         if selected_file_type == 'image':
-            self._presenter.upload_image(selected_file, text)
+            ret = self._presenter.upload_image(selected_file, text)
+            if not self._is_success(ret):
+                self.show_error_dlg()
         elif selected_file_type == 'video':
-            self._presenter.upload_video(selected_file, text)
+            ret = self._presenter.upload_video(selected_file, text)
+            if not self._is_success(ret):
+                self.show_error_dlg()
         else:
             if text is not None:
                 self._presenter.post_to_fb(text)

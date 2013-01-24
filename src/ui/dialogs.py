@@ -1,4 +1,9 @@
 import gtk
+import pango
+from simple_button import SimpleButton
+import gettext
+
+gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 
 
 class SelectDialog(gtk.FileChooserDialog):
@@ -45,3 +50,53 @@ class SelectDialog(gtk.FileChooserDialog):
             filter.add_pattern(ft)
         super(SelectDialog, self).add_filter(filter)
 
+
+class ErrorDialog(gtk.Dialog):
+
+    IMG_PATH = '/usr/share/eos-social/images/'
+
+    def __init__(self, *args, **kwargs):
+        super(ErrorDialog, self).__init__(*args, **kwargs)
+        color = gtk.gdk.color_parse('#222222')
+        super(ErrorDialog, self).modify_bg(gtk.STATE_NORMAL, color)
+        self._set_options()
+        self.hbox = gtk.HBox()
+        self.vbox.pack_start(self.hbox, False, False, 5)
+        self.close_button = SimpleButton()
+        self.close_button.show_image(self.IMG_PATH + 'cancel_button_normal.png')
+        self.close_button.set_image('click', self.IMG_PATH + 'cancel_button_down.png')
+        self.close_button.set_image('release', self.IMG_PATH + 'cancel_button_normal.png')
+        self.close_button.set_image('enter', self.IMG_PATH + 'cancel_button_hover.png')
+        self.close_button.set_image('leave', self.IMG_PATH + 'cancel_button_normal.png')
+        self.close_button.connect('button-press-event', lambda w, e: self.destroy())
+
+        self.label_h1 = gtk.Label()
+        self.label_h1.set_markup(
+          """<span foreground="white">""" + _('ERROR') + """</span>""")
+        self.label_h1.modify_font(pango.FontDescription("sans 14"))
+        self.vbox.pack_start(self.label_h1, False, False, 0)
+        self.label_h2 = gtk.Label()
+        self.label_h2.set_markup(
+          """<span foreground="white">""" + _('There was an error in your request.') + """</span>""")
+        self.label_h2.modify_font(pango.FontDescription("sans 11"))
+        self.vbox.pack_start(self.label_h2, False, False, 3)
+        self.label_h3 = gtk.Label()
+        self.label_h3.set_markup(
+          """<span foreground="white">""" + _('Please, try again.') + """</span>""")
+        self.label_h3.modify_font(pango.FontDescription("sans 11"))
+        self.vbox.pack_start(self.label_h3, False, False, 3)
+        self.hbox.pack_end(self.close_button, False, False, 5)
+
+    def _set_options(self):
+        self.set_role("eos-non-max")
+        self.set_decorated(False)
+        self.set_modal(True)
+        self.set_skip_pager_hint(True)
+        self.set_skip_taskbar_hint(True)
+        self.set_resizable(False)
+
+    def run(self, x, y, w, h):
+        self.move(x, y)
+        self.set_size_request(w, h)
+        self.show_all()
+        super(ErrorDialog, self).run()

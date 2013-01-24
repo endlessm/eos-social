@@ -37,6 +37,7 @@ class MainWindow(SkinableWindow, WM_Inspect_MixIn):
 
         self.first_run = True
         self._last_show_state = None
+        self.freeze_window = False
 
         self.connect('delete-event', lambda w, e: True)
         self._set_options()
@@ -44,6 +45,9 @@ class MainWindow(SkinableWindow, WM_Inspect_MixIn):
 
     def set_ignore_win_names(self, names):
         self._ignore_win_names = names
+
+    def get_current_state(self):
+        return self._get_current_state()
 
     def _get_current_state(self):
         try:
@@ -73,6 +77,8 @@ class MainWindow(SkinableWindow, WM_Inspect_MixIn):
         self.set_skip_pager_hint(True)
 
     def _active_win_callback(self, active_name):
+        if self.freeze_window:
+            return
         if active_name in self._ignore_win_names:
             self._last_show_state = 'max'
             self.show()
@@ -80,6 +86,12 @@ class MainWindow(SkinableWindow, WM_Inspect_MixIn):
             if self._last_show_state is not None:
                 self.hide()
                 self._last_show_state = None
+
+    def freeze(self):
+        self.freeze_window = True
+
+    def unfreeze(self):
+        self.freeze_window = False
 
     def show(self):
         self.set_state(self.show_state)

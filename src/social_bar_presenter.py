@@ -406,7 +406,7 @@ class SocialBarPresenter:
         try:
             with open(file_path, 'r') as f:
                 ret = self._graph_api.put_photo(f, message=message)
-                ret = '{"code": 0. "description": "image uploaded"}'
+                ret = '{"code": 0, "description": "image uploaded"}'
         except:
             from traceback import format_exc
             print format_exc()
@@ -417,7 +417,7 @@ class SocialBarPresenter:
         try:
             with open(file_path, 'r') as f:
                 ret = self._graph_api.put_video(f, message=message)
-                ret = '{"code": 0. "description": "video uploaded"}'
+                ret = '{"code": 0, "description": "video uploaded"}'
         except:
             from traceback import format_exc
             print format_exc()

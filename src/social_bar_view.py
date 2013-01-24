@@ -81,6 +81,20 @@ class SocialBarView(MainWindow):
         y = self.user_name.allocation.y
         self.post_message.toolbar.move(self.user_name, x, y)
 
+    def expand_text_field(self):
+        vadjust = self.post_message_area.text_area.get_vadjustment()
+        offset = int(vadjust.get_value())
+        h = self.post_message_area.allocation.height
+        new_h = h + offset
+        if new_h < 100:
+            new_h = 100
+        main_h = self.post_message.allocation.height + offset
+        if main_h < self.post_message.COLLAPSED_HEIGHT:
+            main_h = self.post_message.COLLAPSED_HEIGHT
+        self.post_message.set_size_request(400, main_h)
+        self.post_message_area.set_size_request(400, new_h)
+        self.post_message_area.text_area.set_size_request(400, new_h)
+
     def show_error_dlg(self):
         self.freeze()
         err_dlg = ErrorDialog()
@@ -177,6 +191,7 @@ class SocialBarView(MainWindow):
         self._presenter.logout()
 
     def _on_post_msg_changed(self):
+        self.expand_text_field()
         text = self.post_message_area.get_post_message()
         selected_file = self.post_message_area.get_selected_file_path()
         if (text is not None) or (selected_file is not None):

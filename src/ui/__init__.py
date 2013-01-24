@@ -495,7 +495,7 @@ class PostMessage(gtk.Alignment):
         self.post_wraper.hide()
         def animate():
             h = self.allocation.height-self.ANIMATION_STEP
-            h = h if h > 0 else 0
+            h = h if h > self.COLLAPSED_HEIGHT-self.ANIMATION_STEP else self.COLLAPSED_HEIGHT-self.ANIMATION_STEP
             self.set_size_request(-1, h)
             not_done = self.allocation.height > self.COLLAPSED_HEIGHT
             if not not_done:

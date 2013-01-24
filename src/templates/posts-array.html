@@ -18,18 +18,24 @@
 						</span>
 						&nbsp;&nbsp;<div class="datetime">$post.time_elapsed_string</div>
 						<br/>
-						<span class="clickable" onclick="show_post_details('$post.url');" style="cursor:pointer;">
+						<!--span class="clickable" onclick="show_post_details('$post.url');" style="cursor:pointer;"-->
+						<span class="clickable">
 						<!-- subject (TODO: add check if subject is existant -->
 						#if $post.subject
-							<br/><b><span class="wrapable">$post.subject</span></b><br/></br>
+							<br/><b><span class="wrapable" onclick="show_post_details('$post.url');" style="cursor:pointer;">$post.subject</span></b><br/></br>
 						#end if
 						<!-- Post text -->
 						#if $post.text
-							<span class="wrapable">$post.text</span><br/>
+							<!--span class="wrapable">$post.text</span><br/-->
+							<span class="wrapable">
+							<span class="expandable">
+			                    $post.text
+                            </span>
+							</span><br/>
 						#end if
 						<!-- Post image -->
 						#if $post.image
-							<div class="imagecls" style="text-align:center;"><img src="$post.image"/></div>
+							<div class="imagecls" style="text-align:center;cursor:pointer;" onclick="show_post_details('$post.url');"><img src="$post.image"/></div>
 						#end if
 						<!-- Like and Comment links/buttons and respective counts -->
 						</span>
@@ -80,7 +86,7 @@
                         
                         <div class="comments-container" id="comments-$post.id" style="display:none;"></div>
                         
-                        <div class="comment-loader" id="comment-loader-$post.id" style="text-align:center;display:none">
+                        <div class="comment-loader" id="comment-loader-$post.id" style="text-align:center;display:none;">
                         <img src="data:image/gif;base64,R0lGODlhEAALAPQAAP///wAAANra2tDQ0Orq6gYGBgAAAC4uLoKCgmBgYLq6uiIiIkpKSoqKimRkZL6+viYmJgQEBE5OTubm5tjY2PT09Dg4ONzc3PLy8ra2tqCgoMrKyu7u7gAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCwAAACwAAAAAEAALAAAFLSAgjmRpnqSgCuLKAq5AEIM4zDVw03ve27ifDgfkEYe04kDIDC5zrtYKRa2WQgAh+QQJCwAAACwAAAAAEAALAAAFJGBhGAVgnqhpHIeRvsDawqns0qeN5+y967tYLyicBYE7EYkYAgAh+QQJCwAAACwAAAAAEAALAAAFNiAgjothLOOIJAkiGgxjpGKiKMkbz7SN6zIawJcDwIK9W/HISxGBzdHTuBNOmcJVCyoUlk7CEAAh+QQJCwAAACwAAAAAEAALAAAFNSAgjqQIRRFUAo3jNGIkSdHqPI8Tz3V55zuaDacDyIQ+YrBH+hWPzJFzOQQaeavWi7oqnVIhACH5BAkLAAAALAAAAAAQAAsAAAUyICCOZGme1rJY5kRRk7hI0mJSVUXJtF3iOl7tltsBZsNfUegjAY3I5sgFY55KqdX1GgIAIfkECQsAAAAsAAAAABAACwAABTcgII5kaZ4kcV2EqLJipmnZhWGXaOOitm2aXQ4g7P2Ct2ER4AMul00kj5g0Al8tADY2y6C+4FIIACH5BAkLAAAALAAAAAAQAAsAAAUvICCOZGme5ERRk6iy7qpyHCVStA3gNa/7txxwlwv2isSacYUc+l4tADQGQ1mvpBAAIfkECQsAAAAsAAAAABAACwAABS8gII5kaZ7kRFGTqLLuqnIcJVK0DeA1r/u3HHCXC/aKxJpxhRz6Xi0ANAZDWa+kEAA7AAAAAAAAAAAA"/>
                         </div>
 						    <form method="get" action="eossocialbar:POST_COMMENT?id=$post.id">

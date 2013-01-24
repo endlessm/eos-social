@@ -1,4 +1,5 @@
 from util.util import CSS, SLICKSCROLL_CSS, SLICKSCROLL_JS, MOUSE_WHEEL_JS, posts_query, users_query, older_posts_query, comments_query, comments_users_query
+from util.util import EXPANDER_JS
 from facebook.facebook import GraphAPIError, GraphAPI
 from facebook.facebook_posts import FacebookPosts
 import subprocess
@@ -170,7 +171,8 @@ class SocialBarPresenter:
                   {'newer':newer_url}, {'older':older_url},
                   {'like_string':_('like')},
                   {'comment_string':_('comment')},
-                  {'auto_refresh_interval':Settings.FB_AUTO_REFRESH_INTERVAL}]
+                  {'auto_refresh_interval':Settings.FB_AUTO_REFRESH_INTERVAL},
+                  {'expander_js':EXPANDER_JS}]
         #@TODO: fix path and file name
         page = Template(file = '/usr/share/eos-social/templates/news-feed.html', searchList = params)
         return page

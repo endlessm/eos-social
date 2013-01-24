@@ -1,5 +1,5 @@
 from util.util import CSS, SLICKSCROLL_CSS, SLICKSCROLL_JS, MOUSE_WHEEL_JS, posts_query, users_query, older_posts_query, comments_query, comments_users_query
-from util.util import EXPANDER_JS
+from util.util import EXPANDER_JS, AUTOSIZE_JS
 from facebook.facebook import GraphAPIError, GraphAPI
 from patcher import patch_facebook_graph_api
 patch_facebook_graph_api(GraphAPI)
@@ -174,7 +174,8 @@ class SocialBarPresenter:
                   {'like_string':_('like')},
                   {'comment_string':_('comment')},
                   {'auto_refresh_interval':Settings.FB_AUTO_REFRESH_INTERVAL},
-                  {'expander_js':EXPANDER_JS}]
+                  {'expander_js':EXPANDER_JS},
+                  {'autosize_js':AUTOSIZE_JS}]
         #@TODO: fix path and file name
         page = Template(file = '/usr/share/eos-social/templates/news-feed.html', searchList = params)
         return page

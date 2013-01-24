@@ -1,5 +1,7 @@
 from util.util import CSS, SLICKSCROLL_CSS, SLICKSCROLL_JS, MOUSE_WHEEL_JS, posts_query, users_query, older_posts_query
 from facebook.facebook import GraphAPIError, GraphAPI
+from patcher import patch_facebook_graph_api
+patch_facebook_graph_api(GraphAPI)
 from facebook.facebook_posts import FacebookPosts
 import subprocess
 from urllib2 import URLError
@@ -346,7 +348,23 @@ class SocialBarPresenter:
             return False
 
     def upload_image(self, file_path, message=None):
-        print 'upload_image', repr(file_path), repr(message)
+        ret = '{"code": 1, "description": "unknown error"}'
+        try:
+            with open(file_path, 'r') as f:
+                ret = self._graph_api.put_photo(f, message=message)
+                ret = '{"code": 0. "description": "image uploaded"}'
+        except:
+            from traceback import format_exc
+            print format_exc()
+        return ret
 
     def upload_video(self, file_path, message=None):
-        print 'upload_video', repr(file_path), repr(message)
+        ret = '{"code": 1, "description": "unknown error"}'
+        try:
+            with open(file_path, 'r') as f:
+                ret = self._graph_api.put_video(f, message=message)
+                ret = '{"code": 0. "description": "video uploaded"}'
+        except:
+            from traceback import format_exc
+            print format_exc()
+        return ret

@@ -15,6 +15,8 @@ import simplejson
 import urllib2
 import gettext
 from settings import Settings
+import httplib
+import urllib
 
 gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 
@@ -175,7 +177,8 @@ class SocialBarPresenter:
                   {'comment_string':_('comment')},
                   {'auto_refresh_interval':Settings.FB_AUTO_REFRESH_INTERVAL},
                   {'expander_js':EXPANDER_JS},
-                  {'autosize_js':AUTOSIZE_JS}]
+                  {'autosize_js':AUTOSIZE_JS},
+                  {'unlike_string':_('unlike')}]
         #@TODO: fix path and file name
         page = Template(file = '/usr/share/eos-social/templates/news-feed.html', searchList = params)
         return page
@@ -193,11 +196,13 @@ class SocialBarPresenter:
         if parsed.path == 'LIKE':
             result = self.post_fb_like(parsed_query['id'][0])
             if result:
-                script = 'like_success(%s, %s);' % (json.dumps(parsed_query['id'][0]), json.dumps(_('liked')))
+                script = 'like_success(%s, %s);' % (json.dumps(parsed_query['id'][0]), json.dumps(_('unlike')))
                 self._view._browser.execute_script(script)
         elif parsed.path == 'UNLIKE':
-            pass
-            #unliking as described in FB documentation does not work
+            result = self.unlike(parsed_query['id'][0])
+            if result:
+                script = 'unlike_success(%s, %s);' % (json.dumps(parsed_query['id'][0]), json.dumps(_('like')))
+                self._view._browser.execute_script(script)
         elif parsed.path == 'VIEWPOST':
             webbrowser.open(parsed.query[4:], new=1, autoraise=True)
         elif parsed.path == 'COMMENT':
@@ -243,7 +248,8 @@ class SocialBarPresenter:
         params = [{'posts':posts},
                   {'like_string':_('like')},
                   {'comment_string':_('comment')},
-                  {'auto_refresh_interval':Settings.FB_AUTO_REFRESH_INTERVAL}]
+                  {'auto_refresh_interval':Settings.FB_AUTO_REFRESH_INTERVAL},
+                  {'unlike_string':_('unlike')}]
         #@TODO: fix path and file name
         page = Template(file = '/usr/share/eos-social/templates/posts-array.html', searchList = params)
         return page
@@ -423,4 +429,33 @@ class SocialBarPresenter:
             from traceback import format_exc
             print format_exc()
         return ret
+    
+    def unlike(self, post_id):
+        if '_' in post_id:
+            s = post_id.split('_')
+            post_id = s[len(s)-1]
+        url = '/%s/likes?%s' % (
+            post_id,
+            urllib.urlencode({'access_token': self._fb_access_token}),
+        )
+        
+        try:
+            conn = httplib.HTTPSConnection('graph.facebook.com')
+            conn.request('DELETE', url)
+            response = conn.getresponse()
+            data = response.read()
+            conn.close()
+            result = json.loads(data)
+            
+            pprint.pprint(result)
+            print '*'*80
+            
+            if (result and isinstance(result, dict) and result.get("error")):
+                return False
+            
+            if response:
+                return True
+        except:
+            return False
+        
 

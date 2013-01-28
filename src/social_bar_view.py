@@ -49,18 +49,20 @@ class SocialBarView(MainWindow):
         self.post_message.connect('post-panel-action', self._on_action)
         self._browser.connect('button_press_event', lambda w, e: self.post_message._on_click(self, e))
 
-        self.main_container = gtk.VBox()
-        self.main_container.pack_start(self.post_message, expand=False, fill=False, padding=0)
-        self.main_container.pack_start(self._browser, expand=True, fill=True, padding=0)
+        self.main_container = gtk.ScrolledWindow()
+        #self.main_container.pack_start(self.post_message, expand=False, fill=False, padding=0)
+        self.main_container.add(self._browser)
 
         self.welcome_panel = WelcomePanel()
         self.welcome_panel.connect('welcome-panel-action', self._on_action)
 
         self.wraper_main = MultiPanel()
         self.wraper_main.add_panel(self.main_container, 'main_container')
-        self.wraper_main.add_panel(self.welcome_panel, 'welcome_panel')
+        #self.wraper_main.add_panel(self.welcome_panel, 'welcome_panel')
         self.add(self.wraper_main)
         self.show_all()
+        
+        self._browser.load_uri('http://m.facebook.com')
 
         if self._presenter.is_user_loged_in():
             self.wraper_main.show_panel('main_container')
@@ -68,8 +70,8 @@ class SocialBarView(MainWindow):
         else:
             self.wraper_main.show_panel('welcome_panel')
             self.show_delayed()
-        self.logout.hide()
-        self.user_name.hide()
+        #self.logout.hide()
+        #self.user_name.hide()
 
     def _user_name_size_request(self, widget, allocation):
         x = self.user_avatar.allocation.x - self.user_name.allocation.width - 8
@@ -159,11 +161,13 @@ class SocialBarView(MainWindow):
         self._browser.show()
     
     def load_html(self, html):
-        result = self._browser.load_string(html, 'text/html', 'utf-8', '')
+        self._browser.load_uri('http://m.facebook.com')
+        #result = self._browser.load_string(html, 'text/html', 'utf-8', '')
         self.show_browser()
     
     def _navigation_handler(self, view, frame, request, data=None):
-        return self._presenter.navigator(request.get_uri())
+        #return self._presenter.navigator(request.get_uri())
+        return False
     
     def _destroy(self, *args):
         gtk.main_quit()

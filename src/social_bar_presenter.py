@@ -59,7 +59,7 @@ class SocialBarPresenter:
         if result:
             result =  self.parse_posts(result)
             html = str(self.render_posts_to_html(result.posts, result.previous_url, result.next_url))
-            self._view.load_html(html)
+            self._view.load_html('http://m.facebook.com/')
         
         if callback:
             callback(result)

@@ -23,6 +23,8 @@ import json
 
 gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 
+ALT = '<Alt>'
+
 class SocialBarView(MainWindow):
     
 
@@ -47,8 +49,8 @@ class SocialBarView(MainWindow):
     def _create(self):
         self._browser = webkit.WebView()
         self._browser.connect("navigation-requested", self._navigation_handler)
-        self._shortcuts = [('Page_Up', '', lambda a, widget, c, m: self._browser.go_back()),
-                           ('Page_Down', '', lambda a, widget, c, m: self._browser.go_forward())]
+        self._shortcuts = [('Left', ALT, lambda a, widget, c, m: self._browser.go_back()),
+                           ('Right', ALT, lambda a, widget, c, m: self._browser.go_forward())]
         self.create_shortcuts()
         self.post_message_area = PostMessageSendArea()
         self.user_avatar_menu = UserProfileMenu(self._presenter)

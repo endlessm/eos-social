@@ -23,9 +23,10 @@ import json
 
 gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 
+ALT = "<Alt>"
 
 class SocialBarView(MainWindow):
-
+    
 
     def __init__(self):
         super(SocialBarView, self).__init__()
@@ -34,14 +35,29 @@ class SocialBarView(MainWindow):
         self.set_title(Settings.MAIN_WINDOW_TITLE)
         super(SocialBarView, self).set_ignore_win_names(Settings.IGNORE_WIN_NAMES)
 
+    def create_shortcuts(self, accelgroup=gtk.AccelGroup()):
+        for hotkey, modifier, callback in self._shortcuts:
+            key, modifier = gtk.accelerator_parse(modifier + hotkey)
+            accelgroup.connect_group(key, modifier, gtk.ACCEL_VISIBLE, callback)
+        self.add_accel_group(accelgroup)
+
     def set_presenter(self, presenter):
         super(SocialBarView, self).set_background_image('/usr/share/eos-social/images/bg-right.png')
         self._presenter = presenter
         self._create()
 
+    def button_callback(self, widget, event):
+        print event
+        print event.state
+        print gtk.gdk.keyval_name(event.keyval)
+
     def _create(self):
         self._browser = webkit.WebView()
         self._browser.connect("navigation-requested", self._navigation_handler)
+        self._shortcuts = [('Down', ALT, lambda a, widget, c, m: self._browser.go_back()),
+                           ('Up', ALT, lambda a, widget, c, m: self._browser.go_forward())]
+        self._browser.connect('key-release-event', self.button_callback)
+        self.create_shortcuts()
         self.post_message_area = PostMessageSendArea()
         self.user_avatar_menu = UserProfileMenu(self._presenter)
         self.user_avatar_menu.connect('user-profile-action', self._on_action)

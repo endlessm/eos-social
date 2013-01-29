@@ -24,7 +24,7 @@ class WindowStateData(object):
 class MainWindow(SkinableWindow, WM_Inspect_MixIn):
 
 
-    def __init__(self, width=400, top_offset=45, bottom_offset=38):
+    def __init__(self, width=400, top_offset=0, bottom_offset=38):
         SkinableWindow.__init__(self, gtk.WINDOW_TOPLEVEL)
         WM_Inspect_MixIn.__init__(self)
         self._ignore_win_names = ()
@@ -67,6 +67,19 @@ class MainWindow(SkinableWindow, WM_Inspect_MixIn):
             self.set_size_request(state.width, state.height)
 
     def _set_options(self):
+        self._freez_on_set_focus = False
+        self._frezz_on_visible = False
+        screen_height = gtk.gdk.screen_height()
+        screen_width = gtk.gdk.screen_width()
+        self.is_minimized = False
+        self.set_app_paintable(True)
+        transparent = False
+        if transparent:
+            self.set_colormap(self.get_screen().get_rgba_colormap())
+
+        #self.y_loc = 45
+        self.y_loc = 0
+        self.height_loc = screen_height - self.y_loc - 38
         self.set_resizable(False)
         self.set_role("eos-non-max")
         self.set_skip_taskbar_hint(True)

@@ -12,8 +12,8 @@ class FacebookPost:
         self.image = self.get_image(data)
         self.subject = ''
         self.actions = {}
-        self.likes = {}
-        self.comments = {}
+        self.likes = {'can_like': False}
+        self.comments = {'can_post': False}
         self.type = data['type']
         self.url = self.get_url(data)
         self.text = self.get_text(data)

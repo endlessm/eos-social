@@ -24,7 +24,7 @@ class WindowStateData(object):
 class MainWindow(SkinableWindow, WM_Inspect_MixIn):
 
 
-    def __init__(self, width=400, top_offset=45, bottom_offset=38):
+    def __init__(self, width=400, top_offset=0, bottom_offset=38):
         SkinableWindow.__init__(self, gtk.WINDOW_TOPLEVEL)
         WM_Inspect_MixIn.__init__(self)
         self._ignore_win_names = ()

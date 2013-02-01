@@ -23,9 +23,10 @@ import json
 
 gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 
+ALT = '<Alt>'
 
 class SocialBarView(MainWindow):
-
+    
 
     def __init__(self):
         super(SocialBarView, self).__init__()
@@ -33,6 +34,12 @@ class SocialBarView(MainWindow):
         self._presenter = None
         self.set_title(Settings.MAIN_WINDOW_TITLE)
         super(SocialBarView, self).set_ignore_win_names(Settings.IGNORE_WIN_NAMES)
+
+    def create_shortcuts(self, accelgroup=gtk.AccelGroup()):
+        for hotkey, modifier, callback in self._shortcuts:
+            key, modifier = gtk.accelerator_parse(modifier + hotkey)
+            accelgroup.connect_group(key, modifier, gtk.ACCEL_VISIBLE, callback)
+        self.add_accel_group(accelgroup)
 
     def set_presenter(self, presenter):
         super(SocialBarView, self).set_background_image('/usr/share/eos-social/images/bg-right.png')
@@ -42,6 +49,9 @@ class SocialBarView(MainWindow):
     def _create(self):
         self._browser = webkit.WebView()
         self._browser.connect("navigation-requested", self._navigation_handler)
+        self._shortcuts = [('Left', ALT, lambda a, widget, c, m: self._browser.go_back()),
+                           ('Right', ALT, lambda a, widget, c, m: self._browser.go_forward())]
+        self.create_shortcuts()
         self.post_message_area = PostMessageSendArea()
         self.user_avatar_menu = UserProfileMenu(self._presenter)
         self.user_avatar_menu.connect('user-profile-action', self._on_action)
@@ -56,16 +66,20 @@ class SocialBarView(MainWindow):
         self.post_message = PostMessage(self.post_message_area, self.user_avatar, self.user_name, self.logout)
         self.post_message.connect('post-panel-action', self._on_action)
         self._browser.connect('button_press_event', lambda w, e: self.post_message._on_click(self, e))
-        self.main_container = gtk.VBox()
-        self.main_container.pack_start(self.post_message, expand=False, fill=False, padding=0)
-        self.main_container.pack_start(self._browser, expand=True, fill=True, padding=0)
+
+        self.main_container = gtk.ScrolledWindow()
+        #self.main_container.pack_start(self.post_message, expand=False, fill=False, padding=0)
+        self.main_container.add(self._browser)
+
         self.welcome_panel = WelcomePanel()
         self.welcome_panel.connect('welcome-panel-action', self._on_action)
         self.wraper_main = MultiPanel()
         self.wraper_main.add_panel(self.main_container, 'main_container')
-        self.wraper_main.add_panel(self.welcome_panel, 'welcome_panel')
+        #self.wraper_main.add_panel(self.welcome_panel, 'welcome_panel')
         self.add(self.wraper_main)
         self.show_all()
+        
+        self._browser.load_uri('http://m.facebook.com')
 
         if self._presenter.is_user_loged_in():
             self.wraper_main.show_panel('main_container')
@@ -282,11 +296,13 @@ class SocialBarView(MainWindow):
         self._browser.show()
     
     def load_html(self, html):
-        result = self._browser.load_string(html, 'text/html', 'utf-8', '')
+        self._browser.load_uri('http://m.facebook.com')
+        #result = self._browser.load_string(html, 'text/html', 'utf-8', '')
         self.show_browser()
     
     def _navigation_handler(self, view, frame, request, data=None):
-        return self._presenter.navigator(request.get_uri())
+        #return self._presenter.navigator(request.get_uri())
+        return False
     
     def _destroy(self, *args):
         gtk.main_quit()

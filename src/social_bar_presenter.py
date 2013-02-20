@@ -1,22 +1,22 @@
-from util.util import CSS, SLICKSCROLL_CSS, SLICKSCROLL_JS, MOUSE_WHEEL_JS, posts_query, users_query, older_posts_query, comments_query, comments_users_query
-from util.util import EXPANDER_JS, AUTOSIZE_JS
-from facebook.facebook import GraphAPIError, GraphAPI
-from patcher import patch_facebook_graph_api
-patch_facebook_graph_api(GraphAPI)
-from facebook.facebook_posts import FacebookPosts
+#from util.util import CSS, SLICKSCROLL_CSS, SLICKSCROLL_JS, MOUSE_WHEEL_JS, posts_query, users_query, older_posts_query, comments_query, comments_users_query
+#from util.util import EXPANDER_JS, AUTOSIZE_JS
+#from facebook.facebook import GraphAPIError, GraphAPI
+#from patcher import patch_facebook_graph_api
+#patch_facebook_graph_api(GraphAPI)
+#from facebook.facebook_posts import FacebookPosts
 import subprocess
-from urllib2 import URLError
+#from urllib2 import URLError
 from Cheetah.Template import Template
-import urlparse
+#import urlparse
 import json
 import pprint
-import webbrowser
+#import webbrowser
 import simplejson
-import urllib2
+#import urllib2
 import gettext
 from settings import Settings
-import httplib
-import urllib
+#import httplib
+#import urllib
 
 gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 
@@ -33,11 +33,13 @@ class SocialBarPresenter:
         self._app_secret = self.FB_APP_SECRET
         self._fb_graph_url = 'graph.facebook.com'
         self._webserver_url = 'http://localhost:8080/'
-        self._fb_access_token = self._model.get_stored_fb_access_token()
-        if self._fb_access_token:
-            self._graph_api = GraphAPI(access_token=self._fb_access_token)
-        else:
-            self._graph_api = None
+        #self._fb_access_token = self._model.get_stored_fb_access_token()
+	self._fb_access_token = None
+        #if self._fb_access_token:
+        #    self._graph_api = GraphAPI(access_token=self._fb_access_token)
+        #else:
+        #    self._graph_api = None
+	self._graph_api = None
 
     def get_view(self):
         return self._view

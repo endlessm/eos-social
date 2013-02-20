@@ -1,24 +1,24 @@
 import gtk
 import gobject
-from facebook.fb_auth_view import FBAuthView
+#from facebook.fb_auth_view import FBAuthView
 from ui import MainWindow
-from ui import SimplePopUp
+#from ui import SimplePopUp
 import webkit
-from ui import PostMessage
-from ui import PostMessageSendArea
+#from ui import PostMessage
+#from ui import PostMessageSendArea
 import os
-from ui import UserAvatar
+#from ui import UserAvatar
 from ui import WelcomePanel
 from ui import MultiPanel
-from ui import UserProfileMenu
-from ui import LogoutLabel
-from ui import UserNameLabel
+#from ui import UserProfileMenu
+#from ui import LogoutLabel
+#from ui import UserNameLabel
 import gettext
 import time
 from settings import Settings
-from ui import SelectDialog
+#from ui import SelectDialog
 import os
-from ui import ErrorDialog
+#from ui import ErrorDialog
 import json
 
 gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
@@ -42,7 +42,7 @@ class SocialBarView(MainWindow):
         self.add_accel_group(accelgroup)
 
     def set_presenter(self, presenter):
-        super(SocialBarView, self).set_background_image('/usr/share/eos-social/images/bg-right.png')
+        #super(SocialBarView, self).set_background_image('/usr/share/eos-social/images/bg-right.png')
         self._presenter = presenter
         self._create()
 
@@ -52,20 +52,20 @@ class SocialBarView(MainWindow):
         self._shortcuts = [('Left', ALT, lambda a, widget, c, m: self._browser.go_back()),
                            ('Right', ALT, lambda a, widget, c, m: self._browser.go_forward())]
         self.create_shortcuts()
-        self.post_message_area = PostMessageSendArea()
-        self.user_avatar_menu = UserProfileMenu(self._presenter)
-        self.user_avatar_menu.connect('user-profile-action', self._on_action)
-        self.user_name = UserNameLabel(self._presenter.get_profil_display_name())
-        self.user_name.connect('user-name-action', self._on_action)
-        self.user_name.connect("size-allocate", self._user_name_size_request)
-        self.logout = LogoutLabel('x Logout')
-        self.logout.connect('logout-label-action', self._on_action)
-        self.user_avatar = UserAvatar(self.user_avatar_menu)
-        self.user_avatar.set_presenter(self._presenter)
-        self.post_message_area.connect('post-panel-action', self._on_action)
-        self.post_message = PostMessage(self.post_message_area, self.user_avatar, self.user_name, self.logout)
-        self.post_message.connect('post-panel-action', self._on_action)
-        self._browser.connect('button_press_event', lambda w, e: self.post_message._on_click(self, e))
+        #self.post_message_area = PostMessageSendArea()
+        #self.user_avatar_menu = UserProfileMenu(self._presenter)
+        #self.user_avatar_menu.connect('user-profile-action', self._on_action)
+        #self.user_name = UserNameLabel(self._presenter.get_profil_display_name())
+        #self.user_name.connect('user-name-action', self._on_action)
+        #self.user_name.connect("size-allocate", self._user_name_size_request)
+        #self.logout = LogoutLabel('x Logout')
+        #self.logout.connect('logout-label-action', self._on_action)
+        #self.user_avatar = UserAvatar(self.user_avatar_menu)
+        #self.user_avatar.set_presenter(self._presenter)
+        #self.post_message_area.connect('post-panel-action', self._on_action)
+        #self.post_message = PostMessage(self.post_message_area, self.user_avatar, self.user_name, self.logout)
+        #self.post_message.connect('post-panel-action', self._on_action)
+        #self._browser.connect('button_press_event', lambda w, e: self.post_message._on_click(self, e))
 
         self.main_container = gtk.ScrolledWindow()
         #self.main_container.pack_start(self.post_message, expand=False, fill=False, padding=0)
@@ -81,14 +81,16 @@ class SocialBarView(MainWindow):
         
         self._browser.load_uri('http://m.facebook.com')
 
-        if self._presenter.is_user_loged_in():
-            self.wraper_main.show_panel('main_container')
-            self._perform_login()
-        else:
-            self.wraper_main.show_panel('welcome_panel')
+        #if self._presenter.is_user_loged_in():
+        #    self.wraper_main.show_panel('main_container')
+        #    self._perform_login()
+        #else:
+        #    self.wraper_main.show_panel('welcome_panel')
             #self.show_delayed()
-        self.logout.hide()
-        self.user_name.hide()
+
+	self.wraper_main.show_panel('welcome_panel')
+        #self.logout.hide()
+        #self.user_name.hide()
 
     def _user_name_size_request(self, widget, allocation):
         x = self.user_avatar.allocation.x - self.user_name.allocation.width - 8

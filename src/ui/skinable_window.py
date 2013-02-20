@@ -17,6 +17,8 @@ class SkinableWindow(gtk.Window):
         self.connect('expose-event', self._on_draw)
 
     def _on_draw(self, widget, event):
+	return False
+
         if os.path.isfile(self.image_path):
             try:
                 cr = widget.window.cairo_create()

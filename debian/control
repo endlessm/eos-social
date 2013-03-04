@@ -1,4 +1,4 @@
-Source: eos-social
+Source: endlessos-base-social
 Section: non-free/misc
 Priority: standard
 Maintainer: Asynchrony Solutions, Inc <endlessmobile@gmail.com>
@@ -6,7 +6,10 @@ Build-Depends: debhelper (>= 7), python-support
 Standards-Version: 3.9.2
 Homepage: http://www.endlessm.com
 
-Package: eos-social
+Package: endlessos-base-social
+Replaces: eos-social
+Conflicts: eos-social
+Provides: eos-social
 Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}, python(>=2.6), python-gtk2, python-webkit, python-setuptools, libgtk-3-dev, python-cheetah, python-simplejson
 Description: Endless Social Bar installation package, this package installs the Endless Social Bar

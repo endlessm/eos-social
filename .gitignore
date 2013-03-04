@@ -39,3 +39,8 @@ debian/files
 .*.swp
 .settings/
 po/*.pot
+*.deb
+*.changes
+*.log
+*.build
+*-stamp

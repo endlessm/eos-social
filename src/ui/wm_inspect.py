@@ -5,7 +5,7 @@ import wnck
 class WM_Inspect_MixIn(object):
 
 
-    CHECK_INTERVAL = 2500
+    CHECK_INTERVAL = 100
     def __init__(self):
         super(WM_Inspect_MixIn, self).__init__()
         gobject.timeout_add(self.CHECK_INTERVAL, self._check_active)

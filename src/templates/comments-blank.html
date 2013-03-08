@@ -1,0 +1,88 @@
+#for $comment in $comments
+<div class="comment-x" >
+
+    <div style="font-size:11px;font-weight:bold;color:#336699;margin-left:5px;">
+    $comment['from']['name']
+    </div>
+    
+    <div style="font-size: 10px;margin-left: 5px;">
+    $comment['text']
+    </div>
+    <hr>
+    
+    
+    
+</div>
+#end for
+
+#if $first_batch
+    <script>
+    var a_more = \$('<a class="show-more"/>').attr('href','#').text('see more');
+    a_more.click(function() {
+            comment_post('$post_id', $last_comment_time);
+        }
+    );
+    
+    var see_more_div = \$('<div class="first-batch-$post_id"/>');
+    see_more_div.attr('style','margin-left:10px;margin-bottom:25px;font-size:11px;');
+    
+    if (\$('#comment-post-box-$post_id .comment-x').length > $initial_comments_number) {
+        var how_many = 0;
+        if (\$('#comment-post-box-$post_id .comment-x').length < $comments_page_size) {
+            how_many = \$('#comment-post-box-$post_id .comment-x').length - $initial_comments_number;
+        } else {
+            how_many = $comments_page_size-$initial_comments_number;
+        }
+        \$('#comment-post-box-$post_id .comment-x:lt('+how_many+')').hide();
+    }
+    
+    see_more_div.append(a_more);
+    a_more.hide();
+    var a_hidden = \$('<a class="show-hidden"/>').attr('href','#').text('see more');
+    a_hidden.click(function(){
+            var a = this;
+            \$('#comment-post-box-$post_id .comment-x:not(:visible)').fadeIn(function(){
+             if (\$('#comment-post-box-$post_id .comment-x:not(:visible)').length == 0) {
+                \$('.first-batch-$post_id a.show-hidden').hide();
+                #if $has_more_comments
+                    \$('.first-batch-$post_id a.show-more').show();
+                #end if
+             }
+            });
+            return false;
+        });
+    see_more_div.append(a_hidden);
+
+    if (\$('#comment-post-box-$post_id .comment-x:not(:visible)').length != 0) {
+        \$('#comment-post-box-$post_id .comment-x').first().before(see_more_div);
+    }
+    </script>
+#else
+    <script>
+    \$('#comment-post-box-$post_id script.first_batch').remove();
+    \$('div.first-batch-$post_id').remove();
+    \$('div.next-batch-$post_id').remove();
+    #if $has_more_comments
+        var see_more_div = \$('<div class="next-batch-$post_id"/>');
+        see_more_div.attr('style','margin-left:10px;margin-bottom:25px;font-size:11px;');
+        see_more_div.append(\$('<a />').attr('href','#').text('see more').click(function(){
+            comment_post('$post_id', $last_comment_time);
+        }));
+        \$('#comment-post-box-$post_id .comment-x').first().before(see_more_div);
+    #else
+        #if $more_on_facebook
+            var see_more_div = \$('<div class="next-batch-$post_id"/>');
+            see_more_div.attr('style','margin-left:10px;margin-bottom:25px;font-size:11px;');
+            see_more_div.append(\$('<a />').attr('href','#').text('see remaining comments on facebook').click(function(){
+                \$('#$post_id .clickable').click();
+            }));
+            \$('#comment-post-box-$post_id .comment-x').first().before(see_more_div);
+        #end if
+    #end if
+    </script>
+#end if
+
+
+
+
+

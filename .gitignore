@@ -33,8 +33,14 @@ nosetests.xml
 .project
 .pydevproject
 
+debian/endlessos-base-social*
 debian/files
 *.pyc
 .*.swp
 .settings/
 po/*.pot
+*.deb
+*.changes
+*.log
+*.build
+*-stamp

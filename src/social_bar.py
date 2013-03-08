@@ -6,6 +6,7 @@ from util.single_instance import DBusSingleAppInstance
 import dbus
 import dbus.service
 from dbus.mainloop.glib import DBusGMainLoop
+import subprocess
  
 class SocialBarDbus(dbus.service.Object):
     DBusGMainLoop(set_as_default=True)
@@ -18,6 +19,10 @@ class SocialBarDbus(dbus.service.Object):
         self.presenter.get_view().deiconify()
     
     def main(self):
+        #try:
+            #subprocess.Popen(['python', '/usr/share/eos-social/util/webserver.pyc'], stdout=subprocess.PIPE)
+        #except:
+        #    pass
         self.presenter = SocialBarPresenter(SocialBarView(), SocialBarModel())
         self.presenter.get_view().set_presenter(self.presenter)
         self.presenter.get_view().main()

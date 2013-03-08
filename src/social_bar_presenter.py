@@ -1,28 +1,30 @@
-from util.util import CSS, SLICKSCROLL_CSS, SLICKSCROLL_JS, MOUSE_WHEEL_JS, posts_query, users_query, older_posts_query
-from facebook.facebook import GraphAPIError, GraphAPI
-from facebook.facebook_posts import FacebookPosts
+#from util.util import CSS, SLICKSCROLL_CSS, SLICKSCROLL_JS, MOUSE_WHEEL_JS, posts_query, users_query, older_posts_query, comments_query, comments_users_query
+#from util.util import EXPANDER_JS, AUTOSIZE_JS
+#from facebook.facebook import GraphAPIError, GraphAPI
+#from patcher import patch_facebook_graph_api
+#patch_facebook_graph_api(GraphAPI)
+#from facebook.facebook_posts import FacebookPosts
 import subprocess
-from urllib2 import URLError
+#from urllib2 import URLError
 from Cheetah.Template import Template
-import urlparse
+#import urlparse
 import json
 import pprint
-import webbrowser
+#import webbrowser
 import simplejson
-import urllib2
+#import urllib2
 import gettext
+from settings import Settings
+#import httplib
+#import urllib
 
 gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 
 class SocialBarPresenter:
 
 
-    # -- DEV --
-    #FB_APP_ID = '393860344022808'
-    #FB_APP_SECRET = 'eb0dcb05f7512be39f7a3826ce99dfcd'
-    # -- PRODUCTION --
-    FB_APP_ID = '407909575958642'
-    FB_APP_SECRET = '496f85b88366ae40b42d16579719815c'
+    FB_APP_ID = Settings.FB_APP_ID
+    FB_APP_SECRET = Settings.FB_APP_SECRET
 
     def __init__(self, view=None, model=None):
         self._view = view
@@ -31,11 +33,13 @@ class SocialBarPresenter:
         self._app_secret = self.FB_APP_SECRET
         self._fb_graph_url = 'graph.facebook.com'
         self._webserver_url = 'http://localhost:8080/'
-        self._fb_access_token = self._model.get_stored_fb_access_token()
-        if self._fb_access_token:
-            self._graph_api = GraphAPI(access_token=self._fb_access_token)
-        else:
-            self._graph_api = None
+        #self._fb_access_token = self._model.get_stored_fb_access_token()
+	self._fb_access_token = None
+        #if self._fb_access_token:
+        #    self._graph_api = GraphAPI(access_token=self._fb_access_token)
+        #else:
+        #    self._graph_api = None
+	self._graph_api = None
 
     def get_view(self):
         return self._view
@@ -47,6 +51,7 @@ class SocialBarPresenter:
         query = {'posts':posts_query,'users':users_query}
         try:
             result = self._graph_api.fql(query)
+            #pprint.pprint(result)
         except GraphAPIError as error:
             self.oauth_exception_handler(error.result)
             return None
@@ -59,7 +64,7 @@ class SocialBarPresenter:
         if result:
             result =  self.parse_posts(result)
             html = str(self.render_posts_to_html(result.posts, result.previous_url, result.next_url))
-            self._view.load_html(html)
+            self._view.load_html('http://m.facebook.com/')
         
         if callback:
             callback(result)
@@ -67,7 +72,7 @@ class SocialBarPresenter:
             return result
     
     def fb_login(self, callback=None):
-        proc = subprocess.Popen(['python', '/usr/share/eos-social/facebook/fb_auth_window.pyc'], stdout=subprocess.PIPE)
+        proc = subprocess.Popen(['python', Settings.FB_LOGIN_MODULE_PATH], stdout=subprocess.PIPE)
         for line in proc.stdout:
             print line
             if line.startswith('ACCESS_TOKEN:'):
@@ -171,7 +176,11 @@ class SocialBarPresenter:
                   {'slickscroll_css':SLICKSCROLL_CSS},
                   {'newer':newer_url}, {'older':older_url},
                   {'like_string':_('like')},
-                  {'comment_string':_('comment')}]
+                  {'comment_string':_('comment')},
+                  {'auto_refresh_interval':Settings.FB_AUTO_REFRESH_INTERVAL},
+                  {'expander_js':EXPANDER_JS},
+                  {'autosize_js':AUTOSIZE_JS},
+                  {'unlike_string':_('unlike')}]
         #@TODO: fix path and file name
         page = Template(file = '/usr/share/eos-social/templates/news-feed.html', searchList = params)
         return page
@@ -189,11 +198,13 @@ class SocialBarPresenter:
         if parsed.path == 'LIKE':
             result = self.post_fb_like(parsed_query['id'][0])
             if result:
-                script = 'like_success(%s, %s);' % (json.dumps(parsed_query['id'][0]), json.dumps(_('liked')))
+                script = 'like_success(%s, %s);' % (json.dumps(parsed_query['id'][0]), json.dumps(_('unlike')))
                 self._view._browser.execute_script(script)
         elif parsed.path == 'UNLIKE':
-            pass
-            #unliking as described in FB documentation does not work
+            result = self.unlike(parsed_query['id'][0])
+            if result:
+                script = 'unlike_success(%s, %s);' % (json.dumps(parsed_query['id'][0]), json.dumps(_('like')))
+                self._view._browser.execute_script(script)
         elif parsed.path == 'VIEWPOST':
             webbrowser.open(parsed.query[4:], new=1, autoraise=True)
         elif parsed.path == 'COMMENT':
@@ -209,14 +220,38 @@ class SocialBarPresenter:
             self.get_fb_news_feed()
         return 1
         
-    def get_commments(self, post_id):
+    def get_commments(self, post_id, until=0):
+        query = {'comments':comments_query,'users':comments_users_query}
+        try:
+            result = self._graph_api.fql(query)
+#            print 'In get_comments...'
+#            print '-'*80
+#            pprint.pprint(result)
+#            print '-'*80
+            comments = self.parse_comments(result)
+            return comments
+        except GraphAPIError as error:
+#            print 'GRAPH API ERROR CAUGHT!'
+#            print '-'*80
+#            pprint.pprint(error)
+#            print '-'*80
+            self.oauth_exception_handler(error.result)
+            return None
+        except URLError as e:
+            self.url_exception_handler()
+            return None
+        except:
+            return None
+            
         raw_comments = self._graph_api.request(post_id+'/comments')
         return raw_comments
     
     def generate_posts_elements(self, posts):
         params = [{'posts':posts},
                   {'like_string':_('like')},
-                  {'comment_string':_('comment')}]
+                  {'comment_string':_('comment')},
+                  {'auto_refresh_interval':Settings.FB_AUTO_REFRESH_INTERVAL},
+                  {'unlike_string':_('unlike')}]
         #@TODO: fix path and file name
         page = Template(file = '/usr/share/eos-social/templates/posts-array.html', searchList = params)
         return page
@@ -257,6 +292,7 @@ class SocialBarPresenter:
         return self._model.get_no_picture_file_path()
 
     def get_image_dwn(self, image_url):
+        image_final_url = None
         try:
             url_response = urllib2.urlopen(image_url)
             image_final_url = url_response.geturl()
@@ -312,6 +348,13 @@ class SocialBarPresenter:
     
     def display_comments(self, parsed_query):
         comments = self.get_commments(parsed_query['id'][0])
+#        print 'In display_comments...'
+#        print '-'*80
+#        pprint.pprint(comments)
+#        print '-'*80
+        return
+        
+        
         comments['data'].reverse()
         if len(comments['data']) > 4:
             to_show = comments['data'][:4]
@@ -344,4 +387,77 @@ class SocialBarPresenter:
             return True
         except:
             return False
+    
+    def parse_comments(self, data):
+#        print 'In parse_comments...'
+#        print '-'*80
+#        pprint.pprint(data)
+#        print '-'*80
+        comments = []
+        users = []
+        
+        for _set in data:
+            if _set['name'] == 'comments':
+                comments = _set['fql_result_set']
+            else:
+                users = _set['fql_result_set']
+        
+        for comment in comments:
+            for user in users:
+                if comment['fromid'] == user['uid']:
+                    comment['from'] = user
+                    break
+        
+        return comments
+
+    def upload_image(self, file_path, message=None):
+        ret = '{"code": 1, "description": "unknown error"}'
+        try:
+            with open(file_path, 'r') as f:
+                ret = self._graph_api.put_photo(f, message=message)
+                ret = '{"code": 0, "description": "image uploaded"}'
+        except:
+            from traceback import format_exc
+            print format_exc()
+        return ret
+
+    def upload_video(self, file_path, message=None):
+        ret = '{"code": 1, "description": "unknown error"}'
+        try:
+            with open(file_path, 'r') as f:
+                ret = self._graph_api.put_video(f, message=message)
+                ret = '{"code": 0, "description": "video uploaded"}'
+        except:
+            from traceback import format_exc
+            print format_exc()
+        return ret
+    
+    def unlike(self, post_id):
+        if '_' in post_id:
+            s = post_id.split('_')
+            post_id = s[len(s)-1]
+        url = '/%s/likes?%s' % (
+            post_id,
+            urllib.urlencode({'access_token': self._fb_access_token}),
+        )
+        
+        try:
+            conn = httplib.HTTPSConnection('graph.facebook.com')
+            conn.request('DELETE', url)
+            response = conn.getresponse()
+            data = response.read()
+            conn.close()
+            result = json.loads(data)
+            
+            pprint.pprint(result)
+            print '*'*80
+            
+            if (result and isinstance(result, dict) and result.get("error")):
+                return False
+            
+            if response:
+                return True
+        except:
+            return False
+        
 

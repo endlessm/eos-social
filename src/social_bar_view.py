@@ -78,6 +78,7 @@ class SocialBarView(MainWindow):
         #self.wraper_main.add_panel(self.welcome_panel, 'welcome_panel')
         self.add(self.wraper_main)
         self.show_all()
+	self.hide()
         
         self._browser.load_uri('http://m.facebook.com')
 

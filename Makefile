@@ -9,7 +9,7 @@ install:
 	mkdir -p $(CFGDIR)
 	mkdir -p $(LIBDIR)/images
 	cp -R src/* $(LIBDIR)
-	cp etc/eos-social/social_bar.ini $(CFGDIR)
+	cp etc/eos-social/* $(CFGDIR)
 	cp -R images/* $(LIBDIR)/images
 	cp eos-social $(BINDIR)
 	chmod +X $(BINDIR)/eos-social

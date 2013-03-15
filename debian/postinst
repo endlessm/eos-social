@@ -5,6 +5,9 @@ case "$1" in
     ln -s -f /usr/share/eos-social /usr/lib/python2.7/dist-packages/
     mkdir -p /home/endlessm/.endlessm/social_bar/images/
     chmod -R 777 /home/endlessm/.endlessm/social_bar/images/
+    cp /etc/eos-social/eos-social-service /etc/init.d
+    chmod +x /etc/init.d/eos-social-service
+    update-rc.d eos-social-service start 99 3 4 5 . stop 10 0 1 6 . > /dev/null
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

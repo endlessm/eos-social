@@ -1,0 +1,51 @@
+#!/bin/bash
+#
+# $Id: endlessvnc 81068 2012-04-16 12:00:00Z endlessmobile@gmail.com $
+#
+# EndlessSocial Control Script
+# chkconfig: - 99 10
+# description: Endless Social Server Control Script
+#
+### BEGIN INIT INFO
+# Provides:          endlesssocial
+# Required-Start:    networking
+# Should-Start: 
+# Should-Stop:
+# Required-Stop:
+# Default-Start:	3 4 5
+# Default-Stop:		0 1 6
+# Description:    Endless Social Server Control Script
+### END INIT INFO
+
+SOCIALBAR=eos-social
+USER="endlessm"
+vncserver_stop() {
+  echo "Stopping social bar."
+  echo "Does nothing!!!!"
+  # su ${USER} -c "$VNCSERVER -clean -kill :${DISPLAY}" 2> /dev/null
+}
+
+vncserver_start() {
+  echo "Starting social bar."
+  export DISPLAY=:0
+  su ${USER} -c "${SOCIALBAR}"
+}
+
+case "$1" in
+  start)
+    vncserver_start
+  ;;
+
+  stop)
+    vncserver_stop
+  ;;
+
+  restart)
+    vncserver_stop
+    vncserver_start
+  ;;
+
+  *)
+    echo "Usage: $0 <start|stop|restart>"
+    exit 1
+esac

@@ -78,7 +78,7 @@ class SocialBarView(MainWindow):
         #self.wraper_main.add_panel(self.welcome_panel, 'welcome_panel')
         self.add(self.wraper_main)
         self.show_all()
-	self.hide()
+        self.hide()
         
         self._browser.load_uri('http://m.facebook.com')
 
@@ -89,7 +89,7 @@ class SocialBarView(MainWindow):
         #    self.wraper_main.show_panel('welcome_panel')
             #self.show_delayed()
 
-	self.wraper_main.show_panel('welcome_panel')
+        self.wraper_main.show_panel('welcome_panel')
         #self.logout.hide()
         #self.user_name.hide()
 

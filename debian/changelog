@@ -1,3 +1,10 @@
+endlessos-base-social (1.0.20) precise; urgency=low
+
+  * bumped version number includes initial hide
+    Matt I and Kyle
+
+ -- dev1 <dev1@em-d7.asynchrony.com>  Mon, 11 Mar 2013 16:32:46 -0500
+
 endlessos-base-social (1.0.19.1) precise; urgency=low
 
   * Increasing version number for package naming change - Matt T &

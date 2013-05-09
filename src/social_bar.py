@@ -14,7 +14,7 @@ class SocialBarDbus(dbus.service.Object):
  
     @dbus.service.method('org.social_bar.view')
     def restore(self):
-        self.view.deiconify()
+        self.view.present()
     
     def main(self):
         self.view = SocialBarView()

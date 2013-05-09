@@ -5,6 +5,7 @@ import dbus
 import dbus.service
 from dbus.mainloop.glib import DBusGMainLoop
 import subprocess
+import signal
  
 class SocialBarDbus(dbus.service.Object):
     DBusGMainLoop(set_as_default=True)
@@ -33,5 +34,9 @@ if __name__ == "__main__":
         restore()
     else:
         app = SocialBarDbus()
+        # FIXME: Get rid of the following line which has the only purpose of
+        # working around Ctrl+C not exiting Gtk applications from bug 622084.
+        # https://bugzilla.gnome.org/show_bug.cgi?id=622084
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
         app.main()
 

@@ -3,7 +3,6 @@ import gobject
 import os
 import pango
 import cairo
-from skinable_window import SkinableWindow
 from wm_inspect import WM_Inspect_MixIn
 
 
@@ -21,11 +20,11 @@ class WindowStateData(object):
             (self.width == other.width) and (self.height == other.height)
 
 
-class MainWindow(SkinableWindow, WM_Inspect_MixIn):
+class MainWindow(gtk.Window, WM_Inspect_MixIn):
 
 
     def __init__(self, width=400, top_offset=0, bottom_offset=38):
-        SkinableWindow.__init__(self, gtk.WINDOW_TOPLEVEL)
+        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         WM_Inspect_MixIn.__init__(self)
         self._ignore_win_names = ()
 

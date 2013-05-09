@@ -99,15 +99,3 @@ class MainWindow(SkinableWindow, WM_Inspect_MixIn):
     def hide(self):
         self.set_state(self.hide_state)
         self.iconify()
-
-#    def show_delayed(self):
-#        if not self.first_run:
-#            return
-#        self.first_run = False
-#        def _callback():
-#            self._maximize()
-#            return False
-#        gobject.timeout_add(2000, _callback)
-
-
-

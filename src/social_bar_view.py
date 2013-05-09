@@ -4,7 +4,6 @@ from ui.main_window import MainWindow
 import webkit
 import gettext
 import time
-from settings import Settings
 import os
 import json
 

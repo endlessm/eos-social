@@ -2,7 +2,6 @@ import gtk
 import gobject
 from ui.main_window import MainWindow
 import webkit
-from ui import MultiPanel
 import gettext
 import time
 from settings import Settings
@@ -40,9 +39,7 @@ class SocialBarView(MainWindow):
         self.main_container = gtk.ScrolledWindow()
         self.main_container.add(self._browser)
 
-        self.wraper_main = MultiPanel()
-        self.wraper_main.add_panel(self.main_container, 'main_container')
-        self.add(self.wraper_main)
+        self.add(self.main_container)
         self.show_all()
         self.hide()
 

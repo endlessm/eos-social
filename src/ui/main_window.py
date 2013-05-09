@@ -1,17 +1,18 @@
-import gtk
-import gobject
+from gi.repository import Gdk
+from gi.repository import Gtk
+from gi.repository import GObject
 import os
 from wm_inspect import WM_Inspect_MixIn
 
 
-class MainWindow(gtk.Window, WM_Inspect_MixIn):
+class MainWindow(Gtk.Window, WM_Inspect_MixIn):
 
     WIDTH = 400
     #FIXME: we should use the primary monitor workarea
     BOTTOM_OFFSET = 38
 
     def __init__(self):
-        gtk.Window.__init__(self, 
+        Gtk.Window.__init__(self, 
                             type=Gtk.WindowType.TOPLEVEL,
                             decorated=False,
                             modal=True,
@@ -32,8 +33,8 @@ class MainWindow(gtk.Window, WM_Inspect_MixIn):
 
     def _ensure_position(self):
         width = MainWindow.WIDTH
-        height = gtk.gdk.screen_height() - MainWindow.BOTTOM_OFFSET
-        x = gtk.gdk.screen_width() - width
+        height = Gdk.Screen.height() - MainWindow.BOTTOM_OFFSET
+        x = Gdk.Screen.width() - width
         y = 0
 
         self.move(x, y)

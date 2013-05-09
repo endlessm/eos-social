@@ -1,5 +1,5 @@
-import gobject
-import wnck
+from gi.repository import GObject
+from gi.repository import Wnck
 
 
 class WM_Inspect_MixIn(object):
@@ -8,7 +8,7 @@ class WM_Inspect_MixIn(object):
     CHECK_INTERVAL = 100
     def __init__(self):
         super(WM_Inspect_MixIn, self).__init__()
-        gobject.timeout_add(self.CHECK_INTERVAL, self._check_active)
+        GObject.timeout_add(self.CHECK_INTERVAL, self._check_active)
 
     def _check_active(self):
         active_name = self._get_active_window_name()
@@ -21,7 +21,7 @@ class WM_Inspect_MixIn(object):
 
     def _get_active_window_name(self):
         try:
-            default = wnck.screen_get_default()
+            default = Wnck.Screen.get_default()
             window_list = default.get_windows()
             active_win = self._find_active(window_list)
             if active_win is not None:

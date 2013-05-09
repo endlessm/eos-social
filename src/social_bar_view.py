@@ -1,7 +1,7 @@
-import gtk
-import gobject
+from gi.repository import Gtk
+from gi.repository import GObject
 from ui.main_window import MainWindow
-import webkit
+from gi.repository import WebKit
 import gettext
 import time
 import os
@@ -20,20 +20,20 @@ class SocialBarView(MainWindow):
         self.set_title('Endless Social Bar')
         self._create()
 
-    def create_shortcuts(self, accelgroup=gtk.AccelGroup()):
+    def create_shortcuts(self, accelgroup=Gtk.AccelGroup()):
         for hotkey, modifier, callback in self._shortcuts:
-            key, modifier = gtk.accelerator_parse(modifier + hotkey)
-            accelgroup.connect_group(key, modifier, gtk.ACCEL_VISIBLE, callback)
+            key, modifier = Gtk.accelerator_parse(modifier + hotkey)
+            accelgroup.connect(key, modifier, Gtk.AccelFlags.VISIBLE, callback)
         self.add_accel_group(accelgroup)
 
     def _create(self):
-        self._browser = webkit.WebView()
+        self._browser = WebKit.WebView()
         self._browser.connect("navigation-requested", self._navigation_handler)
         self._shortcuts = [('Left', ALT, lambda a, widget, c, m: self._browser.go_back()),
                            ('Right', ALT, lambda a, widget, c, m: self._browser.go_forward())]
         self.create_shortcuts()
 
-        self.main_container = gtk.ScrolledWindow()
+        self.main_container = Gtk.ScrolledWindow()
         self.main_container.add(self._browser)
 
         self.add(self.main_container)
@@ -46,10 +46,8 @@ class SocialBarView(MainWindow):
         return False
     
     def _destroy(self, *args):
-        gtk.main_quit()
+        Gtk.main_quit()
 
     def main(self):
-        gobject.threads_init()
-        gtk.threads_init()
-        gtk.main()
-
+        GObject.threads_init()
+        Gtk.main()

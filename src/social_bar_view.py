@@ -3,9 +3,7 @@ from gi.repository import GObject
 from ui.main_window import MainWindow
 from gi.repository import WebKit
 import gettext
-import time
-import os
-import json
+
 
 gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 

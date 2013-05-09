@@ -1,12 +1,10 @@
 #!/usr/bin/env python
-from social_bar_view import SocialBarView
 import dbus
 import dbus.service
 from dbus.mainloop.glib import DBusGMainLoop
-import subprocess
 import signal
+from social_bar_view import SocialBarView
 
-import dbus.service
 
 class SocialBarDbus(dbus.service.Object):
     DBusGMainLoop(set_as_default=True)

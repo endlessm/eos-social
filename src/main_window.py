@@ -42,6 +42,3 @@ class MainWindow(Gtk.Window, WM_Inspect_MixIn):
     def show(self):
         self._ensure_position()
         self.present()
-
-    def hide(self):
-        self.iconify()

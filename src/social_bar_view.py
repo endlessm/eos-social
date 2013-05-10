@@ -15,7 +15,6 @@ class SocialBarView(MainWindow):
     def __init__(self):
         super(SocialBarView, self).__init__()
         self.connect('destroy', self._destroy)
-        self.set_title('Endless Social Bar')
         self._create()
 
     def create_shortcuts(self, accelgroup=Gtk.AccelGroup()):

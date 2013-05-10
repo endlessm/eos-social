@@ -1,4 +1,5 @@
 from gi.repository import Gdk
+from gi.repository import GdkX11
 from gi.repository import Gtk
 from gi.repository import GObject
 from wm_inspect import WM_Inspect_MixIn
@@ -25,9 +26,9 @@ class MainWindow(Gtk.Window, WM_Inspect_MixIn):
         # do not destroy on delete event
         self.connect('delete-event', lambda w, e: self.hide_on_delete())
 
-    #FIXME: this is still pretty awful
-    def _active_win_callback(self, active_name):
-        if active_name != self.get_title():
+    def _active_win_callback(self, active_xid):
+        xid = GdkX11.X11Window.get_xid(self.get_window())
+        if xid != active_xid:
             self.hide()
 
     def _ensure_position(self):

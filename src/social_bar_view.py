@@ -1,11 +1,8 @@
 from gi.repository import Gtk
 from gi.repository import GObject
 from gi.repository import WebKit
-import gettext
 from main_window import MainWindow
 
-
-gettext.install('eos-social', '/usr/share/locale', unicode=True, names=['ngettext'])
 
 ALT = '<Alt>'
 

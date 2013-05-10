@@ -1,3 +1,9 @@
+endlessos-base-social (1.0.99) UNRELEASED; urgency=low
+
+  * Bump version for minimal browser rewrite
+
+ -- Cosimo Cecchi <cosimo@endlessm.com>  Fri, 10 May 2013 01:28:06 -0400
+
 endlessos-base-social (1.0.20) precise; urgency=low
 
   * bumped version number includes initial hide

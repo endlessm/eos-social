@@ -7,8 +7,6 @@ from wm_inspect import WM_Inspect_MixIn
 
 class MainWindow(Gtk.Window, WM_Inspect_MixIn):
 
-    WIDTH = 400
-
     def __init__(self):
         Gtk.Window.__init__(self, 
                             type=Gtk.WindowType.TOPLEVEL,
@@ -41,10 +39,12 @@ class MainWindow(Gtk.Window, WM_Inspect_MixIn):
         monitor = screen.get_primary_monitor()
         workarea = screen.get_monitor_workarea(monitor)
 
+        width = workarea.width / 3
+
         geometry = Gdk.Rectangle()
-        geometry.x = workarea.x + workarea.width - MainWindow.WIDTH
+        geometry.x = workarea.x + workarea.width - width
         geometry.y = workarea.y
-        geometry.width = MainWindow.WIDTH
+        geometry.width = width
         geometry.height = workarea.height
 
         self.move(geometry.x, geometry.y)

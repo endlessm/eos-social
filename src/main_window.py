@@ -8,8 +8,6 @@ from wm_inspect import WM_Inspect_MixIn
 class MainWindow(Gtk.Window, WM_Inspect_MixIn):
 
     WIDTH = 400
-    #FIXME: we should use the primary monitor workarea
-    BOTTOM_OFFSET = 38
 
     def __init__(self):
         Gtk.Window.__init__(self, 
@@ -26,19 +24,31 @@ class MainWindow(Gtk.Window, WM_Inspect_MixIn):
         # do not destroy on delete event
         self.connect('delete-event', lambda w, e: self.hide_on_delete())
 
+        # update position when workarea changes
+        screen = Gdk.Screen.get_default()
+        screen.connect('monitors-changed', self._on_monitors_changed)
+
     def _active_win_callback(self, active_xid):
         xid = GdkX11.X11Window.get_xid(self.get_window())
         if xid != active_xid:
             self.hide()
 
-    def _ensure_position(self):
-        width = MainWindow.WIDTH
-        height = Gdk.Screen.height() - MainWindow.BOTTOM_OFFSET
-        x = Gdk.Screen.width() - width
-        y = 0
+    def _on_monitors_changed(self, screen, data):
+        self._ensure_position()
 
-        self.move(x, y)
-        self.set_size_request(width, height)
+    def _ensure_position(self):
+        screen = Gdk.Screen.get_default()
+        monitor = screen.get_primary_monitor()
+        workarea = screen.get_monitor_workarea(monitor)
+
+        geometry = Gdk.Rectangle()
+        geometry.x = workarea.x + workarea.width - MainWindow.WIDTH
+        geometry.y = workarea.y
+        geometry.width = MainWindow.WIDTH
+        geometry.height = workarea.height
+
+        self.move(geometry.x, geometry.y)
+        self.set_size_request(geometry.width, geometry.height)
 
     def show(self):
         self._ensure_position()

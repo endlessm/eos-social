@@ -19,6 +19,7 @@ PKG_CHECK_MODULES(EOS_SOCIAL,
 
 AC_CONFIG_FILES([
         Makefile
+        data/Makefile
         EosSocial/Makefile
         ])
 

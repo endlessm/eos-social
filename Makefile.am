@@ -1,4 +1,4 @@
-SUBDIRS = EosSocial
+SUBDIRS = EosSocial data
 
 bin_SCRIPTS = eos-social
 

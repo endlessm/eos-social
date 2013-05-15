@@ -21,6 +21,10 @@ class SocialBarDbus(dbus.service.Object):
     def restore(self):
         self.view.show()
 
+    @dbus.service.method(BUS_IFACE)
+    def toggle(self):
+        self.view.toggle()
+
     @classmethod
     def is_running(self):
         app_name = dbus.SessionBus().request_name(SocialBarDbus.BUS_NAME)

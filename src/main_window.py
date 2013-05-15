@@ -53,3 +53,9 @@ class MainWindow(Gtk.Window, WM_Inspect_MixIn):
     def show(self):
         self._ensure_position()
         self.present()
+
+    def toggle(self):
+        if self.get_visible():
+            self.hide()
+        else:
+            self.show()

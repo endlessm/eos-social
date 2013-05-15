@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import dbus
 import dbus.service
 from dbus.mainloop.glib import DBusGMainLoop
@@ -30,11 +29,11 @@ class SocialBarDbus(dbus.service.Object):
         app_name = dbus.SessionBus().request_name(SocialBarDbus.BUS_NAME)
         return app_name != dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER
 
-    def main(self):
+    def run(self):
         self.view = SocialBarView()
         self.view.main()
 
-if __name__ == "__main__":
+def main():
     running = False
     try:
         running = SocialBarDbus.is_running()
@@ -51,5 +50,5 @@ if __name__ == "__main__":
         # working around Ctrl+C not exiting Gtk applications from bug 622084.
         # https://bugzilla.gnome.org/show_bug.cgi?id=622084
         signal.signal(signal.SIGINT, signal.SIG_DFL)
-        app.main()
+        app.run()
 

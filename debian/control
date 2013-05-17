@@ -2,7 +2,13 @@ Source: endlessos-base-social
 Section: non-free/misc
 Priority: standard
 Maintainer: Asynchrony Solutions, Inc <endlessmobile@gmail.com>
-Build-Depends: debhelper (>= 7), python-support
+Build-Depends: cdbs (>= 0.4.90~),
+               autotools-dev,
+               debhelper (>= 8),
+               python-support (>= 0.7),
+               python (>= 2.6.6-3~),
+               gnome-pkg-tools
+X-Python-Version: >= 2.4
 Standards-Version: 3.9.2
 Homepage: http://www.endlessm.com
 
@@ -11,11 +17,9 @@ Replaces: eos-social
 Breaks: eos-social
 Provides: eos-social
 Architecture: all
-Depends: ${gir:Depends},
-         ${shlibs:Depends},
+Depends: ${python:Depends},
          ${misc:Depends},
-         python(>=2.6),
-         python-gobject,
+         python-gi (>= 3.0),
          gir1.2-glib-2.0,
          gir1.2-gtk-3.0,
          gir1.2-webkit-3.0,

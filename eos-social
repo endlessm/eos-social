@@ -1,5 +1,0 @@
-#!/bin/sh
-
-export PYTHONPATH=/usr/share/eos-social:$PYTHONPATH
-python /usr/share/eos-social/social_bar.pyc
-

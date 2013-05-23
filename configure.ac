@@ -9,13 +9,10 @@ AM_INIT_AUTOMAKE([1.9 no-dist-gzip dist-xz foreign])
 
 AM_PATH_PYTHON_VERSION(2.7, 2.7.0, 2.6, 2.6.0, 2.5, 2.5.0, 2.4, 2.4.0)
 
-GOBJECT_INTROSPECTION_REQUIRE([0.9.6])
-
 PKG_CHECK_MODULES(EOS_SOCIAL,
                   gio-2.0
                   gtk+-3.0
-                  webkitgtk-3.0
-                  gobject-introspection-1.0)
+                  webkitgtk-3.0)
 
 AC_CONFIG_FILES([
         Makefile

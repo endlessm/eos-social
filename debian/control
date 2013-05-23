@@ -6,7 +6,6 @@ Uploaders: Roddy Shuler <roddy@endlessm.com>
 Build-Depends: cdbs (>= 0.4.90~),
                autotools-dev,
                debhelper (>= 8),
-               python-support (>= 0.7),
                python (>= 2.6.6-3~),
                gnome-pkg-tools
 X-Python-Version: >= 2.4

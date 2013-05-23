@@ -1,4 +1,6 @@
 eos-social.debhelper.log
+eos-social.postinst.debhelper
+eos-social.prerm.debhelper
 eos-social.substvars
 files
 stamp-autotools

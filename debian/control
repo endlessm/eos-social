@@ -1,7 +1,8 @@
-Source: endlessos-base-social
+Source: eos-social
 Section: non-free/misc
 Priority: standard
-Maintainer: Asynchrony Solutions, Inc <endlessmobile@gmail.com>
+Maintainer: Endless Mobile <maintainers@endlessm.com>
+Uploaders: Roddy Shuler <roddy@endlessm.com>
 Build-Depends: cdbs (>= 0.4.90~),
                autotools-dev,
                debhelper (>= 8),
@@ -12,10 +13,9 @@ X-Python-Version: >= 2.4
 Standards-Version: 3.9.2
 Homepage: http://www.endlessm.com
 
-Package: endlessos-base-social
-Replaces: eos-social
-Breaks: eos-social
-Provides: eos-social
+Package: eos-social
+Replaces: endlessos-base-social
+Breaks: endlessos-base-social
 Architecture: all
 Depends: ${python:Depends},
          ${misc:Depends},
@@ -25,5 +25,5 @@ Depends: ${python:Depends},
          gir1.2-webkit-3.0,
          gir1.2-wnck-3.0,
          python-setuptools
-Description: Endless Social Bar installation package, this package
- installs the Endless Social Bar
+Description: Endless Social Bar installation package
+ This package installs the Endless OS Social Bar

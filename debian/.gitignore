@@ -1,0 +1,7 @@
+eos-social.debhelper.log
+eos-social.substvars
+files
+stamp-autotools
+stamp-autotools-files
+stamp-makefile-build
+stamp-makefile-install

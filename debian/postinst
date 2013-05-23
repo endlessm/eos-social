@@ -2,11 +2,11 @@
 set -e
 case "$1" in
     configure)
-    ln -s -f /usr/share/eos-social /usr/lib/python2.7/dist-packages/
+    ln -s -f /usr/share/eos-social/EosSocial /usr/lib/python2.7/dist-packages/
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
-    rm -f /usr/lib/python2.7/dist-packages/eos-social
+    rm -f /usr/lib/python2.7/dist-packages/EosSocial
     ;;
 
     *)

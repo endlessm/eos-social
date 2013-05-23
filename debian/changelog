@@ -1,3 +1,9 @@
+eos-social (1.1.1~dev1) unstable; urgency=low
+
+  * Updating version to 1.1.1~dev1
+
+ -- Roddy Shuler <roddy@endlessm.com>  Thu, 23 May 2013 16:20:22 -0700
+
 eos-social (1.0.99) UNRELEASED; urgency=low
 
   * Bump version for minimal browser rewrite

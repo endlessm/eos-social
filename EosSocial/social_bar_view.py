@@ -1,4 +1,5 @@
 
+from gi.repository import Gdk
 from gi.repository import Gtk
 from gi.repository import GObject
 from gi.repository import WebKit
@@ -9,17 +10,11 @@ class SocialBarView(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self,
                             type=Gtk.WindowType.TOPLEVEL,
-                            decorated=False,
-                            modal=True,
-                            resizable=False,
-                            skip_pager_hint=True,
-                            skip_taskbar_hint=True)
+                            type_hint=Gdk.WindowTypeHint.DOCK)
 
         self.connect('focus-out-event', self._on_focus_out)
         self.connect('destroy', self._destroy)
 
-        # stick on all desktops
-        self.stick()
         # do not destroy on delete event
         self.connect('delete-event', lambda w, e: self.hide_on_delete())
 

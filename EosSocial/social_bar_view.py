@@ -22,7 +22,6 @@ class SocialBarView(MainWindow):
 
     def _create(self):
         self._browser = WebKit.WebView()
-        self._browser.connect("navigation-requested", self._navigation_handler)
         self._shortcuts = [('Left', ALT, lambda a, widget, c, m: self._browser.go_back()),
                            ('Right', ALT, lambda a, widget, c, m: self._browser.go_forward())]
         self.create_shortcuts()
@@ -36,9 +35,6 @@ class SocialBarView(MainWindow):
 
         self._browser.load_uri('http://m.facebook.com')
 
-    def _navigation_handler(self, view, frame, request, data=None):
-        return False
-    
     def _destroy(self, *args):
         Gtk.main_quit()
 

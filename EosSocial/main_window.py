@@ -1,11 +1,8 @@
 
 from gi.repository import Gdk
-from gi.repository import GdkX11
 from gi.repository import Gtk
-from wm_inspect import WM_Inspect_MixIn
 
-class MainWindow(Gtk.Window, WM_Inspect_MixIn):
-
+class MainWindow(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, 
                             type=Gtk.WindowType.TOPLEVEL,
@@ -14,7 +11,8 @@ class MainWindow(Gtk.Window, WM_Inspect_MixIn):
                             resizable=False,
                             skip_pager_hint=True,
                             skip_taskbar_hint=True)
-        WM_Inspect_MixIn.__init__(self)
+
+        self.connect('focus-out-event', self._on_focus_out)
 
         # stick on all desktops
         self.stick()
@@ -25,9 +23,18 @@ class MainWindow(Gtk.Window, WM_Inspect_MixIn):
         screen = Gdk.Screen.get_default()
         screen.connect('monitors-changed', self._on_monitors_changed)
 
-    def _active_win_callback(self, active_xid):
-        xid = GdkX11.X11Window.get_xid(self.get_window())
-        if xid != active_xid:
+    def _should_hide_on_focus_out(self, event):
+        # When an event pops up and takes a grab, we get
+        # a focus out event that we should ignore. Check
+        # if Gtk thinks there's a grab, and if so, don't
+        # hide.
+        if Gtk.grab_get_current() is not None:
+            return False
+
+        return True
+
+    def _on_focus_out(self, window, event):
+        if self._should_hide_on_focus_out(event):
             self.hide()
 
     def _on_monitors_changed(self, screen, data):

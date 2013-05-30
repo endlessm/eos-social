@@ -5,9 +5,61 @@ from gi.repository import GObject
 from gi.repository import WebKit
 
 ALT = '<Alt>'
+ANIM_TIME = (500 * 1000) # half a second
+
+class FrameClockAnimator(object):
+    def __init__(self, widget, duration):
+        self._widget = widget
+        self._tick_id = 0
+        self._start_time = 0
+        self._start_value = None
+        self._end_value = None
+        self._duration = float(duration)
+
+    def start(self, end_value):
+        if self._tick_id:
+            return
+
+        self._tick_id = self._widget.add_tick_callback(self._on_frame_tick, None)
+        self._start_time = self._widget.get_frame_clock().get_frame_time()
+        self._start_value = self._get_initial_value()
+        self._end_value = end_value
+
+    def stop(self):
+        if not self._tick_id:
+            return
+
+        self._widget.remove_tick_callback(self._tick_id)
+
+    # Robert Penner's easeOutQuint
+    def _ease_time(self, t):
+        p = t - 1
+        return -1 * (p * p * p * p - 1)
+
+    def _on_frame_tick(self, widget, frame_clock, user_data):
+        t = (frame_clock.get_frame_time() - self._start_time) / self._duration
+        if t > 1.0:
+            self._tick_id = 0
+            return False
+
+        t = self._ease_time(t)
+        new_value = self._start_value + (self._end_value - self._start_value) * t
+        self.set_value(new_value)
+        return True
+
+class SocialBarSlider(FrameClockAnimator):
+    def _get_initial_value(self):
+        old_x, old_y = self._widget.get_position()
+        return old_x
+
+    def set_value(self, new_x):
+        old_x, old_y = self._widget.get_position()
+        self._widget.move(new_x, old_y)
 
 class SocialBarView(Gtk.Window):
     def __init__(self):
+        self.showing = False
+
         Gtk.Window.__init__(self,
                             type=Gtk.WindowType.TOPLEVEL,
                             type_hint=Gdk.WindowTypeHint.DOCK)
@@ -21,6 +73,8 @@ class SocialBarView(Gtk.Window):
         # update position when workarea changes
         screen = Gdk.Screen.get_default()
         screen.connect('monitors-changed', self._on_monitors_changed)
+
+        self._animator = SocialBarSlider(self, ANIM_TIME)
 
         self._create()
 
@@ -40,8 +94,9 @@ class SocialBarView(Gtk.Window):
         self.main_container.add(self._browser)
 
         self.add(self.main_container)
+        self._update_non_x_geometry()
+        self._animator.set_value(self._get_final_x())
         self.show_all()
-        self.hide()
 
         self._browser.load_uri('http://m.facebook.com')
 
@@ -57,36 +112,49 @@ class SocialBarView(Gtk.Window):
 
     def _on_focus_out(self, window, event):
         if self._should_hide_on_focus_out(event):
-            self.hide()
+            self.slide_out()
 
     def _on_monitors_changed(self, screen, data):
-        self._ensure_position()
+        self._animator.stop()
+        if self.showing:
+            self._update_non_x_geometry()
+            self._animator.set_value(self._get_final_x())
 
-    def _ensure_position(self):
+    def _get_workarea(self):
         screen = Gdk.Screen.get_default()
         monitor = screen.get_primary_monitor()
-        workarea = screen.get_monitor_workarea(monitor)
+        return screen.get_monitor_workarea(monitor)
 
+    def _get_final_x(self):
+        width, height = self.get_size()
+        workarea = self._get_workarea()
+        x = workarea.width
+        if self.showing:
+            x -= width
+        return x
+
+    def _update_non_x_geometry(self):
+        workarea = self._get_workarea()
+        y = workarea.y
         width = workarea.width / 3
+        height = workarea.height
 
-        geometry = Gdk.Rectangle()
-        geometry.x = workarea.x + workarea.width - width
-        geometry.y = workarea.y
-        geometry.width = width
-        geometry.height = workarea.height
+        self.move(0, y)
+        self.set_size_request(width, height)
 
-        self.move(geometry.x, geometry.y)
-        self.set_size_request(geometry.width, geometry.height)
+    def slide_in(self):
+        self.showing = True
+        self._animator.start(self._get_final_x())
 
-    def show(self):
-        self._ensure_position()
-        self.present()
+    def slide_out(self):
+        self.showing = False
+        self._animator.start(self._get_final_x())
 
     def toggle(self):
-        if self.get_visible():
-            self.hide()
+        if self.showing:
+            self.slide_out()
         else:
-            self.show()
+            self.slide_in()
 
     def _destroy(self, *args):
         Gtk.main_quit()

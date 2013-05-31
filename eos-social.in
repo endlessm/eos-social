@@ -1,11 +1,15 @@
-#! @PYTHON@ @PYOPTIONS@
-# -*- python -*-
-# -*- coding: utf-8 -*-
+#!/bin/sh
 
-import sys
-sys.path.insert(0, '@DATADIR@/eos-social')
+export GJS_PATH="@pkgdatadir@/js${GJS_PATH:+:$GJS_PATH}"
+export GI_TYPELIB_PATH="@pkglibdir@/girepository-1.0${GI_TYPELIB_PATH:+:$GI_TYPELIB_PATH}"
+export LD_LIBRARY_PATH="@pkglibdir@${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 
-from EosSocial.social_bar import main
+if test x"$GJS_DEBUG_OUTPUT" = x ; then
+    export GJS_DEBUG_OUTPUT=stderr
+fi
 
-if __name__ == '__main__':
-    main()
+if test x"$GJS_DEBUG_TOPICS" = x ; then
+    export GJS_DEBUG_TOPICS="JS ERROR;JS LOG"
+fi
+
+exec $DEBUG_COMMAND @GJS_CONSOLE@ -I @pkgdatadir@/js -c "const Main = imports.main; Main.start();" "$@"

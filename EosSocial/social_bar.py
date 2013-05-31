@@ -18,7 +18,7 @@ class SocialBarDbus(dbus.service.Object):
  
     @dbus.service.method(BUS_IFACE)
     def restore(self):
-        self.view.show()
+        self.view.slide_in()
 
     @dbus.service.method(BUS_IFACE)
     def toggle(self):

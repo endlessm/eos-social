@@ -4,5 +4,6 @@ dist_js_DATA = \
 	mainWindow.js \
 	socialBar.js \
 	socialBarView.js \
+	parseUri.js \
 	wmInspect.js \
 	$(NULL)

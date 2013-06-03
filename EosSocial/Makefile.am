@@ -1,8 +1,9 @@
-appdir = $(pythondir)/EosSocial
-app_PYTHON = \
-	__init__.py \
-	main_window.py \
-	social_bar.py \
-	social_bar_view.py \
-	wm_inspect.py \
+jsdir = $(pkgdatadir)/js/
+dist_js_DATA = \
+	main.js \
+	mainWindow.js \
+	socialBar.js \
+	socialBarView.js \
+	parseUri.js \
+	wmInspect.js \
 	$(NULL)

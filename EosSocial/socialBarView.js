@@ -1,10 +1,10 @@
+const Gdk = imports.gi.Gdk;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
 const Lang = imports.lang;
 const WebKit = imports.gi.WebKit;
 
-const MainWindow = imports.mainWindow;
 const ParseUri = imports.parseUri;
 
 const SOCIAL_BAR_HOMEPAGE = 'https://m.facebook.com';
@@ -20,11 +20,18 @@ function _parseLinkFromRedirect(uri) {
 
 const SocialBarView = new Lang.Class({
     Name: 'SocialBarView',
-    Extends: MainWindow.MainWindow,
+    Extends: Gtk.Plug,
 
-    _init: function(params) {
-        this.parent(params);
+    _init: function(socketId) {
+        this.parent();
+        this.construct(socketId);
+
         this._installActions();
+
+        // update position when workarea changes
+        let screen = Gdk.Screen.get_default();
+        screen.connect('monitors-changed', Lang.bind(this,
+            this._ensurePosition));
 
         this._browser = new WebKit.WebView();
         this._browser.connect('resource-request-starting', Lang.bind(this,
@@ -37,12 +44,36 @@ const SocialBarView = new Lang.Class({
 
         let container = new Gtk.ScrolledWindow();
         container.add(this._browser);
+        container.show_all();
 
         this.add(container);
         this._browser.load_uri(SOCIAL_BAR_HOMEPAGE);
 
-        this.show_all();
-        this.hide();
+        this.realize();
+    },
+
+    _ensurePosition: function() {
+        let screen = Gdk.Screen.get_default();
+        let monitor = screen.get_primary_monitor();
+        let workarea = screen.get_monitor_workarea(monitor);
+
+        let width = workarea.width / 3;
+        let geometry = { x: workarea.x + workarea.width - width,
+                         y: workarea.y,
+                         width: width,
+                         height: workarea.height };
+
+        this.move(geometry.x, geometry.y);
+        this.set_size_request(geometry.width, geometry.height);
+    },
+
+    toggle: function() {
+        if (this.get_visible()) {
+            this.hide();
+        } else {
+            this._ensurePosition()
+            this.show();
+        }
     },
 
     _onActionBack: function() {
@@ -61,14 +92,16 @@ const SocialBarView = new Lang.Class({
                          callback: this._onActionForward,
                          accel: '<Alt>Right' }];
 
+        let application = Gio.Application.get_default();
+
         actions.forEach(Lang.bind(this,
             function(actionEntry) {
                 let action = new Gio.SimpleAction({ name: actionEntry.name });
                 action.connect('activate', Lang.bind(this, actionEntry.callback));
 
-                this.application.add_accelerator(actionEntry.accel,
-                    'win.' + actionEntry.name, null);
-                this.add_action(action);
+                application.add_accelerator(actionEntry.accel,
+                    'app.' + actionEntry.name, null);
+                application.add_action(action);
             }));
     },
 

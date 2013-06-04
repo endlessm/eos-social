@@ -1,9 +1,8 @@
 jsdir = $(pkgdatadir)/js/
 dist_js_DATA = \
 	main.js \
-	mainWindow.js \
 	socialBar.js \
 	socialBarView.js \
+	socketWatcher.js \
 	parseUri.js \
-	wmInspect.js \
 	$(NULL)

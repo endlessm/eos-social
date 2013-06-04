@@ -7,8 +7,8 @@ Build-Depends: cdbs (>= 0.4.90~),
                autotools-dev,
                debhelper (>= 8),
                gjs,
-               gnome-pkg-tools
-X-Python-Version: >= 2.4
+               gnome-pkg-tools,
+               pkg-config
 Standards-Version: 3.9.2
 Homepage: http://www.endlessm.com
 

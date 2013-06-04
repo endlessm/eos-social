@@ -8,6 +8,10 @@ Build-Depends: cdbs (>= 0.4.90~),
                debhelper (>= 8),
                gjs,
                gnome-pkg-tools,
+               gobject-introspection,
+               libgjs-dev,
+               libgtk-3-dev,
+               libwebkitgtk-3.0-dev,
                pkg-config
 Standards-Version: 3.9.2
 Homepage: http://www.endlessm.com

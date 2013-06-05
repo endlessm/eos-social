@@ -3,16 +3,19 @@ dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.53)
 AC_INIT([eos-social], [1.0.99], [http://www.endlessm.com])
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
-AC_CONFIG_SRCDIR(eos-social.in)
+AC_CONFIG_SRCDIR([EosSocial/main.js])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([1.9 no-dist-gzip dist-xz foreign])
 
-AM_PATH_PYTHON_VERSION(2.7, 2.7.0, 2.6, 2.6.0, 2.5, 2.5.0, 2.4, 2.4.0)
-
 PKG_CHECK_MODULES(EOS_SOCIAL,
+                  gjs-1.0
                   gio-2.0
                   gtk+-3.0
                   webkitgtk-3.0)
+
+
+GJS_CONSOLE=`$PKG_CONFIG --variable=gjs_console gjs-1.0`
+AC_SUBST(GJS_CONSOLE)
 
 AC_CONFIG_FILES([
         Makefile

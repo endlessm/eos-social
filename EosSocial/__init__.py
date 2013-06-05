@@ -1,1 +1,0 @@
-# EosSocial module

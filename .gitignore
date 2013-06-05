@@ -9,3 +9,8 @@ install-sh
 missing
 py-compile
 stamp-h1
+*.pyo
+*.pyc
+*~
+\#*\#
+*.swp

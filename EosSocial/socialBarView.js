@@ -180,8 +180,8 @@ const SocialBarView = new Lang.Class({
         this.add(container);
         this._browser.load_uri(SOCIAL_BAR_HOMEPAGE);
 
-        this.show_all();
-        this.hide();
+        container.show_all();
+        this.realize();
     },
 
     _onActionBack: function() {

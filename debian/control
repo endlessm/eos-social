@@ -4,15 +4,15 @@ Priority: standard
 Maintainer: Endless Mobile <maintainers@endlessm.com>
 Uploaders: Roddy Shuler <roddy@endlessm.com>
 Build-Depends: cdbs (>= 0.4.90~),
-               autotools-dev,
-               debhelper (>= 8),
-               gjs,
                gnome-pkg-tools,
+               gnome-common,
+               dh-autoreconf,
+               debhelper (>= 8),
                gobject-introspection,
                libgjs-dev,
+               libglib2.0-dev,
                libgtk-3-dev,
-               libwebkitgtk-3.0-dev,
-               pkg-config
+               libwebkitgtk-3.0-dev
 Standards-Version: 3.9.2
 Homepage: http://www.endlessm.com
 
@@ -20,11 +20,12 @@ Package: eos-social
 Replaces: endlessos-base-social
 Breaks: endlessos-base-social
 Architecture: all
-Depends: ${python:Depends},
+Depends: ${gir:Depends},
          ${misc:Depends},
          gir1.2-glib-2.0,
          gir1.2-gtk-3.0,
          gir1.2-webkit-3.0,
          gir1.2-wnck-3.0,
+         gjs
 Description: Endless Social Bar installation package
  This package installs the Endless OS Social Bar

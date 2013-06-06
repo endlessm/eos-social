@@ -26,12 +26,8 @@ const SocialBarView = new Lang.Class({
 
     _init: function(application) {
         this.parent({ type: Gtk.WindowType.TOPLEVEL,
-                      application: application,
-                      decorated: false,
-                      modal: true,
-                      resizable: false,
-                      skip_pager_hint: true,
-                      skip_taskbar_hint: true });
+                      type_hint: Gdk.WindowTypeHint.DOCK,
+                      application: application });
 
         this._wmInspect = new WMInspect.WMInspect();
         this._wmInspect.connect('active-window-changed', Lang.bind(this,

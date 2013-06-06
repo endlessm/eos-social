@@ -5,6 +5,7 @@ const Gtk = imports.gi.Gtk;
 const Lang = imports.lang;
 const WebKit = imports.gi.WebKit;
 
+const FrameClock = imports.frameClock;
 const MainWindow = imports.mainWindow;
 const ParseUri = imports.parseUri;
 const WMInspect = imports.wmInspect;
@@ -19,6 +20,95 @@ function _parseLinkFromRedirect(uri) {
 
     return GLib.uri_unescape_string(queryDict['u'], '');
 };
+
+const ANIMATION_TIME = (500 * 1000); // half a second
+
+const SocialBarSlider = new Lang.Class({
+    Name: 'SocialBarSlider',
+    Extends: FrameClock.FrameClockAnimator,
+
+    _init: function(widget) {
+        this.showing = false;
+        this.parent(widget, ANIMATION_TIME);
+    },
+
+    _getX: function(forVisibility) {
+        let [width, height] = this._getSize();
+        let workarea = this._getWorkarea();
+        let x = workarea.width;
+
+        if (forVisibility) {
+            x -= width;
+        }
+
+        return x;
+    },
+
+    _getInitialValue: function() {
+        return this._getX(!this.showing);
+    },
+
+    setValue: function(newX) {
+        let [, oldY] = this._widget.get_position();
+        this._widget.move(newX, oldY);
+    },
+
+    _getWorkarea: function() {
+        let screen = Gdk.Screen.get_default();
+        let monitor = screen.get_primary_monitor();
+        let workarea = screen.get_monitor_workarea(monitor);
+
+        return workarea;
+    },
+
+    _getSize: function() {
+        let workarea = this._getWorkarea();
+        return [workarea.width / 3, workarea.height];
+    },
+
+    _updateGeometry: function() {
+        let workarea = this._getWorkarea();
+        let [width, height] = this._getSize();
+        let x = this._getX(this.showing);
+
+        let geometry = { x: x,
+                         y: workarea.y,
+                         width: width,
+                         height: height };
+
+        this._widget.move(geometry.x, geometry.y);
+        this._widget.set_size_request(geometry.width, geometry.height);
+    },
+
+    setInitialValue: function() {
+        this.stop();
+        this._updateGeometry();
+    },
+
+    slideIn: function() {
+        if (this.showing) {
+            return;
+        }
+
+        this.setInitialValue();
+        this._widget.show();
+
+        this.showing = true;
+        this.start(this._getX(true));
+    },
+
+    slideOut: function() {
+        if (!this.showing) {
+            return;
+        }
+
+        this.showing = false;
+        this.start(this._getX(false), Lang.bind(this,
+            function() {
+                this._widget.hide();
+            }));
+    }
+});
 
 const SocialBarView = new Lang.Class({
     Name: 'SocialBarView',
@@ -42,43 +132,34 @@ const SocialBarView = new Lang.Class({
         // update position when workarea changes
         let screen = Gdk.Screen.get_default();
         screen.connect('monitors-changed', Lang.bind(this,
-            this._ensurePosition));
+            this._onMonitorsChanged));
+
+        // initialize animator
+        this._animator = new SocialBarSlider(this);
 
         // now create the view
         this._createView();
+
+        this._animator.setInitialValue();
     },
 
     _onActiveWindowChanged: function(wmInspect, activeXid) {
         let xid = this.get_window().get_xid();
         if (xid != activeXid)
-            this.hide();
+            this._animator.slideOut();
     },
 
-    _ensurePosition: function() {
-        let screen = Gdk.Screen.get_default();
-        let monitor = screen.get_primary_monitor();
-        let workarea = screen.get_monitor_workarea(monitor);
-
-        let width = workarea.width / 3;
-        let geometry = { x: workarea.x + workarea.width - width,
-                         y: workarea.y,
-                         width: width,
-                         height: workarea.height };
-
-        this.move(geometry.x, geometry.y);
-        this.set_size_request(geometry.width, geometry.height);
-    },
-
-    show: function() {
-        this._ensurePosition();
-        this.present();
+    _onMonitorsChanged: function() {
+        this._animator.setInitialValue();
     },
 
     toggle: function() {
-        if (this.get_visible())
-            this.hide();
-        else
-            this.show();
+        if (this._animator.showing) {
+            this._animator.slideOut();
+        } else {
+            this._animator.slideIn();
+            this.present();
+        }
     },
 
     _createView: function() {

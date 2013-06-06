@@ -1,3 +1,4 @@
+const Gdk = imports.gi.Gdk;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
@@ -6,6 +7,7 @@ const WebKit = imports.gi.WebKit;
 
 const MainWindow = imports.mainWindow;
 const ParseUri = imports.parseUri;
+const WMInspect = imports.wmInspect;
 
 const SOCIAL_BAR_HOMEPAGE = 'https://m.facebook.com';
 const CANCELED_REQUEST_URI = 'about:blank';
@@ -20,10 +22,70 @@ function _parseLinkFromRedirect(uri) {
 
 const SocialBarView = new Lang.Class({
     Name: 'SocialBarView',
-    Extends: MainWindow.MainWindow,
+    Extends: Gtk.ApplicationWindow,
 
-    _init: function(params) {
-        this.parent(params);
+    _init: function(application) {
+        this.parent({ type: Gtk.WindowType.TOPLEVEL,
+                      application: application,
+                      decorated: false,
+                      modal: true,
+                      resizable: false,
+                      skip_pager_hint: true,
+                      skip_taskbar_hint: true });
+
+        this._wmInspect = new WMInspect.WMInspect();
+        this._wmInspect.connect('active-window-changed', Lang.bind(this,
+            this._onActiveWindowChanged));
+
+        // stick on all desktop
+        this.stick();
+        // do not destroy on delete event
+        this.connect('delete-event', Lang.bind(this,
+            this.hide_on_delete));
+
+        // update position when workarea changes
+        let screen = Gdk.Screen.get_default();
+        screen.connect('monitors-changed', Lang.bind(this,
+            this._ensurePosition));
+
+        // now create the view
+        this._createView();
+    },
+
+    _onActiveWindowChanged: function(wmInspect, activeXid) {
+        let xid = this.get_window().get_xid();
+        if (xid != activeXid)
+            this.hide();
+    },
+
+    _ensurePosition: function() {
+        let screen = Gdk.Screen.get_default();
+        let monitor = screen.get_primary_monitor();
+        let workarea = screen.get_monitor_workarea(monitor);
+
+        let width = workarea.width / 3;
+        let geometry = { x: workarea.x + workarea.width - width,
+                         y: workarea.y,
+                         width: width,
+                         height: workarea.height };
+
+        this.move(geometry.x, geometry.y);
+        this.set_size_request(geometry.width, geometry.height);
+    },
+
+    show: function() {
+        this._ensurePosition();
+        this.present();
+    },
+
+    toggle: function() {
+        if (this.get_visible())
+            this.hide();
+        else
+            this.show();
+    },
+
+    _createView: function() {
         this._installActions();
 
         this._browser = new WebKit.WebView();

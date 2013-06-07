@@ -35,7 +35,7 @@ const SocialBarSlider = new Lang.Class({
     _getX: function(forVisibility) {
         let [width, height] = this._getSize();
         let workarea = this._getWorkarea();
-        let x = workarea.width;
+        let x = workarea.x + workarea.width;
 
         if (forVisibility) {
             x -= width;

@@ -14,6 +14,8 @@ const WMInspect = imports.wmInspect;
 const SOCIAL_BAR_HOMEPAGE = 'https://m.facebook.com';
 const CANCELED_REQUEST_URI = 'about:blank';
 const FB_LINK_REDIRECT_KEY = '/render_linkshim_';
+const SOCIAL_BAR_WIDTH = 420;
+const MAX_FRACTION_OF_DISPLAY_WIDTH = 0.35;
 
 function _parseLinkFromRedirect(uri) {
     let parser = ParseUri.parseUri(uri);
@@ -64,7 +66,8 @@ const SocialBarSlider = new Lang.Class({
 
     _getSize: function() {
         let workarea = this._getWorkarea();
-        return [workarea.width / 3, workarea.height];
+	let maxWidth = workarea.width * MAX_FRACTION_OF_DISPLAY_WIDTH;
+        return [Math.min(SOCIAL_BAR_WIDTH, maxWidth), workarea.height];
     },
 
     _updateGeometry: function() {

@@ -145,8 +145,9 @@ const SocialBarView = new Lang.Class({
 
     _onActiveWindowChanged: function(wmInspect, activeXid) {
         let xid = this.get_window().get_xid();
-        if (xid != activeXid)
+        if (xid != activeXid) {
             this._animator.slideOut();
+        }
     },
 
     _onMonitorsChanged: function() {

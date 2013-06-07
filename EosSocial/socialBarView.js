@@ -6,7 +6,6 @@ const Lang = imports.lang;
 const WebKit = imports.gi.WebKit;
 
 const FrameClock = imports.frameClock;
-const MainWindow = imports.mainWindow;
 const ParseUri = imports.parseUri;
 const WMInspect = imports.wmInspect;
 

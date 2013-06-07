@@ -9,7 +9,6 @@ const SOCIAL_BAR_PATH = '/com/endlessm/SocialBar';
 const SOCIAL_BAR_IFACE = 'com.endlessm.SocialBar';
 
 const SocialBarIface = <interface name={SOCIAL_BAR_NAME}>
-<method name="restore"/>
 <method name="toggle"/>
 </interface>;
 
@@ -32,10 +31,6 @@ const SocialBar = new Lang.Class({
 
     vfunc_activate: function() {
         // do nothing
-    },
-
-    restore: function() {
-        this._window.show();
     },
 
     toggle: function() {

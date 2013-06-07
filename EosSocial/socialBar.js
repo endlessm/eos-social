@@ -30,6 +30,7 @@ const SocialBar = new Lang.Class({
         this.parent();
 
         this._window = new SocialBarView.SocialBarView(this);
+        this._window.connect('visibility-changed', Lang.bind(this, this._onVisibilityChanged));
     },
 
     vfunc_activate: function() {
@@ -38,7 +39,9 @@ const SocialBar = new Lang.Class({
 
     toggle: function() {
         this._window.toggle();
+    },
 
+    _onVisibilityChanged: function() {
         this.Visible = this._window.getVisible();
         let propChangedVariant = new GLib.Variant('(sa{sv}as)',
             [SOCIAL_BAR_IFACE, { 'Visible': new GLib.Variant('b', this.Visible) }, []]);

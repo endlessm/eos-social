@@ -4,6 +4,7 @@ const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
 const Lang = imports.lang;
+const Signals = imports.signals;
 const WebKit = imports.gi.WebKit;
 
 const FrameClock = imports.frameClock;
@@ -28,7 +29,7 @@ const SocialBarSlider = new Lang.Class({
     Extends: FrameClock.FrameClockAnimator,
 
     _init: function(widget) {
-        this.showing = false;
+        this._showing = false;
         this.parent(widget, ANIMATION_TIME);
     },
 
@@ -107,12 +108,25 @@ const SocialBarSlider = new Lang.Class({
             function() {
                 this._widget.hide();
             }));
+    },
+
+    set showing(value) {
+        this._showing = value;
+        this.emit('visibility-changed');
+    },
+
+    get showing() {
+        return this._showing;
     }
 });
+Signals.addSignalMethods(SocialBarSlider.prototype);
 
 const SocialBarView = new Lang.Class({
     Name: 'SocialBarView',
     Extends: Gtk.ApplicationWindow,
+    Signals: {
+        'visibility-changed': { }
+    },
 
     _init: function(application) {
         this.parent({ type: Gtk.WindowType.TOPLEVEL,
@@ -136,6 +150,7 @@ const SocialBarView = new Lang.Class({
 
         // initialize animator
         this._animator = new SocialBarSlider(this);
+        this._animator.connect('visibility-changed', Lang.bind(this, this._onVisibilityChanged));
 
         // now create the view
         this._createView();
@@ -235,5 +250,10 @@ const SocialBarView = new Lang.Class({
 
     _openExternalPage: function(uri) {
         Gtk.show_uri(null, uri, Gtk.get_current_event_time());
+    },
+
+    _onVisibilityChanged: function() {
+        // forward the signal
+        this.emit('visibility-changed');
     }
 });

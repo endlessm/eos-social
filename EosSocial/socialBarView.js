@@ -1,4 +1,5 @@
 const Gdk = imports.gi.Gdk;
+const GdkX11 = imports.gi.GdkX11;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;

@@ -66,7 +66,7 @@ const SocialBarSlider = new Lang.Class({
 
     _getSize: function() {
         let workarea = this._getWorkarea();
-	let maxWidth = workarea.width * MAX_FRACTION_OF_DISPLAY_WIDTH;
+        let maxWidth = workarea.width * MAX_FRACTION_OF_DISPLAY_WIDTH;
         return [Math.min(SOCIAL_BAR_WIDTH, maxWidth), workarea.height];
     },
 

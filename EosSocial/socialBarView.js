@@ -172,12 +172,12 @@ const SocialBarView = new Lang.Class({
         this._animator.setInitialValue();
     },
 
-    toggle: function() {
+    toggle: function(timestamp) {
         if (this._animator.showing) {
             this._animator.slideOut();
         } else {
             this._animator.slideIn();
-            this.present();
+            this.present_with_time(timestamp);
         }
     },
 

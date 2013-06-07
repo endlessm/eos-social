@@ -10,7 +10,9 @@ const SOCIAL_BAR_PATH = '/com/endlessm/SocialBar';
 const SOCIAL_BAR_IFACE = 'com.endlessm.SocialBar';
 
 const SocialBarIface = <interface name={SOCIAL_BAR_NAME}>
-<method name="toggle"/>
+<method name="toggle">
+<arg type="u" direction="in" name="timestamp"/>
+</method>
 <property name="Visible" type="b" access="read"/>
 </interface>;
 
@@ -37,8 +39,8 @@ const SocialBar = new Lang.Class({
         // do nothing
     },
 
-    toggle: function() {
-        this._window.toggle();
+    toggle: function(timestamp) {
+        this._window.toggle(timestamp);
     },
 
     _onVisibilityChanged: function() {

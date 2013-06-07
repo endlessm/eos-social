@@ -1,11 +1,15 @@
+const Gdk = imports.gi.Gdk;
+const GdkX11 = imports.gi.GdkX11;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
 const Lang = imports.lang;
+const Signals = imports.signals;
 const WebKit = imports.gi.WebKit;
 
-const MainWindow = imports.mainWindow;
+const FrameClock = imports.frameClock;
 const ParseUri = imports.parseUri;
+const WMInspect = imports.wmInspect;
 
 const SOCIAL_BAR_HOMEPAGE = 'https://m.facebook.com';
 const CANCELED_REQUEST_URI = 'about:blank';
@@ -18,12 +22,167 @@ function _parseLinkFromRedirect(uri) {
     return GLib.uri_unescape_string(queryDict['u'], '');
 };
 
+const ANIMATION_TIME = (500 * 1000); // half a second
+
+const SocialBarSlider = new Lang.Class({
+    Name: 'SocialBarSlider',
+    Extends: FrameClock.FrameClockAnimator,
+
+    _init: function(widget) {
+        this._showing = false;
+        this.parent(widget, ANIMATION_TIME);
+    },
+
+    _getX: function(forVisibility) {
+        let [width, height] = this._getSize();
+        let workarea = this._getWorkarea();
+        let x = workarea.x + workarea.width;
+
+        if (forVisibility) {
+            x -= width;
+        }
+
+        return x;
+    },
+
+    _getInitialValue: function() {
+        return this._getX(!this.showing);
+    },
+
+    setValue: function(newX) {
+        let [, oldY] = this._widget.get_position();
+        this._widget.move(newX, oldY);
+    },
+
+    _getWorkarea: function() {
+        let screen = Gdk.Screen.get_default();
+        let monitor = screen.get_primary_monitor();
+        let workarea = screen.get_monitor_workarea(monitor);
+
+        return workarea;
+    },
+
+    _getSize: function() {
+        let workarea = this._getWorkarea();
+        return [workarea.width / 3, workarea.height];
+    },
+
+    _updateGeometry: function() {
+        let workarea = this._getWorkarea();
+        let [width, height] = this._getSize();
+        let x = this._getX(this.showing);
+
+        let geometry = { x: x,
+                         y: workarea.y,
+                         width: width,
+                         height: height };
+
+        this._widget.move(geometry.x, geometry.y);
+        this._widget.set_size_request(geometry.width, geometry.height);
+    },
+
+    setInitialValue: function() {
+        this.stop();
+        this._updateGeometry();
+    },
+
+    slideIn: function() {
+        if (this.showing) {
+            return;
+        }
+
+        this.setInitialValue();
+        this._widget.show();
+
+        this.showing = true;
+        this.start(this._getX(true));
+    },
+
+    slideOut: function() {
+        if (!this.showing) {
+            return;
+        }
+
+        this.showing = false;
+        this.start(this._getX(false), Lang.bind(this,
+            function() {
+                this._widget.hide();
+            }));
+    },
+
+    set showing(value) {
+        this._showing = value;
+        this.emit('visibility-changed');
+    },
+
+    get showing() {
+        return this._showing;
+    }
+});
+Signals.addSignalMethods(SocialBarSlider.prototype);
+
 const SocialBarView = new Lang.Class({
     Name: 'SocialBarView',
-    Extends: MainWindow.MainWindow,
+    Extends: Gtk.ApplicationWindow,
+    Signals: {
+        'visibility-changed': { }
+    },
 
-    _init: function(params) {
-        this.parent(params);
+    _init: function(application) {
+        this.parent({ type: Gtk.WindowType.TOPLEVEL,
+                      type_hint: Gdk.WindowTypeHint.DOCK,
+                      application: application });
+
+        this._wmInspect = new WMInspect.WMInspect();
+        this._wmInspect.connect('active-window-changed', Lang.bind(this,
+            this._onActiveWindowChanged));
+
+        // stick on all desktop
+        this.stick();
+        // do not destroy on delete event
+        this.connect('delete-event', Lang.bind(this,
+            this.hide_on_delete));
+
+        // update position when workarea changes
+        let screen = Gdk.Screen.get_default();
+        screen.connect('monitors-changed', Lang.bind(this,
+            this._onMonitorsChanged));
+
+        // initialize animator
+        this._animator = new SocialBarSlider(this);
+        this._animator.connect('visibility-changed', Lang.bind(this, this._onVisibilityChanged));
+
+        // now create the view
+        this._createView();
+
+        this._animator.setInitialValue();
+    },
+
+    _onActiveWindowChanged: function(wmInspect, activeXid) {
+        let xid = this.get_window().get_xid();
+        if (xid != activeXid) {
+            this._animator.slideOut();
+        }
+    },
+
+    _onMonitorsChanged: function() {
+        this._animator.setInitialValue();
+    },
+
+    toggle: function() {
+        if (this._animator.showing) {
+            this._animator.slideOut();
+        } else {
+            this._animator.slideIn();
+            this.present();
+        }
+    },
+
+    getVisible: function() {
+        return this._animator.showing;
+    },
+
+    _createView: function() {
         this._installActions();
 
         this._browser = new WebKit.WebView();
@@ -41,8 +200,8 @@ const SocialBarView = new Lang.Class({
         this.add(container);
         this._browser.load_uri(SOCIAL_BAR_HOMEPAGE);
 
-        this.show_all();
-        this.hide();
+        container.show_all();
+        this.realize();
     },
 
     _onActionBack: function() {
@@ -91,5 +250,10 @@ const SocialBarView = new Lang.Class({
 
     _openExternalPage: function(uri) {
         Gtk.show_uri(null, uri, Gtk.get_current_event_time());
+    },
+
+    _onVisibilityChanged: function() {
+        // forward the signal
+        this.emit('visibility-changed');
     }
 });

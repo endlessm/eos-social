@@ -163,6 +163,10 @@ const SocialBarView = new Lang.Class({
         }
     },
 
+    getVisible: function() {
+        return this._animator.showing;
+    },
+
     _createView: function() {
         this._installActions();
 

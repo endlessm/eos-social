@@ -2,6 +2,12 @@ eos-social (1.1.1~dev5) unstable; urgency=low
 
   * Updating version to 1.1.1~dev5
 
+ -- Roddy Shuler <roddy@endlessm.com>  Wed, 12 Jun 2013 14:01:02 -0500
+
+eos-social (1.1.1~dev5) unstable; urgency=low
+
+  * Updating version to 1.1.1~dev5
+
  -- Cosimo Cecchi <cosimo@endlessm.com>  Thu, 06 Jun 2013 09:16:12 -0700
 
 eos-social (1.1.1~dev4) unstable; urgency=low

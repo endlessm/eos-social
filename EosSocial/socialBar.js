@@ -1,8 +1,10 @@
+const Gdk = imports.gi.Gdk;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
 const Lang = imports.lang;
 
+const Path = imports.path;
 const SocialBarView = imports.socialBarView;
 
 const SOCIAL_BAR_NAME = 'com.endlessm.SocialBar';
@@ -30,6 +32,15 @@ const SocialBar = new Lang.Class({
 
     vfunc_startup: function() {
         this.parent();
+
+        let resource = Gio.Resource.load(Path.RESOURCE_DIR + '/eos-social.gresource');
+        resource._register();
+
+        let provider = new Gtk.CssProvider();
+        provider.load_from_file(Gio.File.new_for_uri('resource:///com/endlessm/socialbar/eos-social.css'));
+        Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(),
+            provider,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
         this._window = new SocialBarView.SocialBarView(this);
         this._window.connect('visibility-changed', Lang.bind(this, this._onVisibilityChanged));

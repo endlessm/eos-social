@@ -14,3 +14,5 @@ stamp-h1
 *~
 \#*\#
 *.swp
+EosSocial/path.js
+data/eos-social.gresource

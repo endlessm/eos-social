@@ -188,23 +188,62 @@ const SocialBarView = new Lang.Class({
     _createView: function() {
         this._installActions();
 
+        let box = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL });
+        this.add(box);
+
+        let toolbar = new Gtk.Toolbar();
+        toolbar.get_style_context().add_class('socialbar-topbar');
+        box.add(toolbar);
+
+        let buttons = new Gtk.Box({ spacing: 6 });
+        toolbar.add(new Gtk.ToolItem({ child: buttons }));
+
+        let backButton = new Gtk.Button({ child: new Gtk.Image({ pixel_size: 16,
+                                                                 icon_name: 'topbar-go-previous-symbolic' }),
+                                          action_name: 'win.back'
+                                        });
+        buttons.add(backButton);
+
+        let forwardButton = new Gtk.Button({ child: new Gtk.Image({ pixel_size: 16,
+                                                                    icon_name: 'topbar-go-next-symbolic' }),
+                                             action_name: 'win.forward'
+                                           });
+        buttons.add(forwardButton);
+
         this._browser = new WebKit.WebView();
         this._browser.connect('resource-request-starting', Lang.bind(this,
             this._resourceHandler));
         this._browser.connect('new-window-policy-decision-requested', Lang.bind(this,
             this._newWindowHandler));
+        this._browser.connect('notify::load-status', Lang.bind(this,
+            this._onLoadStatusChanged));
 
         let settings = this._browser.get_settings();
         settings.javascript_can_open_windows_automatically = true;
 
         let container = new Gtk.ScrolledWindow();
         container.add(this._browser);
+        container.vexpand = true;
 
-        this.add(container);
+        box.add(container);
         this._browser.load_uri(SOCIAL_BAR_HOMEPAGE);
 
-        container.show_all();
+        box.show_all();
         this.realize();
+    },
+
+    _onLoadStatusChanged: function() {
+        let status = this._browser.get_load_status();
+        if (status != WebKit.LoadStatus.COMMITTED &&
+            status != WebKit.LoadStatus.FAILED) {
+            return;
+        }
+
+        let backAction = this.lookup_action('back');
+        backAction.set_enabled(this._browser.can_go_back());
+
+        let forwardAction = this.lookup_action('forward');
+        forwardAction.set_enabled(this._browser.can_go_forward());
     },
 
     _onActionBack: function() {
@@ -225,7 +264,8 @@ const SocialBarView = new Lang.Class({
 
         actions.forEach(Lang.bind(this,
             function(actionEntry) {
-                let action = new Gio.SimpleAction({ name: actionEntry.name });
+                let action = new Gio.SimpleAction({ name: actionEntry.name,
+                                                    enabled: false });
                 action.connect('activate', Lang.bind(this, actionEntry.callback));
 
                 this.application.add_accelerator(actionEntry.accel,

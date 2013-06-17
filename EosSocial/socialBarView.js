@@ -151,6 +151,11 @@ const SocialBarView = new Lang.Class({
         screen.connect('monitors-changed', Lang.bind(this,
             this._onMonitorsChanged));
 
+        let visual = screen.get_rgba_visual();
+        if (visual) {
+            this.set_visual(visual);
+        }
+
         // initialize animator
         this._animator = new SocialBarSlider(this);
         this._animator.connect('visibility-changed', Lang.bind(this, this._onVisibilityChanged));
@@ -188,8 +193,12 @@ const SocialBarView = new Lang.Class({
     _createView: function() {
         this._installActions();
 
+        let frame = new Gtk.Frame({ shadow_type: Gtk.ShadowType.IN });
+        frame.get_style_context().add_class('socialbar-frame');
+        this.add(frame);
+
         let box = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL });
-        this.add(box);
+        frame.add(box);
 
         let toolbar = new Gtk.Toolbar();
         toolbar.get_style_context().add_class('socialbar-topbar');
@@ -228,7 +237,7 @@ const SocialBarView = new Lang.Class({
         box.add(container);
         this._browser.load_uri(SOCIAL_BAR_HOMEPAGE);
 
-        box.show_all();
+        frame.show_all();
         this.realize();
     },
 

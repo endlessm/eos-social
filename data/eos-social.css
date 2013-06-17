@@ -1,3 +1,17 @@
+.background {
+    background-color: transparent;
+}
+
+.socialbar-frame.frame {
+    border-width: 0 0 0 6px;
+    border-color: transparent;
+
+    border-image: linear-gradient(to right,
+                                  transparent,
+                                  alpha(black, 0.10) 2px,
+                                  black 11px) 6 / 6px stretch;
+}
+
 .socialbar-topbar.toolbar {
     padding: 5px 4px 4px;
     background-color: #3c3b37;

@@ -124,6 +124,32 @@ const SocialBarSlider = new Lang.Class({
 });
 Signals.addSignalMethods(SocialBarSlider.prototype);
 
+const SocialBarTopbar = new Lang.Class({
+    Name: 'SocialBarTopbar',
+    Extends: Gtk.Toolbar,
+
+    _init: function(params) {
+        this.parent(params);
+
+        this.get_style_context().add_class('socialbar-topbar');
+
+        let leftButtons = new Gtk.Box({ spacing: 6 });
+        this.add(new Gtk.ToolItem({ child: leftButtons }));
+
+        let backButton = new Gtk.Button({ child: new Gtk.Image({ pixel_size: 16,
+                                                                 icon_name: 'topbar-go-previous-symbolic' }),
+                                          action_name: 'win.back'
+                                        });
+        leftButtons.add(backButton);
+
+        let forwardButton = new Gtk.Button({ child: new Gtk.Image({ pixel_size: 16,
+                                                                    icon_name: 'topbar-go-next-symbolic' }),
+                                             action_name: 'win.forward'
+                                           });
+        leftButtons.add(forwardButton);
+    }
+});
+
 const SocialBarView = new Lang.Class({
     Name: 'SocialBarView',
     Extends: Gtk.ApplicationWindow,
@@ -200,24 +226,8 @@ const SocialBarView = new Lang.Class({
         let box = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL });
         frame.add(box);
 
-        let toolbar = new Gtk.Toolbar();
-        toolbar.get_style_context().add_class('socialbar-topbar');
+        let toolbar = new SocialBarTopbar();
         box.add(toolbar);
-
-        let buttons = new Gtk.Box({ spacing: 6 });
-        toolbar.add(new Gtk.ToolItem({ child: buttons }));
-
-        let backButton = new Gtk.Button({ child: new Gtk.Image({ pixel_size: 16,
-                                                                 icon_name: 'topbar-go-previous-symbolic' }),
-                                          action_name: 'win.back'
-                                        });
-        buttons.add(backButton);
-
-        let forwardButton = new Gtk.Button({ child: new Gtk.Image({ pixel_size: 16,
-                                                                    icon_name: 'topbar-go-next-symbolic' }),
-                                             action_name: 'win.forward'
-                                           });
-        buttons.add(forwardButton);
 
         this._browser = new WebKit.WebView();
         this._browser.connect('resource-request-starting', Lang.bind(this,

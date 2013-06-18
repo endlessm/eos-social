@@ -134,7 +134,9 @@ const SocialBarTopbar = new Lang.Class({
         this.get_style_context().add_class('socialbar-topbar');
 
         let leftButtons = new Gtk.Box({ spacing: 6 });
-        this.add(new Gtk.ToolItem({ child: leftButtons }));
+        let leftItem = new Gtk.ToolItem({ child: leftButtons });
+        leftItem.set_expand(true);
+        this.add(leftItem);
 
         let backButton = new Gtk.Button({ child: new Gtk.Image({ pixel_size: 16,
                                                                  icon_name: 'topbar-go-previous-symbolic' }),
@@ -147,6 +149,15 @@ const SocialBarTopbar = new Lang.Class({
                                              action_name: 'win.forward'
                                            });
         leftButtons.add(forwardButton);
+
+        let rightButtons = new Gtk.Box({ spacing: 6 });
+        this.add(new Gtk.ToolItem({ child: rightButtons }));
+
+        let minimizeButton = new Gtk.Button({ child: new Gtk.Image({ pixel_size: 16,
+                                                                     icon_name: 'topbar-minimize-symbolic' }),
+                                              action_name: 'win.minimize'
+                                            });
+        rightButtons.add(minimizeButton);
     }
 });
 
@@ -236,6 +247,7 @@ const SocialBarView = new Lang.Class({
             this._newWindowHandler));
         this._browser.connect('notify::load-status', Lang.bind(this,
             this._onLoadStatusChanged));
+        this._onLoadStatusChanged();
 
         let settings = this._browser.get_settings();
         settings.javascript_can_open_windows_automatically = true;
@@ -265,6 +277,14 @@ const SocialBarView = new Lang.Class({
         forwardAction.set_enabled(this._browser.can_go_forward());
     },
 
+    _onActionMinimize: function() {
+        if (!this.getVisible()) {
+            return;
+        }
+
+        this.toggle();
+    },
+
     _onActionBack: function() {
         this._browser.go_back();
     },
@@ -279,16 +299,19 @@ const SocialBarView = new Lang.Class({
                          accel: '<Alt>Left' },
                        { name: 'forward',
                          callback: this._onActionForward,
-                         accel: '<Alt>Right' }];
+                         accel: '<Alt>Right' },
+                       { name: 'minimize',
+                         callback: this._onActionMinimize }];
 
         actions.forEach(Lang.bind(this,
             function(actionEntry) {
-                let action = new Gio.SimpleAction({ name: actionEntry.name,
-                                                    enabled: false });
+                let action = new Gio.SimpleAction({ name: actionEntry.name });
                 action.connect('activate', Lang.bind(this, actionEntry.callback));
 
-                this.application.add_accelerator(actionEntry.accel,
-                    'win.' + actionEntry.name, null);
+                if (actionEntry.accel) {
+                    this.application.add_accelerator(actionEntry.accel,
+                        'win.' + actionEntry.name, null);
+                }
                 this.add_action(action);
             }));
     },

@@ -22,17 +22,17 @@
     border: none;
     padding: 0;
 
-    color: #c8c8c8;
+    color: #8a8a8a;
     icon-shadow: inset 0 1px black;
 }
 
 .socialbar-topbar.toolbar .button *:hover {
-    color: white;
+    color: #e8e8e8;
 }
 
 .socialbar-topbar.toolbar .button *:active,
 .socialbar-topbar.toolbar .button *:hover:active {
-    color: #a0a0a0;
+    color: #5d5d5d;
 }
 
 .socialbar-topbar.toolbar .button *:insensitive {

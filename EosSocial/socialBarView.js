@@ -154,7 +154,7 @@ const SocialBarTopbar = new Lang.Class({
         this.add(new Gtk.ToolItem({ child: rightButtons }));
 
         let minimizeButton = new Gtk.Button({ child: new Gtk.Image({ pixel_size: 16,
-                                                                     icon_name: 'topbar-minimize-symbolic' }),
+                                                                     icon_name: 'window-minimize-symbolic' }),
                                               action_name: 'win.minimize'
                                             });
         rightButtons.add(minimizeButton);

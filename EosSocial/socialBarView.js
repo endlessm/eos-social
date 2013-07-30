@@ -5,7 +5,7 @@ const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
 const Lang = imports.lang;
 const Signals = imports.signals;
-const WebKit = imports.gi.WebKit;
+const WebKit = imports.gi.WebKit2;
 
 const FrameClock = imports.frameClock;
 const ParseUri = imports.parseUri;
@@ -241,35 +241,29 @@ const SocialBarView = new Lang.Class({
         box.add(toolbar);
 
         this._browser = new WebKit.WebView();
-        this._browser.connect('resource-request-starting', Lang.bind(this,
+        this._browser.connect('resource-load-started', Lang.bind(this,
             this._resourceHandler));
-        this._browser.connect('new-window-policy-decision-requested', Lang.bind(this,
-            this._newWindowHandler));
-        this._browser.connect('notify::load-status', Lang.bind(this,
-            this._onLoadStatusChanged));
-        this._onLoadStatusChanged();
+        this._browser.connect('decide-policy', Lang.bind(this,
+            this._policyHandler));
+
+        this._browser.connect('load-changed', Lang.bind(this,
+            this._updateNavigationFlags));
+        this._browser.connect('load-failed', Lang.bind(this,
+            this._updateNavigationFlags));
+        this._updateNavigationFlags();
 
         let settings = this._browser.get_settings();
         settings.javascript_can_open_windows_automatically = true;
 
-        let container = new Gtk.ScrolledWindow();
-        container.add(this._browser);
-        container.vexpand = true;
-
-        box.add(container);
+        this._browser.vexpand = true;
+        box.add(this._browser);
         this._browser.load_uri(SOCIAL_BAR_HOMEPAGE);
 
         frame.show_all();
         this.realize();
     },
 
-    _onLoadStatusChanged: function() {
-        let status = this._browser.get_load_status();
-        if (status != WebKit.LoadStatus.COMMITTED &&
-            status != WebKit.LoadStatus.FAILED) {
-            return;
-        }
-
+    _updateNavigationFlags: function() {
         let backAction = this.lookup_action('back');
         backAction.set_enabled(this._browser.can_go_back());
 
@@ -316,7 +310,7 @@ const SocialBarView = new Lang.Class({
             }));
     },
 
-    _resourceHandler: function(view, frame, resource, request, response) {
+    _resourceHandler: function(view, resource, request) {
         let uri = request.get_uri();
         if (uri.indexOf(FB_LINK_REDIRECT_KEY) != -1) {
             let link = _parseLinkFromRedirect(uri);
@@ -326,11 +320,16 @@ const SocialBarView = new Lang.Class({
         }
     },
 
-    _newWindowHandler: function(view, frame, request, action, decision) {
-        this._openExternalPage(request.get_uri());
-        decision.ignore();
+    _policyHandler: function(view, decision, decisionType) {
+        if (decisionType == WebKit.PolicyDecisionType.NEW_WINDOW_ACTION) {
+            let request = decision.get_request();
+            this._openExternalPage(request.get_uri());
+            decision.ignore();
 
-        return true;
+            return true;
+        }
+
+        return false;
     },
 
     _openExternalPage: function(uri) {

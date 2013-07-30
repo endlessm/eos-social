@@ -255,12 +255,25 @@ const SocialBarView = new Lang.Class({
         let settings = this._browser.get_settings();
         settings.javascript_can_open_windows_automatically = true;
 
+        this._initCookies();
+
         this._browser.vexpand = true;
         box.add(this._browser);
         this._browser.load_uri(SOCIAL_BAR_HOMEPAGE);
 
         frame.show_all();
         this.realize();
+    },
+
+    _initCookies: function() {
+        // Use the same as eos-browser
+        let webContext = WebKit.WebContext.get_default();
+        let cookieManager = webContext.get_cookie_manager();
+        let ephyDotDir = GLib.build_filenamev([GLib.get_user_config_dir(),
+                                               'epiphany',
+                                               'cookies.sqlite']);
+
+        cookieManager.set_persistent_storage(ephyDotDir, WebKit.CookiePersistentStorage.SQLITE);
     },
 
     _updateNavigationFlags: function() {

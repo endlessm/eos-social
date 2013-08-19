@@ -250,6 +250,8 @@ const SocialBarView = new Lang.Class({
             this._updateNavigationFlags));
         this._browser.connect('load-failed', Lang.bind(this,
             this._updateNavigationFlags));
+        this._browser.connect('notify::uri', Lang.bind(this,
+            this._updateNavigationFlags));
         this._updateNavigationFlags();
 
         let settings = this._browser.get_settings();

@@ -81,7 +81,7 @@ const SocialBarSlider = new Lang.Class({
                          height: height };
 
         this._widget.move(geometry.x, geometry.y);
-        this._widget.set_size_request(geometry.width, geometry.height);
+        this._widget.resize(geometry.width, geometry.height);
     },
 
     setInitialValue: function() {

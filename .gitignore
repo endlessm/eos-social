@@ -16,3 +16,4 @@ stamp-h1
 *.swp
 EosSocial/path.js
 data/eos-social.gresource
+data/com.endlessm.SocialBar.service.in

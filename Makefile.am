@@ -1,6 +1,6 @@
 SUBDIRS = EosSocial data
 
-bin_SCRIPTS = eos-social
+libexec_SCRIPTS = eos-social
 
 do_subst = sed -e 's|@pkglibdir[@]|$(pkglibdir)|g' \
                -e 's|@pkgdatadir[@]|$(pkgdatadir)|g' \

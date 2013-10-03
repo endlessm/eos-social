@@ -20,3 +20,5 @@ BUILT_SOURCES = \
 EXTRA_DIST = \
 	path.js.in \
 	$(NULL)
+
+CLEANFILES = path.js

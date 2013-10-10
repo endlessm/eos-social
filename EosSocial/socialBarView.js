@@ -149,6 +149,12 @@ const SocialBarTopbar = new Lang.Class({
                                              action_name: 'win.forward'
                                            });
         leftButtons.add(forwardButton);
+        
+        let reloadButton = new Gtk.Button({ child: new Gtk.Image({ pixel_size: 16,
+                                                                   icon_name: 'topbar-refresh-symbolic' }),
+                                             action_name: 'win.reload'
+                                           });
+        leftButtons.add(reloadButton);
 
         let rightButtons = new Gtk.Box({ spacing: 6 });
         this.add(new Gtk.ToolItem({ child: rightButtons }));
@@ -301,6 +307,10 @@ const SocialBarView = new Lang.Class({
     _onActionForward: function() {
         this._browser.go_forward();
     },
+    
+    _onActionReload: function() {
+        this._browser.reload();
+    },
 
     _installActions: function() {
         let actions = [{ name: 'back',
@@ -309,6 +319,9 @@ const SocialBarView = new Lang.Class({
                        { name: 'forward',
                          callback: this._onActionForward,
                          accel: '<Alt>Right' },
+                       { name: 'reload',
+                         callback: this._onActionReload,
+                         accel: '<Control>r' },
                        { name: 'minimize',
                          callback: this._onActionMinimize }];
 

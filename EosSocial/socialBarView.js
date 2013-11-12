@@ -4,6 +4,7 @@ const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
 const Lang = imports.lang;
+const Mainloop = imports.mainloop;
 const Signals = imports.signals;
 const WebKit = imports.gi.WebKit2;
 
@@ -16,6 +17,7 @@ const CANCELED_REQUEST_URI = 'about:blank';
 const FB_LINK_REDIRECT_KEY = '/render_linkshim_';
 const SOCIAL_BAR_WIDTH = 420;
 const MAX_FRACTION_OF_DISPLAY_WIDTH = 0.35;
+const DESTROY_TIMEOUT_SECS = 30;
 
 function _parseLinkFromRedirect(uri) {
     let parser = ParseUri.parseUri(uri);
@@ -172,6 +174,8 @@ const SocialBarView = new Lang.Class({
         this.parent({ type: Gtk.WindowType.TOPLEVEL,
                       type_hint: Gdk.WindowTypeHint.DOCK,
                       application: application });
+
+        this._destroyTimeoutId = 0;
 
         this._wmInspect = new WMInspect.WMInspect();
         this._wmInspect.connect('active-window-changed', Lang.bind(this,
@@ -351,7 +355,34 @@ const SocialBarView = new Lang.Class({
         Gtk.show_uri(null, uri, Gtk.get_current_event_time());
     },
 
+    _destroyTimeout: function() {
+        this._destroyTimeoutId = 0;
+        this.destroy();
+
+        return false;
+    },
+
+    _clearDestroyTimeout: function() {
+        if (this._destroyTimeoutId > 0) {
+            Mainloop.source_remove(this._destroyTimeoutId);
+            this._destroyTimeoutId = 0;
+        }
+    },
+
+    _ensureDestroyTimeout: function() {
+        if (this._destroyTimeoutId == 0) {
+            this._destroyTimeoutId =
+                Mainloop.timeout_add_seconds (DESTROY_TIMEOUT_SECS, Lang.bind(this, this._destroyTimeout));
+        }
+    },
+
     _onVisibilityChanged: function() {
+        if (this.getVisible()) {
+            this._clearDestroyTimeout();
+        } else {
+            this._ensureDestroyTimeout();
+        }
+
         // forward the signal
         this.emit('visibility-changed');
     }

@@ -279,11 +279,13 @@ const SocialBarView = new Lang.Class({
         // Use the same as eos-browser
         let webContext = WebKit.WebContext.get_default();
         let cookieManager = webContext.get_cookie_manager();
-        let ephyDotDir = GLib.build_filenamev([GLib.get_user_config_dir(),
-                                               'epiphany',
+        let cookiesDir = GLib.build_filenamev([GLib.get_user_config_dir(),
+                                               'eos-social']);
+        let cookiesFile = GLib.build_filenamev([cookiesDir,
                                                'cookies.sqlite']);
 
-        cookieManager.set_persistent_storage(ephyDotDir, WebKit.CookiePersistentStorage.SQLITE);
+        GLib.mkdir_with_parents(cookiesDir, parseInt(700, 8));
+        cookieManager.set_persistent_storage(cookiesFile, WebKit.CookiePersistentStorage.SQLITE);
     },
 
     _updateNavigationFlags: function() {

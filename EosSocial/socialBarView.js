@@ -16,6 +16,7 @@ const CANCELED_REQUEST_URI = 'about:blank';
 const FB_LINK_REDIRECT_KEY = '/render_linkshim_';
 const SOCIAL_BAR_WIDTH = 420;
 const MAX_FRACTION_OF_DISPLAY_WIDTH = 0.35;
+const USER_AGENT_OVERRIDE = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_1) AppleWebKit/537.73.11 (KHTML, like Gecko) Version/7.0.1 Safari/537.73.11';
 
 function _parseLinkFromRedirect(uri) {
     let parser = ParseUri.parseUri(uri);
@@ -262,6 +263,7 @@ const SocialBarView = new Lang.Class({
 
         let settings = this._browser.get_settings();
         settings.javascript_can_open_windows_automatically = true;
+        settings.user_agent = USER_AGENT_OVERRIDE;
 
         this._initCookies();
 
@@ -277,11 +279,13 @@ const SocialBarView = new Lang.Class({
         // Use the same as eos-browser
         let webContext = WebKit.WebContext.get_default();
         let cookieManager = webContext.get_cookie_manager();
-        let ephyDotDir = GLib.build_filenamev([GLib.get_user_config_dir(),
-                                               'epiphany',
+        let cookiesDir = GLib.build_filenamev([GLib.get_user_config_dir(),
+                                               'eos-social']);
+        let cookiesFile = GLib.build_filenamev([cookiesDir,
                                                'cookies.sqlite']);
 
-        cookieManager.set_persistent_storage(ephyDotDir, WebKit.CookiePersistentStorage.SQLITE);
+        GLib.mkdir_with_parents(cookiesDir, parseInt(700, 8));
+        cookieManager.set_persistent_storage(cookiesFile, WebKit.CookiePersistentStorage.SQLITE);
     },
 
     _updateNavigationFlags: function() {

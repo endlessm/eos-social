@@ -22,7 +22,7 @@ const FrameClockAnimator = new Lang.Class({
         this._endCallback = null;
     },
 
-    start: function(endValue, endCallback) {
+    start: function(startValue, endValue, endCallback) {
         if (this._tickId) {
             this.stop();
         }
@@ -30,7 +30,7 @@ const FrameClockAnimator = new Lang.Class({
         this._tickId = this._widget.add_tick_callback(
             Lang.bind(this, this._onFrameTick));
         this._startTime = this._widget.get_frame_clock().get_frame_time();
-        this._startValue = this._getInitialValue();
+        this._startValue = startValue;
         this._endValue = endValue;
 
         if (endCallback) {

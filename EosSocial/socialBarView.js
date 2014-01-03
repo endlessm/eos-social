@@ -33,6 +33,7 @@ const SocialBarSlider = new Lang.Class({
 
     _init: function(widget) {
         this._showing = false;
+        this._willShow = false;
         this.parent(widget, ANIMATION_TIME);
     },
 
@@ -46,10 +47,6 @@ const SocialBarSlider = new Lang.Class({
         }
 
         return x;
-    },
-
-    _getInitialValue: function() {
-        return this._getX(!this.showing);
     },
 
     setValue: function(newX) {
@@ -91,27 +88,29 @@ const SocialBarSlider = new Lang.Class({
     },
 
     slideIn: function() {
-        if (this.showing) {
+        if (this._willShow) {
             return;
         }
 
         this.setInitialValue();
         this._widget.show();
 
+        this._willShow = true;
         this.showing = true;
-        this.start(this._getX(true));
+        this.start(this._getX(false), this._getX(true));
     },
 
     slideOut: function() {
-        if (!this.showing) {
+        if (!this._willShow) {
             return;
         }
 
-        this.showing = false;
-        this.start(this._getX(false), Lang.bind(this,
-            function() {
-                this._widget.hide();
-            }));
+        this._willShow = false;
+        this.start(this._getX(true), this._getX(false),
+                   Lang.bind(this, function() {
+                                 this.showing = false;
+                                 this._widget.hide();
+                             }));
     },
 
     set showing(value) {

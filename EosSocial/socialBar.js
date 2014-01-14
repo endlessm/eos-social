@@ -43,7 +43,7 @@ const SocialBar = new Lang.Class({
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
         this._window = new SocialBarView.SocialBarView(this);
-        this._window.connect('visibility-changed', Lang.bind(this, this._onVisibilityChanged));
+        this._window.connect('notify::visible', Lang.bind(this, this._onVisibilityChanged));
     },
 
     vfunc_activate: function() {
@@ -55,7 +55,7 @@ const SocialBar = new Lang.Class({
     },
 
     _onVisibilityChanged: function() {
-        this.Visible = this._window.getVisible();
+        this.Visible = this._window.is_visible();
         let propChangedVariant = new GLib.Variant('(sa{sv}as)',
             [SOCIAL_BAR_IFACE, { 'Visible': new GLib.Variant('b', this.Visible) }, []]);
 

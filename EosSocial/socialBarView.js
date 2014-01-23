@@ -153,7 +153,7 @@ const SocialBarView = new Lang.Class({
         } else {
             this._updateGeometry();
             this.show_all();
-            this.present();
+            this.present_with_time(timestamp);
         }
     },
 

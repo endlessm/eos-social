@@ -119,27 +119,27 @@ const SocialBarView = new Lang.Class({
         this._updateGeometry();
     },
 
-    _getWorkarea: function() {
+    _getWorkArea: function() {
         let screen = Gdk.Screen.get_default();
         let monitor = screen.get_primary_monitor();
-        let workarea = screen.get_monitor_workarea(monitor);
+        let workArea = screen.get_monitor_workarea(monitor);
 
-        return workarea;
+        return workArea;
     },
 
     _getSize: function() {
-        let workarea = this._getWorkarea();
-        let maxWidth = workarea.width * MAX_FRACTION_OF_DISPLAY_WIDTH;
-        return [Math.min(SOCIAL_BAR_WIDTH, maxWidth), workarea.height];
+        let workArea = this._getWorkArea();
+        let maxWidth = workArea.width * MAX_FRACTION_OF_DISPLAY_WIDTH;
+        return [Math.min(SOCIAL_BAR_WIDTH, maxWidth), workArea.height];
     },
 
     _updateGeometry: function() {
-        let workarea = this._getWorkarea();
+        let workArea = this._getWorkArea();
         let [width, height] = this._getSize();
-        let x = workarea.x + workarea.width - width;
+        let x = workArea.x + workArea.width - width;
 
         let geometry = { x: x,
-                         y: workarea.y,
+                         y: workArea.y,
                          width: width,
                          height: height };
 

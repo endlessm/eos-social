@@ -7,7 +7,6 @@ const Lang = imports.lang;
 const Signals = imports.signals;
 const WebKit = imports.gi.WebKit2;
 
-const FrameClock = imports.frameClock;
 const ParseUri = imports.parseUri;
 const WMInspect = imports.wmInspect;
 
@@ -17,6 +16,7 @@ const FB_LINK_REDIRECT_KEY = '/render_linkshim_';
 const SOCIAL_BAR_WIDTH = 420;
 const MAX_FRACTION_OF_DISPLAY_WIDTH = 0.35;
 const USER_AGENT_OVERRIDE = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_1) AppleWebKit/537.73.11 (KHTML, like Gecko) Version/7.0.1 Safari/537.73.11';
+const SIDE_COMPONENT_ROLE = 'eos-side-component';
 
 function _parseLinkFromRedirect(uri) {
     let parser = ParseUri.parseUri(uri);
@@ -26,103 +26,6 @@ function _parseLinkFromRedirect(uri) {
 };
 
 const ANIMATION_TIME = (500 * 1000); // half a second
-
-const SocialBarSlider = new Lang.Class({
-    Name: 'SocialBarSlider',
-    Extends: FrameClock.FrameClockAnimator,
-
-    _init: function(widget) {
-        this._showing = false;
-        this._willShow = false;
-        this.parent(widget, ANIMATION_TIME);
-    },
-
-    _getX: function(forVisibility) {
-        let [width, height] = this._getSize();
-        let workarea = this._getWorkarea();
-        let x = workarea.x + workarea.width;
-
-        if (forVisibility) {
-            x -= width;
-        }
-
-        return x;
-    },
-
-    setValue: function(newX) {
-        let [, oldY] = this._widget.get_position();
-        this._widget.move(newX, oldY);
-    },
-
-    _getWorkarea: function() {
-        let screen = Gdk.Screen.get_default();
-        let monitor = screen.get_primary_monitor();
-        let workarea = screen.get_monitor_workarea(monitor);
-
-        return workarea;
-    },
-
-    _getSize: function() {
-        let workarea = this._getWorkarea();
-        let maxWidth = workarea.width * MAX_FRACTION_OF_DISPLAY_WIDTH;
-        return [Math.min(SOCIAL_BAR_WIDTH, maxWidth), workarea.height];
-    },
-
-    _updateGeometry: function() {
-        let workarea = this._getWorkarea();
-        let [width, height] = this._getSize();
-        let x = this._getX(this.showing);
-
-        let geometry = { x: x,
-                         y: workarea.y,
-                         width: width,
-                         height: height };
-
-        this._widget.move(geometry.x, geometry.y);
-        this._widget.resize(geometry.width, geometry.height);
-    },
-
-    setInitialValue: function() {
-        this.stop();
-        this._updateGeometry();
-    },
-
-    slideIn: function() {
-        if (this._willShow) {
-            return;
-        }
-
-        this.setInitialValue();
-        this._widget.show();
-
-        this._willShow = true;
-        this.showing = true;
-        this.start(this._getX(false), this._getX(true));
-    },
-
-    slideOut: function() {
-        if (!this._willShow) {
-            return;
-        }
-
-        this._willShow = false;
-        this.start(this._getX(true), this._getX(false),
-                   Lang.bind(this, function() {
-                                 this.showing = false;
-                                 this._widget.hide();
-                             }));
-    },
-
-    set showing(value) {
-        this._showing = value;
-        this.emit('visibility-changed');
-    },
-
-    get showing() {
-        return this._showing;
-    }
-});
-Signals.addSignalMethods(SocialBarSlider.prototype);
 
 const SocialBarTopbar = new Lang.Class({
     Name: 'SocialBarTopbar',
@@ -177,6 +80,7 @@ const SocialBarView = new Lang.Class({
     _init: function(application) {
         this.parent({ type: Gtk.WindowType.TOPLEVEL,
                       type_hint: Gdk.WindowTypeHint.DOCK,
+                      role: SIDE_COMPONENT_ROLE,
                       application: application });
 
         this._wmInspect = new WMInspect.WMInspect();
@@ -199,38 +103,58 @@ const SocialBarView = new Lang.Class({
             this.set_visual(visual);
         }
 
-        // initialize animator
-        this._animator = new SocialBarSlider(this);
-        this._animator.connect('visibility-changed', Lang.bind(this, this._onVisibilityChanged));
-
         // now create the view
         this._createView();
-
-        this._animator.setInitialValue();
+        this._updateGeometry();
     },
 
     _onActiveWindowChanged: function(wmInspect, activeXid) {
         let xid = this.get_window().get_xid();
         if (xid != activeXid) {
-            this._animator.slideOut();
+            this.hide();
         }
     },
 
     _onMonitorsChanged: function() {
-        this._animator.setInitialValue();
+        this._updateGeometry();
+    },
+
+    _getWorkArea: function() {
+        let screen = Gdk.Screen.get_default();
+        let monitor = screen.get_primary_monitor();
+        let workArea = screen.get_monitor_workarea(monitor);
+
+        return workArea;
+    },
+
+    _getSize: function() {
+        let workArea = this._getWorkArea();
+        let maxWidth = workArea.width * MAX_FRACTION_OF_DISPLAY_WIDTH;
+        return [Math.min(SOCIAL_BAR_WIDTH, maxWidth), workArea.height];
+    },
+
+    _updateGeometry: function() {
+        let workArea = this._getWorkArea();
+        let [width, height] = this._getSize();
+        let x = workArea.x + workArea.width - width;
+
+        let geometry = { x: x,
+                         y: workArea.y,
+                         width: width,
+                         height: height };
+
+        this.move(geometry.x, geometry.y);
+        this.resize(geometry.width, geometry.height);
     },
 
     toggle: function(timestamp) {
-        if (this._animator.showing) {
-            this._animator.slideOut();
+        if (this.is_visible()) {
+            this.hide();
         } else {
-            this._animator.slideIn();
+            this._updateGeometry();
+            this.show_all();
             this.present_with_time(timestamp);
         }
-    },
-
-    getVisible: function() {
-        return this._animator.showing;
     },
 
     _createView: function() {
@@ -296,11 +220,9 @@ const SocialBarView = new Lang.Class({
     },
 
     _onActionMinimize: function() {
-        if (!this.getVisible()) {
-            return;
+        if (this.is_visible()) {
+            this.toggle();
         }
-
-        this.toggle();
     },
 
     _onActionBack: function() {
@@ -365,10 +287,5 @@ const SocialBarView = new Lang.Class({
 
     _openExternalPage: function(uri) {
         Gtk.show_uri(null, uri, Gtk.get_current_event_time());
-    },
-
-    _onVisibilityChanged: function() {
-        // forward the signal
-        this.emit('visibility-changed');
     }
 });

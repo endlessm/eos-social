@@ -12,8 +12,11 @@ const SOCIAL_BAR_PATH = '/com/endlessm/SocialBar';
 const SOCIAL_BAR_IFACE = 'com.endlessm.SocialBar';
 
 const SocialBarIface = <interface name={SOCIAL_BAR_NAME}>
-<method name="toggle">
-<arg type="u" direction="in" name="timestamp"/>
+<method name="show">
+  <arg type="u" direction="in" name="timestamp"/>
+</method>
+<method name="hide">
+  <arg type="u" direction="in" name="timestamp"/>
 </method>
 <property name="Visible" type="b" access="read"/>
 </interface>;
@@ -43,19 +46,25 @@ const SocialBar = new Lang.Class({
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
         this._window = new SocialBarView.SocialBarView(this);
-        this._window.connect('visibility-changed', Lang.bind(this, this._onVisibilityChanged));
+        this._window.connect('notify::visible', Lang.bind(this, this._onVisibilityChanged));
     },
 
     vfunc_activate: function() {
         // do nothing
     },
 
-    toggle: function(timestamp) {
-        this._window.toggle(timestamp);
+    show: function(timestamp) {
+        this._window._updateGeometry();
+        this._window.show_all();
+        this._window.present_with_time(timestamp);
+    },
+
+    hide: function(timestamp) {
+        this._window.hide();
     },
 
     _onVisibilityChanged: function() {
-        this.Visible = this._window.getVisible();
+        this.Visible = this._window.is_visible();
         let propChangedVariant = new GLib.Variant('(sa{sv}as)',
             [SOCIAL_BAR_IFACE, { 'Visible': new GLib.Variant('b', this.Visible) }, []]);
 

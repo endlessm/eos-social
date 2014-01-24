@@ -147,16 +147,6 @@ const SocialBarView = new Lang.Class({
         this.resize(geometry.width, geometry.height);
     },
 
-    toggle: function(timestamp) {
-        if (this.is_visible()) {
-            this.hide();
-        } else {
-            this._updateGeometry();
-            this.show_all();
-            this.present_with_time(timestamp);
-        }
-    },
-
     _createView: function() {
         this._installActions();
 
@@ -220,9 +210,7 @@ const SocialBarView = new Lang.Class({
     },
 
     _onActionMinimize: function() {
-        if (this.is_visible()) {
-            this.toggle();
-        }
+        this.hide();
     },
 
     _onActionBack: function() {

@@ -174,6 +174,11 @@ const SocialBarView = new Lang.Class({
             this._updateNavigationFlags));
         this._updateNavigationFlags();
 
+        this._browser.connect('web-process-crashed',
+                              Lang.bind(this, function() {
+                                  this._browser.reload();
+                              }));
+
         let settings = this._browser.get_settings();
         settings.javascript_can_open_windows_automatically = true;
         settings.user_agent = USER_AGENT_OVERRIDE;

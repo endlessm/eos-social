@@ -186,7 +186,10 @@ const SocialBarView = new Lang.Class({
         this._initCookies();
 
         this._browser.vexpand = true;
-        box.add(this._browser);
+        let browserFrame = new Gtk.Frame({ shadow_type: Gtk.ShadowType.NONE });
+        browserFrame.get_style_context().add_class('socialbar-browser-frame');
+        browserFrame.add(this._browser);
+        box.add(browserFrame);
         this._browser.load_uri(SOCIAL_BAR_HOMEPAGE);
 
         frame.show_all();

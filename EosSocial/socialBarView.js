@@ -169,7 +169,7 @@ const SocialBarView = new Lang.Class({
         this._browser.connect('load-changed', Lang.bind(this,
             this._updateNavigationFlags));
         this._browser.connect('load-failed', Lang.bind(this,
-            this._updateNavigationFlags));
+            this._onLoadFailed));
         this._browser.connect('notify::uri', Lang.bind(this,
             this._updateNavigationFlags));
         this._updateNavigationFlags();
@@ -206,6 +206,21 @@ const SocialBarView = new Lang.Class({
 
         let forwardAction = this.lookup_action('forward');
         forwardAction.set_enabled(this._browser.can_go_forward());
+    },
+
+    _onLoadFailed: function(browser, loadEvent, uri, error) {
+        let html = null;
+
+        try {
+            let htmlBytes = Gio.resources_lookup_data('/com/endlessm/socialbar/offline.html', 0);
+            html = htmlBytes.get_data().toString();
+        } catch (e) {
+            log('Unable to load HTML offline page from GResource');
+            return;
+        }
+
+        this._browser.load_alternate_html(html, uri, null);
+        this._updateNavigationFlags();
     },
 
     _onActionMinimize: function() {

@@ -189,7 +189,6 @@ const SocialBarView = new Lang.Class({
     },
 
     _initCookies: function() {
-        // Use the same as eos-browser
         let webContext = WebKit.WebContext.get_default();
         let cookieManager = webContext.get_cookie_manager();
         let cookiesDir = GLib.build_filenamev([GLib.get_user_config_dir(),

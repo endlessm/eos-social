@@ -174,6 +174,11 @@ const SocialBarView = new Lang.Class({
             this._updateNavigationFlags));
         this._updateNavigationFlags();
 
+        this._browser.connect('web-process-crashed',
+                              Lang.bind(this, function() {
+                                  this._browser.reload();
+                              }));
+
         let settings = this._browser.get_settings();
         settings.javascript_can_open_windows_automatically = true;
         settings.user_agent = USER_AGENT_OVERRIDE;
@@ -181,7 +186,10 @@ const SocialBarView = new Lang.Class({
         this._initCookies();
 
         this._browser.vexpand = true;
-        box.add(this._browser);
+        let browserFrame = new Gtk.Frame({ shadow_type: Gtk.ShadowType.NONE });
+        browserFrame.get_style_context().add_class('socialbar-browser-frame');
+        browserFrame.add(this._browser);
+        box.add(browserFrame);
         this._browser.load_uri(SOCIAL_BAR_HOMEPAGE);
 
         frame.show_all();

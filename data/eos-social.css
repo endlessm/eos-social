@@ -38,3 +38,7 @@
 .socialbar-topbar.toolbar .button *:insensitive {
     color: #6e6e6e;
 }
+
+.socialbar-browser-frame {
+       background: white;
+}

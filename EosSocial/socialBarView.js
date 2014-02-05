@@ -224,7 +224,7 @@ const SocialBarView = new Lang.Class({
             return;
         }
 
-        this._browser.load_alternate_html(html, uri, null);
+        this._browser.load_alternate_html(html, uri, uri);
         this._updateNavigationFlags();
     },
 

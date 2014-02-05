@@ -17,3 +17,6 @@ stamp-h1
 EosSocial/path.js
 data/eos-social.gresource
 data/com.endlessm.SocialBar.service.in
+data/com.endlessm.SocialBar.service
+po/POTFILES
+po/stamp-it

@@ -1,0 +1,28 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+html, body {
+	height: 100%;
+}
+body, .off {
+	background: #6888ca;
+	background: linear-gradient(to bottom, #6888ca 0%, #3c5a98 39%);
+}
+.off-modal {
+	height: 160px;
+	left: 50%;
+	margin: -80px 0 0 -135px;
+	position: fixed;
+	text-align: center;
+	top: 50%;
+	width: 270px;
+}
+.off-icon {
+	display: block;
+	margin: 0 auto 28px;
+}
+.off-text {
+	color: #fff;
+	font: italic 18px/24px 'Lato', sans-serif;
+}

@@ -1,1 +1,2 @@
 let RESOURCE_DIR = '@pkgdatadir@';
+let LOCALE_DIR = '@localedir@';

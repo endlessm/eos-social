@@ -52,7 +52,7 @@ const SocialBarTopbar = new Lang.Class({
                                              action_name: 'win.forward'
                                            });
         leftButtons.add(forwardButton);
-        
+
         let reloadButton = new Gtk.Button({ child: new Gtk.Image({ pixel_size: 16,
                                                                    icon_name: 'topbar-refresh-symbolic' }),
                                              action_name: 'win.reload'
@@ -213,9 +213,14 @@ const SocialBarView = new Lang.Class({
 
         try {
             let htmlBytes = Gio.resources_lookup_data('/com/endlessm/socialbar/offline.html', 0);
-            html = htmlBytes.get_data().toString();
+            let cssBytes = Gio.resources_lookup_data('/com/endlessm/socialbar/offline.css', 0);
+            let imgBytes = Gio.resources_lookup_data('/com/endlessm/socialbar/offline.png', 0);
+            let imgBase64 = GLib.base64_encode(imgBytes.toArray());
+            let str = _("You’re not online! Connect your<br>internet to access Facebook.");
+
+            html = htmlBytes.get_data().toString().format(cssBytes.toArray(), imgBase64, str);
         } catch (e) {
-            log('Unable to load HTML offline page from GResource');
+            log('Unable to load HTML offline page from GResource ' + e.message);
             return;
         }
 
@@ -234,7 +239,7 @@ const SocialBarView = new Lang.Class({
     _onActionForward: function() {
         this._browser.go_forward();
     },
-    
+
     _onActionReload: function() {
         this._browser.reload();
     },

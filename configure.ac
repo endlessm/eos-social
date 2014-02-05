@@ -7,6 +7,11 @@ AC_CONFIG_SRCDIR([EosSocial/main.js])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([1.9 no-dist-gzip dist-xz foreign tar-ustar])
 
+GETTEXT_PACKAGE=AC_PACKAGE_NAME
+AC_SUBST(GETTEXT_PACKAGE)
+AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE",[The name of the gettext domain])
+IT_PROG_INTLTOOL(0.40.0)
+
 PKG_CHECK_MODULES(EOS_SOCIAL,
                   gjs-1.0
                   gio-2.0
@@ -24,6 +29,7 @@ AC_CONFIG_FILES([
         Makefile
         data/Makefile
         EosSocial/Makefile
+        po/Makefile.in
         ])
 
 AC_OUTPUT

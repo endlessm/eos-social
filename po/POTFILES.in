@@ -1,0 +1,8 @@
+[encoding: UTF-8]
+EosSocial/config.js
+EosSocial/main.js
+EosSocial/parseUri.js
+EosSocial/path.js
+EosSocial/socialBar.js
+EosSocial/socialBarView.js
+EosSocial/wmInspect.js

@@ -1,4 +1,4 @@
-SUBDIRS = EosSocial data
+SUBDIRS = EosSocial data po
 
 libexec_SCRIPTS = eos-social
 

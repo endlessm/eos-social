@@ -2,5 +2,8 @@
 <gresources>
   <gresource prefix="/com/endlessm/socialbar">
     <file>eos-social.css</file>
+    <file>offline.css</file>
+    <file>offline.html</file>
+    <file>offline.png</file>
   </gresource>
 </gresources>

@@ -52,7 +52,7 @@ const SocialBarTopbar = new Lang.Class({
                                              action_name: 'win.forward'
                                            });
         leftButtons.add(forwardButton);
-        
+
         let reloadButton = new Gtk.Button({ child: new Gtk.Image({ pixel_size: 16,
                                                                    icon_name: 'topbar-refresh-symbolic' }),
                                              action_name: 'win.reload'
@@ -169,7 +169,7 @@ const SocialBarView = new Lang.Class({
         this._browser.connect('load-changed', Lang.bind(this,
             this._updateNavigationFlags));
         this._browser.connect('load-failed', Lang.bind(this,
-            this._updateNavigationFlags));
+            this._onLoadFailed));
         this._browser.connect('notify::uri', Lang.bind(this,
             this._updateNavigationFlags));
         this._updateNavigationFlags();
@@ -216,6 +216,26 @@ const SocialBarView = new Lang.Class({
         forwardAction.set_enabled(this._browser.can_go_forward());
     },
 
+    _onLoadFailed: function(browser, loadEvent, uri, error) {
+        let html = null;
+
+        try {
+            let htmlBytes = Gio.resources_lookup_data('/com/endlessm/socialbar/offline.html', 0);
+            let cssBytes = Gio.resources_lookup_data('/com/endlessm/socialbar/offline.css', 0);
+            let imgBytes = Gio.resources_lookup_data('/com/endlessm/socialbar/offline.png', 0);
+            let imgBase64 = GLib.base64_encode(imgBytes.toArray());
+            let str = _("You’re not online! Connect your<br>internet to access Facebook.");
+
+            html = htmlBytes.get_data().toString().format(cssBytes.toArray(), imgBase64, str);
+        } catch (e) {
+            log('Unable to load HTML offline page from GResource ' + e.message);
+            return;
+        }
+
+        this._browser.load_alternate_html(html, uri, uri);
+        this._updateNavigationFlags();
+    },
+
     _onActionMinimize: function() {
         this.hide();
     },
@@ -227,7 +247,7 @@ const SocialBarView = new Lang.Class({
     _onActionForward: function() {
         this._browser.go_forward();
     },
-    
+
     _onActionReload: function() {
         this._browser.reload();
     },

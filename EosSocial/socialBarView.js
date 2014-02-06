@@ -229,11 +229,15 @@ const SocialBarView = new Lang.Class({
             html = htmlBytes.get_data().toString().format(cssBytes.toArray(), imgBase64, str);
         } catch (e) {
             log('Unable to load HTML offline page from GResource ' + e.message);
-            return;
+            // let the default handler run instead
+            return false;
         }
 
         this._browser.load_alternate_html(html, uri, uri);
         this._updateNavigationFlags();
+
+        // block the default error page handler
+        return true;
     },
 
     _onActionMinimize: function() {

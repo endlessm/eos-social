@@ -106,6 +106,10 @@ const SocialBarView = new Lang.Class({
         // now create the view
         this._createView();
         this._updateGeometry();
+
+        let networkMonitor = Gio.NetworkMonitor.get_default();
+        networkMonitor.connect('notify::network-available', Lang.bind(this,
+            this._onNetworkAvailable));
     },
 
     _onActiveWindowChanged: function(wmInspect, activeXid) {
@@ -214,6 +218,32 @@ const SocialBarView = new Lang.Class({
 
         let forwardAction = this.lookup_action('forward');
         forwardAction.set_enabled(this._browser.can_go_forward());
+    },
+
+    _onNetworkAvailable: function(networkMonitor) {
+        let available = networkMonitor.network_available;
+        if (!available) {
+            return;
+        }
+
+        let connectable = null;
+        try {
+            connectable = Gio.NetworkAddress.parse_uri(SOCIAL_BAR_HOMEPAGE, 80);
+        } catch (e) {
+            log('Unable to create connectable for social bar URI: ' + e.message);
+            return;
+        }
+
+        networkMonitor.can_reach_async(connectable, null, Lang.bind(this, function(object, res) {
+            try {
+                let canReach = networkMonitor.can_reach_finish(res);
+                if (canReach) {
+                    this._browser.reload();
+                }
+            } catch (e) {
+                log('Unable to verify connection to social bar URI: ' + e.message);
+            }
+        }));
     },
 
     _onLoadFailed: function(browser, loadEvent, uri, error) {

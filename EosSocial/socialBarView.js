@@ -7,6 +7,8 @@ const Lang = imports.lang;
 const Signals = imports.signals;
 const WebKit = imports.gi.WebKit2;
 
+const EosSocialPrivate = imports.gi.EosSocialPrivate;
+
 const ParseUri = imports.parseUri;
 const WMInspect = imports.wmInspect;
 
@@ -172,7 +174,7 @@ const SocialBarView = new Lang.Class({
 
         this._browser.connect('load-changed', Lang.bind(this,
             this._updateNavigationFlags));
-        this._browser.connect('load-failed', Lang.bind(this,
+        EosSocialPrivate.connect_to_load_failed(this._browser, Lang.bind(this,
             this._onLoadFailed));
         this._browser.connect('notify::uri', Lang.bind(this,
             this._updateNavigationFlags));
@@ -259,15 +261,11 @@ const SocialBarView = new Lang.Class({
             html = htmlBytes.get_data().toString().format(cssBytes.toArray(), imgBase64, str);
         } catch (e) {
             log('Unable to load HTML offline page from GResource ' + e.message);
-            // let the default handler run instead
-            return false;
+            return;
         }
 
         this._browser.load_alternate_html(html, uri, uri);
         this._updateNavigationFlags();
-
-        // block the default error page handler
-        return true;
     },
 
     _onActionMinimize: function() {

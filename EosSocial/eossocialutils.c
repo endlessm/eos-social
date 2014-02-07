@@ -1,17 +1,25 @@
 #include "eossocialutils.h"
 
-#include <libsoup/soup.h>
+enum {
+  LOAD_FAILED_2,
+  LAST_SIGNAL
+};
+static guint signals[LAST_SIGNAL] = { 0, };
 
-typedef struct {
-  EosSocialLoadFailedCallback callback;
-  gpointer user_data;
-} LoadFailedData;
+G_DEFINE_TYPE (EosSocialWebView, eos_social_web_view, WEBKIT_TYPE_WEB_VIEW)
 
 static void
-load_failed_data_free (gpointer _data)
+eos_social_web_view_class_init (EosSocialWebViewClass *klass)
 {
-  LoadFailedData *data = _data;
-  g_slice_free (LoadFailedData, data);
+  signals[LOAD_FAILED_2] = g_signal_new ("load-failed-2",
+                                         eos_social_web_view_get_type (),
+                                         G_SIGNAL_RUN_LAST,
+                                         0, NULL, NULL, NULL,
+                                         G_TYPE_BOOLEAN,
+                                         3,
+                                         WEBKIT_TYPE_LOAD_EVENT,
+                                         G_TYPE_STRING,
+                                         G_TYPE_ERROR);
 }
 
 static gboolean
@@ -21,50 +29,19 @@ on_load_failed (WebKitWebView *web_view,
                 GError *error,
                 gpointer user_data)
 {
-  LoadFailedData *data = user_data;
   gboolean res = FALSE;
 
-  if (error->domain == SOUP_HTTP_ERROR ||
-      error->code == WEBKIT_NETWORK_ERROR_FAILED ||
-      error->code == WEBKIT_NETWORK_ERROR_TRANSPORT ||
-      error->code == WEBKIT_NETWORK_ERROR_UNKNOWN_PROTOCOL ||
-      error->code == WEBKIT_NETWORK_ERROR_FILE_DOES_NOT_EXIST ||
-      error->code == WEBKIT_POLICY_ERROR_FAILED ||
-      error->code == WEBKIT_POLICY_ERROR_CANNOT_SHOW_MIME_TYPE ||
-      error->code == WEBKIT_POLICY_ERROR_CANNOT_SHOW_URI ||
-      error->code == WEBKIT_POLICY_ERROR_CANNOT_USE_RESTRICTED_PORT ||
-      error->code == WEBKIT_PLUGIN_ERROR_FAILED ||
-      error->code == WEBKIT_PLUGIN_ERROR_CANNOT_FIND_PLUGIN ||
-      error->code == WEBKIT_PLUGIN_ERROR_CANNOT_LOAD_PLUGIN ||
-      error->code == WEBKIT_PLUGIN_ERROR_JAVA_UNAVAILABLE ||
-      error->code == WEBKIT_PLUGIN_ERROR_CONNECTION_CANCELLED)
-    {
-      data->callback (web_view, load_event, failing_uri, error, data->user_data);
-      res = TRUE;
-    }
+  g_signal_emit (web_view, signals[LOAD_FAILED_2], 0,
+                 load_event, failing_uri, error,
+                 &res);
 
   return res;
 }
 
-/**
- * eos_social_connect_to_load_failed:
- * @web_view:
- * @callback: (scope async):
- * @user_data: (closure):
- */
-void
-eos_social_connect_to_load_failed (WebKitWebView *web_view,
-                                   EosSocialLoadFailedCallback callback,
-                                   gpointer user_data)
+static void
+eos_social_web_view_init (EosSocialWebView *self)
 {
-  LoadFailedData *data = g_slice_new0 (LoadFailedData);
-  data->callback = callback;
-  data->user_data = user_data;
-
-  g_object_set_data_full (G_OBJECT (web_view),
-                          "load-failed-data", data,
-                          load_failed_data_free);
-
-  g_signal_connect (web_view, "load-failed",
-                    G_CALLBACK (on_load_failed), data);
+  g_signal_connect (self, "load-failed",
+                    G_CALLBACK (on_load_failed), NULL);
 }
+

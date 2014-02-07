@@ -5,6 +5,7 @@ const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
 const Lang = imports.lang;
 const Signals = imports.signals;
+const Soup = imports.gi.Soup;
 const WebKit = imports.gi.WebKit2;
 
 const EosSocialPrivate = imports.gi.EosSocialPrivate;
@@ -166,7 +167,7 @@ const SocialBarView = new Lang.Class({
         let toolbar = new SocialBarTopbar();
         box.add(toolbar);
 
-        this._browser = new WebKit.WebView();
+        this._browser = new EosSocialPrivate.WebView();
         this._browser.connect('resource-load-started', Lang.bind(this,
             this._resourceHandler));
         this._browser.connect('decide-policy', Lang.bind(this,
@@ -174,7 +175,7 @@ const SocialBarView = new Lang.Class({
 
         this._browser.connect('load-changed', Lang.bind(this,
             this._updateNavigationFlags));
-        EosSocialPrivate.connect_to_load_failed(this._browser, Lang.bind(this,
+        this._browser.connect('load-failed-2', Lang.bind(this,
             this._onLoadFailed));
         this._browser.connect('notify::uri', Lang.bind(this,
             this._updateNavigationFlags));
@@ -251,6 +252,24 @@ const SocialBarView = new Lang.Class({
     _onLoadFailed: function(browser, loadEvent, uri, error) {
         let html = null;
 
+        if (error.domain != Soup.http_error_quark() &&
+            !error.matches(WebKit.NetworkError, WebKit.NetworkError.FAILED) &&
+            !error.matches(WebKit.NetworkError, WebKit.NetworkError.TRANSPORT) &&
+            !error.matches(WebKit.NetworkError, WebKit.NetworkError.UNKNOWN_PROTOCOL) &&
+            !error.matches(WebKit.NetworkError, WebKit.NetworkError.FILE_DOES_NOT_EXIST) &&
+            !error.matches(WebKit.PolicyError, WebKit.PolicyError.FAILED) &&
+            !error.matches(WebKit.PolicyError, WebKit.PolicyError.CANNOT_SHOW_MIME_TYPE) &&
+            !error.matches(WebKit.PolicyError, WebKit.PolicyError.CANNOT_SHOW_URI) &&
+            !error.matches(WebKit.PolicyError, WebKit.PolicyError.CANNOT_USE_RESTRICTED_PORT) &&
+            !error.matches(WebKit.PluginError, WebKit.PluginError.FAILED) &&
+            !error.matches(WebKit.PluginError, WebKit.PluginError.CANNOT_FIND_PLUGIN) &&
+            !error.matches(WebKit.PluginError, WebKit.PluginError.CANNOT_LOAD_PLUGIN) &&
+            !error.matches(WebKit.PluginError, WebKit.PluginError.JAVA_UNAVAILABLE) &&
+            !error.matches(WebKit.PluginError, WebKit.PluginError.CONNECTION_CANCELLED))
+        {
+            return false;
+        }
+
         try {
             let htmlBytes = Gio.resources_lookup_data('/com/endlessm/socialbar/offline.html', 0);
             let cssBytes = Gio.resources_lookup_data('/com/endlessm/socialbar/offline.css', 0);
@@ -261,14 +280,12 @@ const SocialBarView = new Lang.Class({
             html = htmlBytes.get_data().toString().format(cssBytes.toArray(), imgBase64, str);
         } catch (e) {
             log('Unable to load HTML offline page from GResource ' + e.message);
-            // let the default handler run instead
             return false;
         }
 
-        this._browser.load_alternate_html(html, uri, uri);
+        this._browser.load_alternate_html(html, uri, null);
         this._updateNavigationFlags();
 
-        // block the default error page handler
         return true;
     },
 

@@ -3,14 +3,14 @@
 
 #include <webkit2/webkit2.h>
 
-typedef void (* EosSocialLoadFailedCallback) (WebKitWebView *web_view,
-                                              WebKitLoadEvent load_event,
-                                              const gchar *failing_uri,
-                                              const GError *error,
-                                              gpointer user_data);
+typedef struct {
+  WebKitWebView parent;
+} EosSocialWebView;
 
-void eos_social_connect_to_load_failed (WebKitWebView *web_view,
-                                        EosSocialLoadFailedCallback callback,
-                                        gpointer user_data);
+typedef struct {
+  WebKitWebViewClass parent_class;
+} EosSocialWebViewClass;
+
+GType eos_social_web_view_get_type (void);
 
 #endif /* __EOS_SOCIAL_UTILS_H__ */

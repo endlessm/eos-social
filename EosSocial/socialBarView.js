@@ -7,6 +7,8 @@ const Lang = imports.lang;
 const Signals = imports.signals;
 const WebKit = imports.gi.WebKit2;
 
+const EosSocialPrivate = imports.gi.EosSocialPrivate;
+
 const ParseUri = imports.parseUri;
 const WMInspect = imports.wmInspect;
 
@@ -172,7 +174,7 @@ const SocialBarView = new Lang.Class({
 
         this._browser.connect('load-changed', Lang.bind(this,
             this._updateNavigationFlags));
-        this._browser.connect('load-failed', Lang.bind(this,
+        EosSocialPrivate.connect_to_load_failed(this._browser, Lang.bind(this,
             this._onLoadFailed));
         this._browser.connect('notify::uri', Lang.bind(this,
             this._updateNavigationFlags));

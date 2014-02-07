@@ -12,6 +12,11 @@ AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE",[The name of the gettext domain])
 IT_PROG_INTLTOOL(0.40.0)
 
+# enable libtool
+AC_PROG_LIBTOOL
+
+GOBJECT_INTROSPECTION_REQUIRE([0.9.6])
+
 PKG_CHECK_MODULES(EOS_SOCIAL,
                   gjs-1.0
                   gio-2.0

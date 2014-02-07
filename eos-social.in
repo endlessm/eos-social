@@ -6,7 +6,7 @@ export LD_LIBRARY_PATH="@pkglibdir@${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 
 # Temporary workaround for a crash in WebKitWebProcess
 # https://github.com/endlessm/eos-shell/issues/1738
-export JSC_useJIT=0
+export JSC_maximumInliningDepth=1
 
 if [ "$GJS_DEBUG_OUTPUT" == "" ]; then
     export GJS_DEBUG_OUTPUT=stderr

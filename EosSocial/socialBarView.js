@@ -110,8 +110,8 @@ const SocialBarView = new Lang.Class({
         this._createView();
         this._updateGeometry();
 
-        let networkMonitor = Gio.NetworkMonitor.get_default();
-        networkMonitor.connect('notify::network-available', Lang.bind(this,
+        this._networkMonitor = Gio.NetworkMonitor.get_default();
+        this._networkMonitor.connect('notify::network-available', Lang.bind(this,
             this._onNetworkAvailable));
     },
 
@@ -249,9 +249,33 @@ const SocialBarView = new Lang.Class({
         }));
     },
 
-    _onLoadFailed: function(browser, loadEvent, uri, error) {
+    _loadOfflinePage: function(uri) {
         let html = null;
 
+        try {
+            let htmlBytes = Gio.resources_lookup_data('/com/endlessm/socialbar/offline.html', 0);
+            let cssBytes = Gio.resources_lookup_data('/com/endlessm/socialbar/offline.css', 0);
+            let imgBytes = Gio.resources_lookup_data('/com/endlessm/socialbar/offline.png', 0);
+            let imgBase64 = GLib.base64_encode(imgBytes.toArray());
+            let str = _("You’re not online! Connect your<br>internet to access Facebook.");
+
+            html = htmlBytes.get_data().toString().format(cssBytes.toArray(), imgBase64, str);
+            this._browser.load_alternate_html(html, uri, uri);
+        } catch (e) {
+            log('Unable to load HTML offline page from GResource ' + e.message);
+        }
+
+        this._updateNavigationFlags();
+    },
+
+    _onLoadFailed: function(browser, loadEvent, uri, error) {
+        // if we know we're offline, just show the page immediately
+        if (!this._networkMonitor.network_available) {
+            this._loadOfflinePage(uri);
+            return true;
+        }
+
+        // now check the error status we got from WebKit
         if (error.domain != Soup.http_error_quark() &&
             !error.matches(WebKit.NetworkError, WebKit.NetworkError.FAILED) &&
             !error.matches(WebKit.NetworkError, WebKit.NetworkError.TRANSPORT) &&
@@ -267,25 +291,11 @@ const SocialBarView = new Lang.Class({
             !error.matches(WebKit.PluginError, WebKit.PluginError.JAVA_UNAVAILABLE) &&
             !error.matches(WebKit.PluginError, WebKit.PluginError.CONNECTION_CANCELLED))
         {
+            // another unhandled error
             return false;
         }
 
-        try {
-            let htmlBytes = Gio.resources_lookup_data('/com/endlessm/socialbar/offline.html', 0);
-            let cssBytes = Gio.resources_lookup_data('/com/endlessm/socialbar/offline.css', 0);
-            let imgBytes = Gio.resources_lookup_data('/com/endlessm/socialbar/offline.png', 0);
-            let imgBase64 = GLib.base64_encode(imgBytes.toArray());
-            let str = _("You’re not online! Connect your<br>internet to access Facebook.");
-
-            html = htmlBytes.get_data().toString().format(cssBytes.toArray(), imgBase64, str);
-        } catch (e) {
-            log('Unable to load HTML offline page from GResource ' + e.message);
-            return false;
-        }
-
-        this._browser.load_alternate_html(html, uri, null);
-        this._updateNavigationFlags();
-
+        this._loadOfflinePage(uri);
         return true;
     },
 

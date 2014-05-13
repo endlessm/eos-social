@@ -1,3 +1,5 @@
+// -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
+
 const Gdk = imports.gi.Gdk;
 const GdkX11 = imports.gi.GdkX11;
 const Gio = imports.gi.Gio;
@@ -105,6 +107,9 @@ const SocialBarView = new Lang.Class({
         if (visual) {
             this.set_visual(visual);
         }
+
+        // disable DFG optimizations in JSC
+        GLib.setenv("JSC_useDFG", "false", true);
 
         // now create the view
         this._createView();

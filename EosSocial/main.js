@@ -1,3 +1,5 @@
+// -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
+
 const Format = imports.format;
 const Gettext = imports.gettext;
 

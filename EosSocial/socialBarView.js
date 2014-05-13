@@ -106,8 +106,8 @@ const SocialBarView = new Lang.Class({
             this.set_visual(visual);
         }
 
-	// disable DFG optimizations in JSC
-	GLib.setenv("JSC_useDFG", "false", true);
+        // disable DFG optimizations in JSC
+        GLib.setenv("JSC_useDFG", "false", true);
 
         // now create the view
         this._createView();

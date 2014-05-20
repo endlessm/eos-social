@@ -22,6 +22,7 @@ Breaks: endlessos-base-social
 Architecture: any
 Depends: ${gir:Depends},
          ${misc:Depends},
+         gir1.2-eosmetrics-0,
          gir1.2-glib-2.0,
          gir1.2-gtk-3.0,
          gir1.2-webkit2-3.0,

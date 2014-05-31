@@ -35,8 +35,6 @@ const SocialBar = new Lang.Class({
 
         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(SocialBarIface, this);
         this._dbusImpl.export(Gio.DBus.session, SOCIAL_BAR_PATH);
-
-        this._eventRecorder = EosMetrics.EventRecorder.new();
     },
 
     vfunc_startup: function() {
@@ -78,9 +76,11 @@ const SocialBar = new Lang.Class({
                                      'org.freedesktop.DBus.Properties',
                                      'PropertiesChanged',
                                      propChangedVariant);
+
+        let eventRecorder = EosMetrics.EventRecorder.prototype.get_default();
         if (this.Visible)
-            this._eventRecorder.record_start(EosMetrics.EVENT_SOCIAL_BAR_IS_VISIBLE, null, null);
+            eventRecorder.record_start(EosMetrics.EVENT_SOCIAL_BAR_IS_VISIBLE, null, null);
         else
-            this._eventRecorder.record_stop(EosMetrics.EVENT_SOCIAL_BAR_IS_VISIBLE, null, null);
+            eventRecorder.record_stop(EosMetrics.EVENT_SOCIAL_BAR_IS_VISIBLE, null, null);
     }
 });

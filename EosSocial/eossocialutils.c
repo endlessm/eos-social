@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "eossocialutils.h"
 
 enum {
@@ -36,6 +38,36 @@ on_load_failed (WebKitWebView *web_view,
                  &res);
 
   return res;
+}
+
+void
+eos_social_web_view_setup (EosSocialWebView *self)
+{
+  gchar *cpu, *tail = NULL, *ua = NULL;
+  WebKitSettings *settings = webkit_web_view_get_settings (WEBKIT_WEB_VIEW (self));
+
+  g_object_get (G_OBJECT (settings), "user-agent", &ua, NULL);
+  if (ua)
+    tail = strstr (ua, "AppleWebKit");
+
+  if (!tail)
+    tail = "AppleWebKit/538.1 (KHTML, like Gecko) Safari/538.1";
+
+#if defined(__i386__)
+  cpu = "i586";
+#elif defined(__x86_64__)
+  cpu = "x86_64";
+#elif defined(__arm__)
+  cpu = "armv7l";
+#else
+  cpu = "unknown";
+#endif
+
+  gchar *nua = g_strdup_printf ("Mozilla/5.0 (X11; Linux %s) %s", cpu, tail);
+  g_object_set (G_OBJECT (settings), "user-agent", nua, NULL);
+
+  g_free (nua);
+  g_free (ua);
 }
 
 static void

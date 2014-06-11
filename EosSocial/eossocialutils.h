@@ -11,6 +11,7 @@ typedef struct {
   WebKitWebViewClass parent_class;
 } EosSocialWebViewClass;
 
+void eos_social_web_view_setup (EosSocialWebView *self);
 GType eos_social_web_view_get_type (void);
 
 #endif /* __EOS_SOCIAL_UTILS_H__ */

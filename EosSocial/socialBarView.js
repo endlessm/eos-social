@@ -86,6 +86,7 @@ const SocialBarView = new Lang.Class({
                       type_hint: Gdk.WindowTypeHint.DOCK,
                       role: SIDE_COMPONENT_ROLE,
                       application: application });
+        this.get_style_context().add_class('socialbar-toplevel');
 
         this._wmInspect = new WMInspect.WMInspect();
         this._wmInspect.connect('active-window-changed', Lang.bind(this,

@@ -236,6 +236,8 @@ const SocialBarView = new Lang.Class({
             this._resourceHandler));
         this._browser.connect('decide-policy', Lang.bind(this,
             this._policyHandler));
+        this._browser.connect('context-menu', Lang.bind(this,
+            this._onContextMenu));
 
         this._browser.connect('load-changed', Lang.bind(this,
             this._updateNavigationFlags));
@@ -425,6 +427,36 @@ const SocialBarView = new Lang.Class({
             decision.ignore();
 
             return true;
+        }
+
+        return false;
+    },
+
+    _onContextMenu: function(view, contextMenu, event, hitTestResult) {
+        let uri = hitTestResult.get_link_uri();
+        if (!uri) {
+            return false;
+        }
+
+        let position = -1;
+        let items = contextMenu.get_items();
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].get_stock_action() == WebKit.ContextMenuAction.OPEN_LINK_IN_NEW_WINDOW) {
+                position = i;
+                contextMenu.remove(items[i]);
+                break;
+            }
+        }
+
+        let newItem = WebKit.ContextMenuItem.new_from_stock_action(WebKit.ContextMenuAction.OPEN_LINK_IN_NEW_WINDOW);
+        newItem.get_action().connect('activate', Lang.bind(this, function() {
+            this._openExternalPage(uri);
+        }));
+
+        if (position >= 0) {
+            contextMenu.insert(newItem, position);
+        } else {
+            contextMenu.append(newItem);
         }
 
         return false;

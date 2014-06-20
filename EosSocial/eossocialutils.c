@@ -63,7 +63,13 @@ eos_social_web_view_setup (EosSocialWebView *self)
   cpu = "unknown";
 #endif
 
-  gchar *nua = g_strdup_printf ("Mozilla/5.0 (X11; Linux %s) %s", cpu, tail);
+  /* Temporary workaround: adding this bit to the user-agent makes Facebook format
+   * external links in a way that correctly triggers a new browser window when clicked.
+   * https://github.com/endlessm/eos-shell/issues/2765
+   */
+  gchar* extra = "Chrome/33";
+
+  gchar *nua = g_strdup_printf ("Mozilla/5.0 (X11; Linux %s) %s %s", cpu, tail, extra);
   g_object_set (G_OBJECT (settings), "user-agent", nua, NULL);
 
   g_free (nua);

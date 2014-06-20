@@ -86,6 +86,7 @@ const SocialBarView = new Lang.Class({
                       type_hint: Gdk.WindowTypeHint.DOCK,
                       role: SIDE_COMPONENT_ROLE,
                       application: application });
+        this.get_style_context().add_class('socialbar-toplevel');
 
         this._wmInspect = new WMInspect.WMInspect();
         this._wmInspect.connect('active-window-changed', Lang.bind(this,
@@ -107,6 +108,8 @@ const SocialBarView = new Lang.Class({
             this.set_visual(visual);
         }
 
+        this._fileChooserRequest = null;
+
         // now create the view
         this._createView();
         this._updateGeometry();
@@ -116,11 +119,71 @@ const SocialBarView = new Lang.Class({
             this._onNetworkAvailable));
     },
 
-    _onActiveWindowChanged: function(wmInspect, activeXid) {
-        let xid = this.get_window().get_xid();
-        if (xid != activeXid) {
-            this.hide();
+    hide: function() {
+        if (this._fileChooser != null) {
+            this._fileChooser.response(Gtk.ResponseType.DELETE_EVENT);
+            this._fileChooser = null;
         }
+
+        this.parent();
+    },
+
+    _onRunFileChooser: function(webView, request) {
+        let fileChooser = new Gtk.FileChooserDialog({ action: Gtk.FileChooserAction.OPEN,
+                                                      transient_for: this,
+                                                      select_multiple: request.select_multiple,
+                                                      filter: request.filter });
+        fileChooser.add_button(_("Cancel"), Gtk.ResponseType.CANCEL);
+        fileChooser.add_button(_("Open"), Gtk.ResponseType.ACCEPT);
+
+        let selectedFiles = request.get_selected_files();
+        if (selectedFiles != null) {
+            selectedFiles.forEach(function(file) {
+                fileChooser.select_filename(file);
+            });
+        }
+
+        this._fileChooser = fileChooser;
+        fileChooser.connect('response', Lang.bind(this, function(dialog, response) {
+            if (response == Gtk.ResponseType.ACCEPT) {
+                let filenames = this._fileChooser.get_filenames();
+                request.select_files(filenames);
+            } else {
+                request.cancel();
+            }
+
+            this._fileChooser.destroy();
+            this._fileChooser = null;
+        }));
+
+        fileChooser.show_all();
+
+        return true;
+    },
+
+    _onActiveWindowChanged: function(wmInspect, activeWindow) {
+        // try to match the own window first
+        let activeXid = activeWindow.get_xid();
+        let xid = this.get_window().get_xid();
+
+        if (xid == activeXid) {
+            return;
+        }
+
+        // try to match transient windows
+        let transientWindow = activeWindow.get_transient();
+        let transientXid = 0;
+
+        if (transientWindow != null) {
+            transientXid = transientWindow.get_xid();
+        }
+
+        if (xid == transientXid) {
+            return;
+        }
+
+        // no matches - hide our own window
+        this.hide();
     },
 
     _onMonitorsChanged: function() {
@@ -178,6 +241,8 @@ const SocialBarView = new Lang.Class({
             this._updateNavigationFlags));
         this._browser.connect('load-failed-2', Lang.bind(this,
             this._onLoadFailed));
+        this._browser.connect('run-file-chooser', Lang.bind(this,
+            this._onRunFileChooser));
         this._browser.connect('notify::uri', Lang.bind(this,
             this._updateNavigationFlags));
         this._updateNavigationFlags();

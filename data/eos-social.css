@@ -26,12 +26,12 @@
     icon-shadow: inset 0 1px black;
 }
 
-.socialbar-topbar.toolbar .button *:hover {
+.socialbar-topbar.toolbar .button:hover {
     color: #e8e8e8;
 }
 
-.socialbar-topbar.toolbar .button *:active,
-.socialbar-topbar.toolbar .button *:hover:active {
+.socialbar-topbar.toolbar .button:active,
+.socialbar-topbar.toolbar .button:hover:active {
     color: #5d5d5d;
 }
 

@@ -22,21 +22,24 @@
     border: none;
     padding: 0;
 
-    color: #8a8a8a;
+    color: #a0a0a0;
+    icon-shadow: inset 0 1px alpha(black, 0.5);
+}
+
+.socialbar-topbar.toolbar .button:hover {
+    color: #ffffff;
     icon-shadow: inset 0 1px black;
 }
 
-.socialbar-topbar.toolbar .button *:hover {
-    color: #e8e8e8;
-}
-
-.socialbar-topbar.toolbar .button *:active,
-.socialbar-topbar.toolbar .button *:hover:active {
-    color: #5d5d5d;
+.socialbar-topbar.toolbar .button:active,
+.socialbar-topbar.toolbar .button:hover:active {
+    color: #6e6e6e;
+    icon-shadow: inset 0 1px alpha(black, 0.5);
 }
 
 .socialbar-topbar.toolbar .button *:insensitive {
-    color: #6e6e6e;
+    color: alpha(black, 0.4);
+    icon-shadow: inset 0 1px alpha(white, 0.15);
 }
 
 .socialbar-browser-frame {

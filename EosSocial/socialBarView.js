@@ -207,7 +207,11 @@ const SocialBarView = new Lang.Class({
     _updateGeometry: function() {
         let workArea = this._getWorkArea();
         let [width, height] = this._getSize();
-        let x = workArea.x + workArea.width - width;
+        let x = workArea.x;
+
+        if (this.get_direction() == Gtk.TextDirection.LTR) {
+            x += workArea.width - width;
+        }
 
         let geometry = { x: x,
                          y: workArea.y,

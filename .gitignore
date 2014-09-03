@@ -28,7 +28,6 @@ stamp-h1
 /data/eos-social.gresource
 /data/com.endlessm.SocialBar.service.in
 /data/com.endlessm.SocialBar.service
-/po/eos-social.pot
 /po/Makefile.in.in
 /po/POTFILES
 /po/stamp-it

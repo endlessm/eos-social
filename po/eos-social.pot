@@ -28,5 +28,3 @@ msgstr ""
 #: ../EosSocial/socialBarView.js:333
 msgid "You’re not online! Connect your<br>internet to access Facebook."
 msgstr ""
-"Você está desconectado da Internet.<br>Por favor, conecte-se<br>para poder "
-"acessar o Facebook."

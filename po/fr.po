@@ -19,12 +19,12 @@ msgstr ""
 
 #: ../EosSocial/socialBarView.js:136
 msgid "Cancel"
-msgstr ""
+msgstr "Annuler"
 
 #: ../EosSocial/socialBarView.js:137
 msgid "Open"
-msgstr ""
+msgstr "Ouvrir"
 
 #: ../EosSocial/socialBarView.js:333
 msgid "You’re not online! Connect your<br>internet to access Facebook."
-msgstr ""
+msgstr "Vous n'êtes pas en ligne ! Connectez votre <br> internet pour accéder à Facebook."

@@ -77,10 +77,13 @@ const SocialBar = new Lang.Class({
                                      'PropertiesChanged',
                                      propChangedVariant);
 
-        let eventRecorder = EosMetrics.EventRecorder.prototype.get_default();
+        let eventRecorder = EosMetrics.EventRecorder.get_default();
         if (this.Visible)
-            eventRecorder.record_start(EosMetrics.EVENT_SOCIAL_BAR_IS_VISIBLE, null, null);
+            eventRecorder.record_start(EosMetrics.EVENT_SOCIAL_BAR_IS_VISIBLE,
+                                       null, null);
         else
-            eventRecorder.record_stop(EosMetrics.EVENT_SOCIAL_BAR_IS_VISIBLE, null, null);
+            eventRecorder.record_stop(EosMetrics.EVENT_SOCIAL_BAR_IS_VISIBLE,
+                                      null, null);
     }
+
 });

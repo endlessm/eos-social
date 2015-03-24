@@ -1,4 +1,5 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
+imports.gi.versions.WebKit2 = '3.0';
 
 const Format = imports.format;
 const Gettext = imports.gettext;

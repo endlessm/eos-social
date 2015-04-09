@@ -11,6 +11,9 @@ const EosMetrics = imports.gi.EosMetrics;
 const Path = imports.path;
 const SocialBarView = imports.socialBarView;
 
+// Started when the social bar is visible and stopped when it's hidden.
+const SOCIAL_BAR_IS_VISIBLE_EVENT = '9c33a734-7ed8-4348-9e39-3c27f4dc2e62';
+
 const SOCIAL_BAR_NAME = 'com.endlessm.SocialBar';
 const SOCIAL_BAR_PATH = '/com/endlessm/SocialBar';
 const SOCIAL_BAR_IFACE = 'com.endlessm.SocialBar';
@@ -79,11 +82,9 @@ const SocialBar = new Lang.Class({
 
         let eventRecorder = EosMetrics.EventRecorder.get_default();
         if (this.Visible)
-            eventRecorder.record_start(EosMetrics.EVENT_SOCIAL_BAR_IS_VISIBLE,
-                                       null, null);
+            eventRecorder.record_start(SOCIAL_BAR_IS_VISIBLE_EVENT, null, null);
         else
-            eventRecorder.record_stop(EosMetrics.EVENT_SOCIAL_BAR_IS_VISIBLE,
-                                      null, null);
+            eventRecorder.record_stop(SOCIAL_BAR_IS_VISIBLE_EVENT, null, null);
     }
 
 });

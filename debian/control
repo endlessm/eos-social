@@ -12,7 +12,7 @@ Build-Depends: cdbs (>= 0.4.90~),
                libgjs-dev,
                libglib2.0-dev,
                libgtk-3-dev,
-               libwebkit2gtk-3.0-dev
+               libwebkit2gtk-4.0-dev
 Standards-Version: 3.9.2
 Homepage: http://www.endlessm.com
 
@@ -25,7 +25,7 @@ Depends: ${gir:Depends},
          gir1.2-eosmetrics-0,
          gir1.2-glib-2.0,
          gir1.2-gtk-3.0,
-         gir1.2-webkit2-3.0,
+         gir1.2-webkit2-4.0,
          gir1.2-wnck-3.0,
          gjs
 Description: Endless Social Bar installation package

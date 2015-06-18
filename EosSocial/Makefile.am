@@ -50,7 +50,7 @@ EosSocialPrivate_1_0_gir_LIBS = libeossocialprivate-1.0.la
 EosSocialPrivate_1_0_gir_CFLAGS = $(AM_CPPFLAGS) $(EOS_SOCIAL_CFLAGS)
 EosSocialPrivate_1_0_gir_SCANNERFLAGS = --warn-all --symbol-prefix=eos_social --identifier-prefix=EosSocial
 EosSocialPrivate_1_0_gir_INCLUDES = \
-	WebKit2-3.0
+	WebKit2-4.0
 EosSocialPrivate_1_0_gir_FILES = \
     $(addprefix $(srcdir)/,$(libeossocialprivate_1_0_la_SOURCES))
 

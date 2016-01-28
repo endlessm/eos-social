@@ -18,8 +18,9 @@ const WMInspect = imports.wmInspect;
 const SOCIAL_BAR_HOMEPAGE = 'https://m.facebook.com';
 const CANCELED_REQUEST_URI = 'about:blank';
 const FB_LINK_REDIRECT_KEY = '/render_linkshim_';
-const SOCIAL_BAR_WIDTH = 420;
-const MAX_FRACTION_OF_DISPLAY_WIDTH = 0.35;
+const FRACTION_OF_DISPLAY_WIDTH = 0.35;
+const MAX_WIDTH = 420;
+const MIN_WIDTH = 320;
 const SIDE_COMPONENT_ROLE = 'eos-side-component';
 
 function _parseLinkFromRedirect(uri) {
@@ -200,8 +201,9 @@ const SocialBarView = new Lang.Class({
 
     _getSize: function() {
         let workArea = this._getWorkArea();
-        let maxWidth = workArea.width * MAX_FRACTION_OF_DISPLAY_WIDTH;
-        return [Math.min(SOCIAL_BAR_WIDTH, maxWidth), workArea.height];
+        let width = workArea.width * FRACTION_OF_DISPLAY_WIDTH;
+        return [Math.max(Math.min(width, MAX_WIDTH), MIN_WIDTH),
+                workArea.height];
     },
 
     _updateGeometry: function() {

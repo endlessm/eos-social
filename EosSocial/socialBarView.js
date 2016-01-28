@@ -31,6 +31,8 @@ function _parseLinkFromRedirect(uri) {
 
 const ANIMATION_TIME = (500 * 1000); // half a second
 
+const BASE_DPI = 96; // base DPI when no font scaling is applied.
+
 const SocialBarTopbar = new Lang.Class({
     Name: 'SocialBarTopbar',
     Extends: Gtk.Toolbar,
@@ -263,6 +265,11 @@ const SocialBarView = new Lang.Class({
         let settings = this._browser.get_settings();
         settings.javascript_can_open_windows_automatically = true;
 
+        // Adjust the default font size depending on the text scaling factor.
+        let gtk_settings = Gtk.Settings.get_for_screen(this.get_screen());
+        this._updateZoomLevelFromGtkSettings(gtk_settings);
+        gtk_settings.connect('notify::gtk-xft-dpi', Lang.bind (this, this._updateZoomLevelFromGtkSettings));
+
         this._initCookies();
 
         this._browser.vexpand = true;
@@ -294,6 +301,18 @@ const SocialBarView = new Lang.Class({
 
         let forwardAction = this.lookup_action('forward');
         forwardAction.set_enabled(this._browser.can_go_forward());
+    },
+
+    _updateZoomLevelFromGtkSettings: function (gtk_settings) {
+        // The xft-dpi property stores DPI in 1024 * dots/inch.
+        let dpi = gtk_settings.gtk_xft_dpi / 1024;
+
+        // We can't use the usual approach used everywhere else (yelp, knowledge apps...)
+        // because facebook.com does not use relative units for font-size (it uses 'px'),
+        // so changing the default font size won't work, and we use the zoom level instead.
+        // That said, the facebook bar seems to work better when scaling everything and not
+        // just the text, so we leave the default for WebKitSetting 'zoom-text-only' (FALSE).
+        this._browser.set_zoom_level(dpi / BASE_DPI);
     },
 
     _onNetworkAvailable: function(networkMonitor) {

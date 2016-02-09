@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-social\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-26 06:25+0000\n"
+"POT-Creation-Date: 2016-02-02 03:13+0000\n"
 "PO-Revision-Date: 2014-10-06 05:06+0000\n"
 "Last-Translator: Eddy Alegria <eddy@endlessm.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/endless-mobile-inc/eos-social/language/es/)\n"
@@ -18,14 +18,14 @@ msgstr ""
 "Language: es\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../EosSocial/socialBarView.js:136
+#: ../EosSocial/socialBarView.js:139
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: ../EosSocial/socialBarView.js:137
+#: ../EosSocial/socialBarView.js:140
 msgid "Open"
 msgstr "Abrir"
 
-#: ../EosSocial/socialBarView.js:333
+#: ../EosSocial/socialBarView.js:354
 msgid "You’re not online! Connect your<br>internet to access Facebook."
 msgstr "¡No estás conectado!<br>Necesitas acceso a Internet<br>para entrar en Facebook"

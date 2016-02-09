@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-social\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-26 06:25+0000\n"
+"POT-Creation-Date: 2016-02-02 03:13+0000\n"
 "PO-Revision-Date: 2016-01-23 14:35+0000\n"
 "Last-Translator: liuxuejiao <liuxuejiao_endless@126.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/endless-mobile-inc/eos-social/language/zh_CN/)\n"
@@ -18,14 +18,14 @@ msgstr ""
 "Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../EosSocial/socialBarView.js:136
+#: ../EosSocial/socialBarView.js:139
 msgid "Cancel"
 msgstr "取消"
 
-#: ../EosSocial/socialBarView.js:137
+#: ../EosSocial/socialBarView.js:140
 msgid "Open"
 msgstr "打开"
 
-#: ../EosSocial/socialBarView.js:333
+#: ../EosSocial/socialBarView.js:354
 msgid "You’re not online! Connect your<br>internet to access Facebook."
 msgstr "您不在线！连接您的<br>网络以访问Facebook。"

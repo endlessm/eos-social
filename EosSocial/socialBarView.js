@@ -91,9 +91,9 @@ const SocialBarView = new Lang.Class({
                       application: application });
         this.get_style_context().add_class('socialbar-toplevel');
 
-        this._wmInspect = new WMInspect.WMInspect();
-        this._wmInspect.connect('active-window-changed', Lang.bind(this,
-            this._onActiveWindowChanged));
+        // Delay the initialization of this object until the sidebar's window
+        // has been made visible. See vfunc_state_flags_changed for details.
+        this._wmInspect = null;
 
         // stick on all desktop
         this.stick();
@@ -489,5 +489,24 @@ const SocialBarView = new Lang.Class({
 
     _openExternalPage: function(uri) {
         Gtk.show_uri(null, uri, Gtk.get_current_event_time());
+    },
+
+    // There seems to be a race condition with the WM that can lead the
+    // sidebar into an inconsistent state if the _onActiveWindowChanged
+    // callback gets executed in such a way that ends up calling to hide()
+    // between the user pressed the tray button and the sidebar has been
+    // made visible, which can lead to the sidebar never been displayed.
+    vfunc_state_flags_changed: function() {
+        // The whole purpose of this function is to initialize this.
+        if (this._wmInspect)
+            return;
+
+        // We want to wait as much as possible, so wait until it's
+        // the windows is in a visible state.
+        if (this.is_visible()) {
+            this._wmInspect = new WMInspect.WMInspect();
+            this._wmInspect.connect('active-window-changed', Lang.bind(this,
+                this._onActiveWindowChanged));
+        }
     }
 });

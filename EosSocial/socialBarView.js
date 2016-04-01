@@ -496,7 +496,9 @@ const SocialBarView = new Lang.Class({
     // callback gets executed in such a way that ends up calling to hide()
     // between the user pressed the tray button and the sidebar has been
     // made visible, which can lead to the sidebar never been displayed.
-    vfunc_state_flags_changed: function() {
+    vfunc_state_flags_changed: function(prevFlags) {
+        this.parent(prevFlags);
+
         // The whole purpose of this function is to initialize this.
         if (this._wmInspect)
             return;

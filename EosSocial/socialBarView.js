@@ -49,19 +49,19 @@ const SocialBarTopbar = new Lang.Class({
         this.add(leftItem);
 
         let backButton = new Gtk.Button({ child: new Gtk.Image({ pixel_size: 16,
-                                                                 icon_name: 'topbar-go-previous-symbolic' }),
+                                                                 icon_name: 'go-previous-symbolic' }),
                                           action_name: 'win.back'
                                         });
         leftButtons.add(backButton);
 
         let forwardButton = new Gtk.Button({ child: new Gtk.Image({ pixel_size: 16,
-                                                                    icon_name: 'topbar-go-next-symbolic' }),
+                                                                    icon_name: 'go-next-symbolic' }),
                                              action_name: 'win.forward'
                                            });
         leftButtons.add(forwardButton);
 
         let reloadButton = new Gtk.Button({ child: new Gtk.Image({ pixel_size: 16,
-                                                                   icon_name: 'topbar-refresh-symbolic' }),
+                                                                   icon_name: 'view-refresh-symbolic' }),
                                              action_name: 'win.reload'
                                            });
         leftButtons.add(reloadButton);

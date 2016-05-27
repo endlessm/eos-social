@@ -2,7 +2,7 @@
     background-color: transparent;
 }
 
-.socialbar-frame.frame {
+frame.socialbar-frame border {
     border-width: 0 0 0 6px;
     border-color: transparent;
 
@@ -12,7 +12,7 @@
                                   black 11px) 6 / 6px stretch;
 }
 
-.socialbar-frame.frame:dir(rtl) {
+frame.socialbar-frame border:dir(rtl) {
     border-width: 0 6px 0 0;
     border-color: transparent;
 
@@ -22,37 +22,37 @@
                                   black 11px) 6 / 6px stretch;
 }
 
-.socialbar-topbar.toolbar {
+toolbar.socialbar-topbar {
     padding: 5px 4px 4px;
     background-color: #3c3b37;
 }
 
-.socialbar-topbar.toolbar .button {
+toolbar.socialbar-topbar button {
     background: none;
     border: none;
-    padding: 6px;
+    min-height: 18px;
 
     color: #a0a0a0;
-    icon-shadow: 0 1px alpha(black, 0.5);
+    -gtk-icon-shadow: 0 1px alpha(black, 0.5);
     box-shadow: none;
 }
 
-.socialbar-topbar.toolbar .button:hover {
+toolbar.socialbar-topbar button:hover {
     color: #ffffff;
-    icon-shadow: 0 1px black;
+    -gtk-icon-shadow: 0 1px black;
 }
 
-.socialbar-topbar.toolbar .button:active,
-.socialbar-topbar.toolbar .button:hover:active {
+toolbar.socialbar-topbar button:active,
+toolbar.socialbar-topbar button:hover:active {
     color: #6e6e6e;
-    icon-shadow: 0 1px alpha(black, 0.5);
+    -gtk-icon-shadow: 0 1px alpha(black, 0.5);
 }
 
-.socialbar-topbar.toolbar .button *:insensitive {
+toolbar.socialbar-topbar button:disabled {
     color: alpha(black, 0.4);
-    icon-shadow: 0 1px alpha(white, 0.15);
+    -gtk-icon-shadow: 0 1px alpha(white, 0.15);
 }
 
 .socialbar-browser-frame {
-       background: white;
+    background: white;
 }

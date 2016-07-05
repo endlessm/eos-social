@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-social\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-21 02:11+0000\n"
-"PO-Revision-Date: 2016-04-16 04:39+0000\n"
+"POT-Creation-Date: 2016-06-28 02:14+0000\n"
+"PO-Revision-Date: 2016-07-03 06:01+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Thai (http://www.transifex.com/endless-mobile-inc/eos-social/language/th/)\n"
 "MIME-Version: 1.0\n"
@@ -19,12 +19,12 @@ msgstr ""
 
 #: ../EosSocial/socialBarView.js:139
 msgid "Cancel"
-msgstr ""
+msgstr "ยกเลิก"
 
 #: ../EosSocial/socialBarView.js:140
 msgid "Open"
-msgstr ""
+msgstr "เปิด"
 
 #: ../EosSocial/socialBarView.js:354
 msgid "You’re not online! Connect your<br>internet to access Facebook."
-msgstr ""
+msgstr "คุณไม่ได้ออนไลน์! เชื่อมต่อ <br> อินเทอร์เน็ตเพื่อเข้าถึง Facebook"

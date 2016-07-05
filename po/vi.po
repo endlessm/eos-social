@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-social\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-21 02:11+0000\n"
-"PO-Revision-Date: 2016-04-16 04:39+0000\n"
+"POT-Creation-Date: 2016-06-28 02:14+0000\n"
+"PO-Revision-Date: 2016-07-02 05:56+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/endless-mobile-inc/eos-social/language/vi/)\n"
 "MIME-Version: 1.0\n"
@@ -19,12 +19,12 @@ msgstr ""
 
 #: ../EosSocial/socialBarView.js:139
 msgid "Cancel"
-msgstr ""
+msgstr "Hủy bỏ"
 
 #: ../EosSocial/socialBarView.js:140
 msgid "Open"
-msgstr ""
+msgstr "Mở"
 
 #: ../EosSocial/socialBarView.js:354
 msgid "You’re not online! Connect your<br>internet to access Facebook."
-msgstr ""
+msgstr "Bạn không trực tuyến! Hãy kết nối <br>internet của bạn để truy cập Facebook."

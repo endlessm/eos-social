@@ -1,0 +1,31 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# 
+# Translators:
+# georgian balan <braila222@gmail.com>, 2016
+msgid ""
+msgstr ""
+"Project-Id-Version: eos-social\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-12-13 03:31+0000\n"
+"PO-Revision-Date: 2016-11-19 01:00+0000\n"
+"Last-Translator: Vicki Niu <vicki@endlessm.com>\n"
+"Language-Team: Romanian (http://www.transifex.com/endless-mobile-inc/eos-social/language/ro/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ro\n"
+"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));\n"
+
+#: ../EosSocial/socialBarView.js:139
+msgid "Cancel"
+msgstr "Anuleaza"
+
+#: ../EosSocial/socialBarView.js:140
+msgid "Open"
+msgstr "Deschide"
+
+#: ../EosSocial/socialBarView.js:354
+msgid "You’re not online! Connect your<br>internet to access Facebook."
+msgstr "Nu esti online!Conecteaza-te<br>la internet pentru a accesa Facebook"

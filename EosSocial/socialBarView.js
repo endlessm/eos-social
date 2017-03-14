@@ -496,12 +496,12 @@ const SocialBarView = new Lang.Class({
     // callback gets executed in such a way that ends up calling to hide()
     // between the user pressed the tray button and the sidebar has been
     // made visible, which can lead to the sidebar never been displayed.
-    vfunc_state_flags_changed: function(prevFlags) {
-        this.parent(prevFlags);
+    vfunc_map_event: function(event) {
+        let ret = this.parent(event);
 
         // The whole purpose of this function is to initialize this.
         if (this._wmInspect)
-            return;
+            return ret;
 
         // We want to wait as much as possible, so wait until it's
         // the windows is in a visible state.
@@ -510,5 +510,7 @@ const SocialBarView = new Lang.Class({
             this._wmInspect.connect('active-window-changed', Lang.bind(this,
                 this._onActiveWindowChanged));
         }
+
+        return ret;
     }
 });
